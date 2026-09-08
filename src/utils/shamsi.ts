@@ -186,11 +186,12 @@ export function getArchiveFileName(dateShamsi?: string, dayOfWeek?: string): str
  * 2. On the same date, later submission times (14:30 > 11:00) have higher weight
  * 3. Exact creation timestamps and IDs break ties deterministically
  */
-export function getReportSubmissionWeight(r: {
-  id?: string;
-  dateShamsi?: string;
-  submittedAt?: string;
+export function getReportSubmissionWeight(r: { 
+  id?: string; 
+  dateShamsi?: string; 
+  submittedAt?: string; 
   createdAt?: string;
+  updatedAt?: string;
 }): {
   shamsiScore: number;
   timeOfDaySeconds: number;
@@ -198,38 +199,48 @@ export function getReportSubmissionWeight(r: {
   id: string;
 } {
   let shamsiScore = 0;
-  if (r?.dateShamsi) {
-    const p = parseShamsiDate(r.dateShamsi);
-    if (p) {
-      shamsiScore = p.year * 10000 + p.month * 100 + p.day;
-    }
-  }
-
   let timeOfDaySeconds = 0;
-  if (r?.submittedAt) {
-    const en = toEnglishDigits(String(r.submittedAt)).trim();
-    const m = en.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
-    if (m) {
-      const h = parseInt(m[1], 10);
-      const min = parseInt(m[2], 10);
-      const s = m[3] ? parseInt(m[3], 10) : 0;
-      timeOfDaySeconds = h * 3600 + min * 60 + s;
-    }
-  } else if (r?.createdAt) {
-    const cDate = new Date(r.createdAt);
-    if (!isNaN(cDate.getTime())) {
-      timeOfDaySeconds = cDate.getHours() * 3600 + cDate.getMinutes() * 60 + cDate.getSeconds();
-    }
-  }
-
   let creationMs = 0;
-  if (r?.createdAt) {
-    const t = new Date(r.createdAt).getTime();
-    if (!isNaN(t) && t > 0) creationMs = t;
-  }
-  if (!creationMs && r?.id) {
-    const m = String(r.id).match(/\d{10,}/);
-    if (m) creationMs = parseInt(m[0], 10);
+
+  const createdTime = r?.createdAt ? new Date(r.createdAt).getTime() : 0;
+  const updatedTime = r?.updatedAt ? new Date(r.updatedAt).getTime() : 0;
+  const isUpdatedLater = updatedTime > createdTime + 60000;
+
+  if (isUpdatedLater) {
+    const uDate = new Date(updatedTime);
+    const uShamsi = getCurrentShamsiDate(uDate);
+    shamsiScore = uShamsi.year * 10000 + uShamsi.month * 100 + uShamsi.day;
+    timeOfDaySeconds = uDate.getHours() * 3600 + uDate.getMinutes() * 60 + uDate.getSeconds();
+    creationMs = updatedTime;
+  } else {
+    if (r?.dateShamsi) {
+      const p = parseShamsiDate(r.dateShamsi);
+      if (p) {
+        shamsiScore = p.year * 10000 + p.month * 100 + p.day;
+      }
+    }
+
+    if (r?.submittedAt) {
+      const en = toEnglishDigits(String(r.submittedAt)).trim();
+      const m = en.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+      if (m) {
+        const h = parseInt(m[1], 10);
+        const min = parseInt(m[2], 10);
+        const s = m[3] ? parseInt(m[3], 10) : 0;
+        timeOfDaySeconds = h * 3600 + min * 60 + s;
+      }
+    } else if (r?.createdAt) {
+      const cDate = new Date(r.createdAt);
+      if (!isNaN(cDate.getTime())) {
+        timeOfDaySeconds = cDate.getHours() * 3600 + cDate.getMinutes() * 60 + cDate.getSeconds();
+      }
+    }
+
+    if (createdTime > 0) creationMs = createdTime;
+    if (!creationMs && r?.id) {
+      const m = String(r.id).match(/\d{10,}/);
+      if (m) creationMs = parseInt(m[0], 10);
+    }
   }
 
   return {

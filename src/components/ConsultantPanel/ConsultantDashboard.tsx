@@ -545,6 +545,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
     const updatedReport: DailyReport = {
       ...parentReport,
       rows: updatedRows,
+      submittedAt: getCurrentTimeFormatted(),
       updatedAt: new Date().toISOString()
     };
 

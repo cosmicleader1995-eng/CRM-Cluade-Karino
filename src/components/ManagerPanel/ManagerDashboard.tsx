@@ -370,28 +370,61 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
       // Activity
       if (c.reports.length > 0) {
         c.latestReport = c.reports[0];
-        c.lastActivityDate = c.latestReport.dateShamsi;
-        c.lastActivityTime = c.latestReport.submittedAt;
+        const latestUpdateMs = c.latestReport.updatedAt ? new Date(c.latestReport.updatedAt).getTime() : 0;
+        const createdMs = c.latestReport.createdAt ? new Date(c.latestReport.createdAt).getTime() : 0;
+        const isUpdatedLater = latestUpdateMs > createdMs + 60000;
+
+        if (isUpdatedLater) {
+          const uDate = new Date(latestUpdateMs);
+          const uShamsi = getCurrentShamsiDate(uDate);
+          c.lastActivityDate = uShamsi.formatted;
+          const h = String(uDate.getHours()).padStart(2, '0');
+          const m = String(uDate.getMinutes()).padStart(2, '0');
+          c.lastActivityTime = `${toPersianDigits(h)}:${toPersianDigits(m)}`;
+        } else {
+          c.lastActivityDate = c.latestReport.dateShamsi;
+          c.lastActivityTime = c.latestReport.submittedAt;
+        }
         c.guild = c.latestReport.guild;
       }
 
-      // Check if submitted today strictly by Shamsi calendar date
+      // Check if submitted OR updated today (e.g. follow-ups 2-4 submitted today)
       c.hasSubmittedToday = c.reports.some(r => {
+        // 1. Check if dateShamsi is today
         const rParsed = parseShamsiDate(r.dateShamsi);
         if (rParsed) {
-          return (
+          if (
             rParsed.year === todayShamsiInfo.year &&
             rParsed.month === todayShamsiInfo.month &&
             rParsed.day === todayShamsiInfo.day
-          );
+          ) {
+            return true;
+          }
         }
+        // 2. Check if createdAt is today
         if (r.createdAt) {
           const cShamsi = getCurrentShamsiDate(new Date(r.createdAt));
-          return (
+          if (
             cShamsi.year === todayShamsiInfo.year &&
             cShamsi.month === todayShamsiInfo.month &&
             cShamsi.day === todayShamsiInfo.day
-          );
+          ) {
+            return true;
+          }
+        }
+        // 3. Check if updatedAt is today (Follow-up 2, 3, or 4 submitted today!)
+        if (r.updatedAt) {
+          const uDate = new Date(r.updatedAt);
+          if (!isNaN(uDate.getTime())) {
+            const uShamsi = getCurrentShamsiDate(uDate);
+            if (
+              uShamsi.year === todayShamsiInfo.year &&
+              uShamsi.month === todayShamsiInfo.month &&
+              uShamsi.day === todayShamsiInfo.day
+            ) {
+              return true;
+            }
+          }
         }
         return false;
       });
