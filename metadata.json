@@ -1,0 +1,8 @@
+{
+  "name": "سامانه مدیریت عملکرد و گزارشات اجرایی کارینو",
+  "description": "سامانه جامع گزارش‌گیری روزانه مشاوران، تحلیل هوشمند با Gemini AI، داشبورد نظارتی مدیریت و بایگانی مکانیزه مجموعه کارینو",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
