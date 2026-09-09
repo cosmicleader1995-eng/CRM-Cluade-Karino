@@ -480,7 +480,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   const handleOpenFollowUpModal = (item: UpcomingFollowUpItem) => {
     setActiveFollowUpTarget(item);
     setNewFollowUpSymbol('+');
-    setNewFollowUpResultText(item.followUpResult || '');
+    setNewFollowUpResultText('');
     setFollowUpSaveSuccess(false);
   };
 
