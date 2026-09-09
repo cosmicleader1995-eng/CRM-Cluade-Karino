@@ -1,5 +1,47 @@
-import { User, DailyReport, FollowUpStatusCode } from '../types';
+import { User, DailyReport, FollowUpStatusCode, ManagerDirective } from '../types';
 import { getCurrentShamsiDate } from '../utils/shamsi';
+
+export const DEFAULT_DIRECTIVES: ManagerDirective[] = [
+  {
+    id: 'dir-seed-1',
+    targetConsultantId: 'user-c101',
+    targetConsultantName: 'علیرضا رضایی',
+    authorName: 'مدیریت کارینو (CEO)',
+    content: 'پرونده کریمی و صنایع ریخته‌گری توس فولاد رو در اولویت قطعی امروز قرار بده.',
+    priority: 'high',
+    createdAt: new Date().toISOString(),
+    dateShamsi: 'امروز'
+  },
+  {
+    id: 'dir-seed-2',
+    targetConsultantId: 'all',
+    authorName: 'مدیریت کارینو (CEO)',
+    content: 'تمرکز تماس‌های این هفته بر روی عارضه‌یابی قراردادهای کار و پیشگیری از جرایم بازرسی تأمین اجتماعی است.',
+    priority: 'normal',
+    createdAt: new Date().toISOString(),
+    dateShamsi: 'امروز'
+  },
+  {
+    id: 'dir-seed-3',
+    targetConsultantId: 'user-c102',
+    targetConsultantName: 'مریم محمدی',
+    authorName: 'مدیریت کارینو (CEO)',
+    content: 'جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.',
+    priority: 'high',
+    createdAt: new Date().toISOString(),
+    dateShamsi: 'امروز'
+  },
+  {
+    id: 'dir-seed-4',
+    targetConsultantId: 'user-c103',
+    targetConsultantName: 'سعید حسینی',
+    authorName: 'مدیریت کارینو (CEO)',
+    content: 'تمرکز تماس‌های امروز بر مبالغ سفته و تضامین پرسنلی ویزیتورها و رانندگان پخش باشد.',
+    priority: 'normal',
+    createdAt: new Date().toISOString(),
+    dateShamsi: 'امروز'
+  }
+];
 
 export const FOLLOW_UP_STATUS_CODES: FollowUpStatusCode[] = [
   {
@@ -163,38 +205,48 @@ export const DEFAULT_USERS: User[] = [
 
 export function getInitialReports(): DailyReport[] {
   const now = new Date();
-  const todayInfo = getCurrentShamsiDate(now);
   
-  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-  const yesterdayInfo = getCurrentShamsiDate(yesterday);
+  const getRelativeInfo = (daysAgo: number) => {
+    const d = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
+    return {
+      date: d,
+      iso: d.toISOString(),
+      shamsi: getCurrentShamsiDate(d)
+    };
+  };
 
-  const fourDaysAgo = new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000);
-  const fourDaysAgoInfo = getCurrentShamsiDate(fourDaysAgo);
-
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const sevenDaysAgoInfo = getCurrentShamsiDate(sevenDaysAgo);
+  const day0 = getRelativeInfo(0);
+  const day1 = getRelativeInfo(1);
+  const day3 = getRelativeInfo(3);
+  const day4 = getRelativeInfo(4); // Step 2 (target 4d) - Today!
+  const day6 = getRelativeInfo(6); // Step 2 (target 4d) - Overdue by 2 days!
+  const day8 = getRelativeInfo(8); // Step 3 (target 8d) - Today!
+  const day9 = getRelativeInfo(9); // Step 3 (target 8d) - Overdue by 1 day!
 
   return [
-    // 1. Today's Report - Alireza Rezaei (C-101)
+    // -------------------------------------------------------------
+    // CONSULTANT 1: علیرضا رضایی (C-101) - Focus Profile for Testing
+    // -------------------------------------------------------------
+    // 1-1. Today's Report (Current Activity & Session Booked)
     {
-      id: 'rep-seed-1',
+      id: 'rep-c101-today',
       consultantId: 'user-c101',
       consultantName: 'علیرضا رضایی',
       consultantCode: 'C-101',
-      dateShamsi: todayInfo.formatted,
-      dayOfWeekShamsi: todayInfo.dayOfWeek,
+      dateShamsi: day0.shamsi.formatted,
+      dayOfWeekShamsi: day0.shamsi.dayOfWeek,
       guild: 'تولیدی قطعات خودرو و ریخته‌گری',
       status: 'approved',
-      managerFeedback: 'عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری هماهنگ شود.',
+      managerFeedback: 'عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری به خوبی هماهنگ شد.',
       managerRating: 5,
-      reviewedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdAt: now.toISOString(),
+      reviewedAt: day0.iso,
+      updatedAt: day0.iso,
+      createdAt: day0.iso,
       submittedAt: '۱۴:۳۰',
       personalOpinion: 'به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند.',
       rows: [
         {
-          id: 'row-seed-1-1',
+          id: 'row-c101-today-1',
           rowNumber: 1,
           clientName: 'صنایع ریخته‌گری توس فولاد',
           activityField: 'تولید قطعات چدنی خودرو',
@@ -211,25 +263,8 @@ export function getInitialReports(): DailyReport[] {
           notes: 'جلسه با مهندس صادقی (مدیرعامل) دوشنبه ساعت ۱۰:۰۰ در محل کارخانه تنظیم شد.'
         },
         {
-          id: 'row-seed-1-2',
+          id: 'row-c101-today-2',
           rowNumber: 2,
-          clientName: 'صنعتی پارت سازان خاور',
-          activityField: 'ماشین‌کاری قطعات حساس',
-          personnelCount: 22,
-          phone: '05135412233',
-          address: 'شهرک صنعتی فناوری‌های برتر',
-          employerConcern: 'عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی',
-          followUp1: '+',
-          followUp2: '+',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '',
-          meetingTopic: '',
-          notes: 'تماس دوم انجام شد؛ پیش‌نویس چک‌لیست حقوقی ارسال گردید، منتظر بررسی هیئت‌مدیره هستند.'
-        },
-        {
-          id: 'row-seed-1-3',
-          rowNumber: 3,
           clientName: 'کارگاه تراشکاری نوین صنعت',
           activityField: 'تراشکاری قطعات برنجی',
           personnelCount: 14,
@@ -242,11 +277,11 @@ export function getInitialReports(): DailyReport[] {
           followUp4: '',
           followUpResult: '',
           meetingTopic: '',
-          notes: 'مدیر کارگاه در خط تولید بود؛ تماس مجدد در نوبت عصر هماهنگ خواهد شد.'
+          notes: 'مدیر کارگاه در خط تولید بود؛ تماس مجدد هماهنگ خواهد شد.'
         },
         {
-          id: 'row-seed-1-4',
-          rowNumber: 4,
+          id: 'row-c101-today-3',
+          rowNumber: 3,
           clientName: 'قالب‌سازی دقیق البرز',
           activityField: 'طراحی قالب‌های سنبه ماتریس',
           personnelCount: 9,
@@ -259,47 +294,184 @@ export function getInitialReports(): DailyReport[] {
           followUp4: '',
           followUpResult: '- (اعلام عدم نیاز فعلی)',
           meetingTopic: '',
-          notes: 'کارفرما عنوان کرد فعلاً به دلیل نوسانات بازار برنامه اصلاح ساختار ندارند.'
-        },
-        {
-          id: 'row-seed-1-5',
-          rowNumber: 5,
-          clientName: 'ریخته‌گری آلومینیوم خاوران',
-          activityField: 'ریخته‌گری تحت فشار دایکست',
-          personnelCount: 30,
-          phone: '05138810011',
-          address: 'جاده قدیم نیشابور',
-          employerConcern: 'عدم تطابق فیش حقوقی، مزایای قانونی و تراز مالی با پرداختی واقعی',
-          followUp1: '*',
-          followUp2: '',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '* (شماره کارخانه تغییر یافته است)',
-          meetingTopic: '',
-          notes: 'خط قطع بود؛ نیاز به اصلاح شماره در پایگاه داده داده‌کاوی.'
+          notes: 'کارفرما عنوان کرد فعلاً برنامه اصلاح ساختار ندارند.'
         }
       ]
     },
 
-    // 2. Today's Report - Maryam Mohammadi (C-102)
+    // 1-2. Report from 6 Days Ago (Generates: 🔴 معوق — ۲ روز از پیگیری ۲)
     {
-      id: 'rep-seed-2',
-      consultantId: 'user-c102',
-      consultantName: 'مریم محمدی',
-      consultantCode: 'C-102',
-      dateShamsi: todayInfo.formatted,
-      dayOfWeekShamsi: todayInfo.dayOfWeek,
-      guild: 'فناوری اطلاعات و تجارت الکترونیک',
+      id: 'rep-c101-overdue-6d',
+      consultantId: 'user-c101',
+      consultantName: 'علیرضا رضایی',
+      consultantCode: 'C-101',
+      dateShamsi: day6.shamsi.formatted,
+      dayOfWeekShamsi: day6.shamsi.dayOfWeek,
+      guild: 'ماشین‌سازی و قطعه‌سازی خودرو',
+      status: 'approved',
+      managerFeedback: 'پرونده کارفرما احمدی را سریعاً تماس گرفته و تعیین تکلیف نمایید.',
+      managerRating: 4,
+      reviewedAt: day6.iso,
+      updatedAt: day6.iso,
+      createdAt: day6.iso,
+      submittedAt: '۱۶:۱۵',
+      personalOpinion: 'کارفرمایان این گروه به دلیل چالش تضامین و قراردادهای کارگری نیازمند پیگیری منظم هستند.',
+      rows: [
+        {
+          id: 'row-c101-ahmadi',
+          rowNumber: 1,
+          clientName: 'کارفرما احمدی (گروه صنعتی پارت گستر)',
+          activityField: 'تولید قطعات پرسی بدنه خودرو',
+          personnelCount: 35,
+          phone: '05138491122',
+          address: 'شهرک صنعتی توس، تلاش شمالی ۶',
+          employerConcern: 'عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی',
+          followUp1: '+',
+          followUp2: '',
+          followUp3: '',
+          followUp4: '',
+          followUpResult: '',
+          meetingTopic: 'تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی',
+          notes: 'در تماس اول بسیار مشتاق بودند؛ قرار شد بعد از ۴ روز برای ارسال پیش‌نویس تماس گرفته شود.'
+        }
+      ]
+    },
+
+    // 1-3. Report from 9 Days Ago (Generates: 🔴 معوق — ۱ روز از پیگیری ۳)
+    {
+      id: 'rep-c101-overdue-9d',
+      consultantId: 'user-c101',
+      consultantName: 'علیرضا رضایی',
+      consultantCode: 'C-101',
+      dateShamsi: day9.shamsi.formatted,
+      dayOfWeekShamsi: day9.shamsi.dayOfWeek,
+      guild: 'صنایع چاپ و بسته‌بندی صادراتی',
+      status: 'approved',
+      managerFeedback: 'پیگیری سوم کارفرما رضایی برای نهایی‌سازی قرارداد مشاوره بسیار حساس است.',
+      managerRating: 5,
+      reviewedAt: day9.iso,
+      updatedAt: day9.iso,
+      createdAt: day9.iso,
+      submittedAt: '۱۵:۰۰',
+      personalOpinion: 'چاپخانه‌ها با مسائل بیمه تأمین اجتماعی کارگران شیفت شب درگیرند.',
+      rows: [
+        {
+          id: 'row-c101-rezaei-client',
+          rowNumber: 1,
+          clientName: 'کارفرما رضایی (صنایع بسته‌بندی آرین نگین)',
+          activityField: 'تولید جعبه‌های دارویی و صادراتی',
+          personnelCount: 52,
+          phone: '05135429988',
+          address: 'شهرک صنعتی فناوری‌های برتر، صنعت ۴',
+          employerConcern: 'چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری',
+          followUp1: '+',
+          followUp2: '+',
+          followUp3: '',
+          followUp4: '',
+          followUpResult: '',
+          meetingTopic: 'تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی',
+          notes: 'تماس دوم عالی بود؛ پیش‌فاکتور ارسال شده و برای نهایی‌سازی نیاز به پیگیری ۳ دارد.'
+        }
+      ]
+    },
+
+    // 1-4. Report from 4 Days Ago (Generates: 🟢 برنامه امروز — پیگیری ۲ موعد امروز)
+    {
+      id: 'rep-c101-today-due-4d',
+      consultantId: 'user-c101',
+      consultantName: 'علیرضا رضایی',
+      consultantCode: 'C-101',
+      dateShamsi: day4.shamsi.formatted,
+      dayOfWeekShamsi: day4.shamsi.dayOfWeek,
+      guild: 'صنعتی و مهندسی دقیق',
       status: 'submitted',
       managerFeedback: '',
       managerRating: undefined,
-      updatedAt: new Date().toISOString(),
-      createdAt: now.toISOString(),
+      updatedAt: day4.iso,
+      createdAt: day4.iso,
+      submittedAt: '۱۱:۴۰',
+      personalOpinion: 'استقبال مدیرعامل در جلسه نخست امیدوارکننده بود.',
+      rows: [
+        {
+          id: 'row-c101-hosseini-client',
+          rowNumber: 1,
+          clientName: 'کارفرما حسینی (صنعتی پارت سازان خاور)',
+          activityField: 'ماشین‌کاری قطعات حساس موتور',
+          personnelCount: 22,
+          phone: '05135412233',
+          address: 'شهرک صنعتی فناوری‌های برتر',
+          employerConcern: 'ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد',
+          followUp1: '+',
+          followUp2: '',
+          followUp3: '',
+          followUp4: '',
+          followUpResult: '',
+          meetingTopic: 'عارضه‌یابی منابع انسانی و طراحی نظام پاداش و ارزیابی عملکرد',
+          notes: 'امروز دقیقاً موعد تماس دوم (روز چهارم) است.'
+        }
+      ]
+    },
+
+    // 1-5. Report from 8 Days Ago (Generates: 🟢 برنامه امروز — پیگیری ۳ موعد امروز)
+    {
+      id: 'rep-c101-today-due-8d',
+      consultantId: 'user-c101',
+      consultantName: 'علیرضا رضایی',
+      consultantCode: 'C-101',
+      dateShamsi: day8.shamsi.formatted,
+      dayOfWeekShamsi: day8.shamsi.dayOfWeek,
+      guild: 'تولید تجهیزات بالابری و صنعتی',
+      status: 'approved',
+      managerFeedback: 'این پرونده شانس بالایی برای تبدیل به قرارداد سالانه دارد.',
+      managerRating: 5,
+      reviewedAt: day8.iso,
+      updatedAt: day8.iso,
+      createdAt: day8.iso,
+      submittedAt: '۱۷:۲۰',
+      personalOpinion: 'نیاز جدی به استقرار نظام ایمنی و مسئولیت مدنی کارفرما دارند.',
+      rows: [
+        {
+          id: 'row-c101-nouri-client',
+          rowNumber: 1,
+          clientName: 'کارفرما نوری (تولیدی قطعات آسانسور پارس نوری)',
+          activityField: 'تولید درب و کابین آسانسور',
+          personnelCount: 31,
+          phone: '05136514455',
+          address: 'شهرک صنعتی کلات، خیابان تلاش ۳',
+          employerConcern: 'حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی',
+          followUp1: '+',
+          followUp2: '+',
+          followUp3: '',
+          followUp4: '',
+          followUpResult: '',
+          meetingTopic: 'آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار',
+          notes: 'پیگیری ۱ و ۲ با موفقیت انجام شده؛ امروز موعد تماس سوم برای ست کردن جلسه است.'
+        }
+      ]
+    },
+
+    // -------------------------------------------------------------
+    // CONSULTANT 2: مریم محمدی (C-102)
+    // -------------------------------------------------------------
+    {
+      id: 'rep-c102-today',
+      consultantId: 'user-c102',
+      consultantName: 'مریم محمدی',
+      consultantCode: 'C-102',
+      dateShamsi: day0.shamsi.formatted,
+      dayOfWeekShamsi: day0.shamsi.dayOfWeek,
+      guild: 'فناوری اطلاعات و تجارت الکترونیک',
+      status: 'approved',
+      managerFeedback: 'جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.',
+      managerRating: 5,
+      reviewedAt: day0.iso,
+      updatedAt: day0.iso,
+      createdAt: day0.iso,
       submittedAt: '۱۳:۱۵',
       personalOpinion: 'شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند.',
       rows: [
         {
-          id: 'row-seed-2-1',
+          id: 'row-c102-1',
           rowNumber: 1,
           clientName: 'شرکت دانش‌بنیان داده‌پردازان عصر نوین',
           activityField: 'توسعه نرم‌افزارهای سازمانی و هوش مصنوعی',
@@ -313,138 +485,71 @@ export function getInitialReports(): DailyReport[] {
           followUp4: '',
           followUpResult: '✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)',
           meetingTopic: 'تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی',
-          notes: 'جلسه تخصصی گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.'
-        },
-        {
-          id: 'row-seed-2-2',
-          rowNumber: 2,
-          clientName: 'پلتفرم خدمات ابری رایان‌سرویس',
-          activityField: 'ارائه زیرساخت و سرور ابری',
-          personnelCount: 24,
-          phone: '05137614455',
-          address: 'بلوار دستغیب، مجتمع تک',
-          employerConcern: 'ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد',
-          followUp1: '+',
-          followUp2: '',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '',
-          meetingTopic: '',
-          notes: 'مدیر مالی شرکت استقبال کرد؛ مستندات مقایسه‌ای مالیات حقوق ارسال شد.'
-        },
-        {
-          id: 'row-seed-2-3',
-          rowNumber: 3,
-          clientName: 'آژانس دیجیتال مارکتینگ صبا',
-          activityField: 'سئو و تبلیغات دیجیتال',
-          personnelCount: 16,
-          phone: '05138435566',
-          address: 'احمدآباد، خیابان عدالت',
-          employerConcern: 'ابهام در فرمول‌های پورسانت، پاداش و تارگت‌های فروش',
-          followUp1: '+',
-          followUp2: '',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '',
-          meetingTopic: '',
-          notes: 'درخواست راهنمایی در خصوص فرمول پورسانت پلکانی کارشناسان فروش.'
+          notes: 'جلسه گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.'
         }
       ]
     },
-
-    // 3. Yesterday's Report - Maryam Mohammadi (C-102)
     {
-      id: 'rep-seed-3',
+      id: 'rep-c102-overdue',
       consultantId: 'user-c102',
       consultantName: 'مریم محمدی',
       consultantCode: 'C-102',
-      dateShamsi: yesterdayInfo.formatted,
-      dayOfWeekShamsi: yesterdayInfo.dayOfWeek,
-      guild: 'صنایع غذایی و بسته‌بندی',
+      dateShamsi: day6.shamsi.formatted,
+      dayOfWeekShamsi: day6.shamsi.dayOfWeek,
+      guild: 'صنایع غذایی و کشاورزی',
       status: 'approved',
-      managerFeedback: 'نکات درج شده در خصوص شرکت فرآورده‌های لبنی کوهستان فوق‌العاده است. پشتیبانی کامل حقوقی داده شود.',
-      managerRating: 5,
-      reviewedAt: yesterday.toISOString(),
-      updatedAt: yesterday.toISOString(),
-      createdAt: yesterday.toISOString(),
+      managerFeedback: 'پشتیبانی کامل حقوقی داده شود.',
+      managerRating: 4,
+      reviewedAt: day6.iso,
+      updatedAt: day6.iso,
+      createdAt: day6.iso,
       submittedAt: '۱۶:۰۰',
-      personalOpinion: 'صنایع غذایی به دلیل شیفت‌های گردشی و سختی کار، ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند.',
+      personalOpinion: 'صنایع غذایی ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند.',
       rows: [
         {
-          id: 'row-seed-3-1',
+          id: 'row-c102-overdue-1',
           rowNumber: 1,
-          clientName: 'فرآورده‌های لبنی کوهستان مشهد',
-          activityField: 'تولید دوغ و ماست پاستوریزه',
-          personnelCount: 92,
-          phone: '05135421100',
-          address: 'شهرک صنعتی چناران',
-          employerConcern: 'پرونده‌های سخت و زیان‌آور و بازنشستگی‌های زودرس پیش‌بینی نشده',
-          followUp1: '+',
-          followUp2: '✓',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '✓ (جلسه حضوری با مدیر اداری ست شد)',
-          meetingTopic: 'تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی',
-          notes: 'مدیر اداری آقای رجبی بسیار پیگیر بودند؛ جلسه پنج‌شنبه ساعت ۱۱ صبح.'
-        },
-        {
-          id: 'row-seed-3-2',
-          rowNumber: 2,
-          clientName: 'صنایع بسته‌بندی ترنج سبز',
+          clientName: 'کارفرما کاظمی (صنایع بسته‌بندی ترنج سبز)',
           activityField: 'بسته‌بندی حبوبات و خشکبار صادراتی',
           personnelCount: 38,
           phone: '05135413344',
           address: 'شهرک صنعتی توس، فاز ۲',
           employerConcern: 'فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ',
           followUp1: '+',
-          followUp2: '+',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '',
-          meetingTopic: '',
-          notes: 'مذاکره اولیه انجام شد؛ منتظر تماس مجدد در چرخه پیگیری هستند.'
-        },
-        {
-          id: 'row-seed-3-3',
-          rowNumber: 3,
-          clientName: 'تولیدی کیک و کلوچه پردیس',
-          activityField: 'شیرینی و بیسکویت صنعتی',
-          personnelCount: 25,
-          phone: '05136517722',
-          address: 'شهرک صنعتی ماشین‌سازی',
-          employerConcern: 'چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری',
-          followUp1: '.',
           followUp2: '',
           followUp3: '',
           followUp4: '',
           followUpResult: '',
-          meetingTopic: '',
-          notes: 'مدیرعامل در جلسه بازرسی استاندارد بود.'
+          meetingTopic: 'تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی',
+          notes: 'نیازمند تماس فوری پیگیری دوم (۲ روز معوق).'
         }
       ]
     },
 
-    // 4. Report 4 Days Ago (4-Day Cycle Test) - Saeed Hosseini (C-103)
+    // -------------------------------------------------------------
+    // CONSULTANT 3: سعید حسینی (C-103)
+    // -------------------------------------------------------------
     {
-      id: 'rep-seed-4',
+      id: 'rep-c103-today',
       consultantId: 'user-c103',
       consultantName: 'سعید حسینی',
       consultantCode: 'C-103',
-      dateShamsi: fourDaysAgoInfo.formatted,
-      dayOfWeekShamsi: fourDaysAgoInfo.dayOfWeek,
+      dateShamsi: day4.shamsi.formatted,
+      dayOfWeekShamsi: day4.shamsi.dayOfWeek,
       guild: 'بازرگانی و پخش مویرگی',
-      status: 'submitted',
-      managerFeedback: '',
-      managerRating: undefined,
-      updatedAt: fourDaysAgo.toISOString(),
-      createdAt: fourDaysAgo.toISOString(),
+      status: 'approved',
+      managerFeedback: 'تمرکز بر روی مبالغ سفته و تضامین ویزیتورها باشد.',
+      managerRating: 4,
+      reviewedAt: day4.iso,
+      updatedAt: day4.iso,
+      createdAt: day4.iso,
       submittedAt: '۱۵:۴۵',
-      personalOpinion: 'شرکت‌های پخش به دلیل مبالغ سنگین ضمانت‌نامه‌های ویزیتورها و رانندگان، دغدغه فوری تنظیم سفته و قرارداد ضمانت دارند.',
+      personalOpinion: 'شرکت‌های پخش دغدغه فوری تنظیم سفته و قرارداد ضمانت دارند.',
       rows: [
         {
-          id: 'row-seed-4-1',
+          id: 'row-c103-1',
           rowNumber: 1,
-          clientName: 'شرکت بازرگانی پخش مویرگی کیان',
+          clientName: 'کارفرما شجاعی (شرکت بازرگانی پخش مویرگی کیان)',
           activityField: 'پخش سراسری مواد شوینده و بهداشتی',
           personnelCount: 65,
           phone: '02188991122',
@@ -455,68 +560,36 @@ export function getInitialReports(): DailyReport[] {
           followUp3: '',
           followUp4: '',
           followUpResult: '',
-          meetingTopic: '',
-          notes: 'امروز دقیقاً موعد تماس دوم در چرخه ۴ روزه است و سیستم آلارم پیگیری صادر کرده است.'
-        },
-        {
-          id: 'row-seed-4-2',
-          rowNumber: 2,
-          clientName: 'توزیع و پخش دارویی رازیان سلامت',
-          activityField: 'پخش اقلام دارویی و مکمل‌ها',
-          personnelCount: 42,
-          phone: '02166554433',
-          address: 'تهران، خیابان آزادی، نبش شادمان',
-          employerConcern: 'عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی',
-          followUp1: '+',
-          followUp2: '',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '',
-          meetingTopic: '',
-          notes: 'موعد تماس دوم فرارسیده؛ مدیر منابع انسانی تمایل به دریافت نمونه قرارداد امانی دارد.'
-        },
-        {
-          id: 'row-seed-4-3',
-          rowNumber: 3,
-          clientName: 'شرکت لجستیک سپهر ترابر',
-          activityField: 'خدمات انبارداری و ارسال مرسولات',
-          personnelCount: 28,
-          phone: '02155443322',
-          address: 'تهران، جاده مخصوص کرج، کیلومتر ۱۱',
-          employerConcern: 'حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی',
-          followUp1: '.',
-          followUp2: '',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '',
-          meetingTopic: '',
-          notes: 'در چرخه پیگیری قرار دارد.'
+          meetingTopic: 'آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار',
+          notes: 'امروز موعد تماس دوم است.'
         }
       ]
     },
 
-    // 5. Report 7 Days Ago (Overdue +4 Days Test) - Neda Karimi (C-104)
+    // -------------------------------------------------------------
+    // CONSULTANT 4: ندا کریمی (C-104)
+    // -------------------------------------------------------------
     {
-      id: 'rep-seed-5',
+      id: 'rep-c104-today',
       consultantId: 'user-c104',
       consultantName: 'ندا کریمی',
       consultantCode: 'C-104',
-      dateShamsi: sevenDaysAgoInfo.formatted,
-      dayOfWeekShamsi: sevenDaysAgoInfo.dayOfWeek,
+      dateShamsi: day6.shamsi.formatted,
+      dayOfWeekShamsi: day6.shamsi.dayOfWeek,
       guild: 'ساختمانی، انبوه‌سازی و تأسیسات',
       status: 'approved',
-      managerFeedback: 'دو مورد از کارفرمایان این لیست بیش از ۵ روز است که پیگیری نشده‌اند. لطفاً بلافاصله تماس گرفته شود.',
+      managerFeedback: 'پکیج مشاوره آیین‌نامه انضباطی برای کارگاه‌های بالای ۲۰ نفر معرفی شود.',
       managerRating: 4,
-      reviewedAt: sevenDaysAgo.toISOString(),
-      updatedAt: sevenDaysAgo.toISOString(),
-      createdAt: sevenDaysAgo.toISOString(),
+      reviewedAt: day6.iso,
+      updatedAt: day6.iso,
+      createdAt: day6.iso,
       submittedAt: '۱۲:۳۰',
-      personalOpinion: 'شرکت‌های پیمانکاری ساختمانی بیشترین حجم احضاریه‌های هیئت‌های تشخیص اداره کار را گزارش کردند.',
+      personalOpinion: 'شرکت‌های پیمانکاری بیشترین حجم احضاریه‌های هیئت‌های تشخیص را دارند.',
       rows: [
         {
-          id: 'row-seed-5-1',
+          id: 'row-c104-1',
           rowNumber: 1,
-          clientName: 'شرکت ساختمانی و ابنیه عمران گستر پارس',
+          clientName: 'کارفرما ابراهیمی (شرکت ابنیه عمران گستر)',
           activityField: 'پیمانکاری پروژه‌های مسکونی و تجاری',
           personnelCount: 115,
           phone: '05138447788',
@@ -527,44 +600,11 @@ export function getInitialReports(): DailyReport[] {
           followUp3: '',
           followUp4: '',
           followUpResult: '',
-          meetingTopic: '',
-          notes: 'بیش از ۶ روز از تماس اول گذشته؛ نیازمند تماس فوری پیگیری دوم (معوق).'
-        },
-        {
-          id: 'row-seed-5-2',
-          rowNumber: 2,
-          clientName: 'تأسیسات سرمایش و گرمایش آریا سازه',
-          activityField: 'اجرای موتورخانه و تأسیسات برج‌ها',
-          personnelCount: 29,
-          phone: '05137682211',
-          address: 'مشهد، بلوار پیروزی، نبش پیروزی ۳۴',
-          employerConcern: 'حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی',
-          followUp1: '+',
-          followUp2: '',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '',
-          meetingTopic: '',
-          notes: 'پیگیری معوق؛ در انتظار تماس بعدی.'
-        },
-        {
-          id: 'row-seed-5-3',
-          rowNumber: 3,
-          clientName: 'تولیدی سازه‌های بتنی پایدار',
-          activityField: 'تیرچه، بلوک و قطعات پیش‌ساخته بتنی',
-          personnelCount: 18,
-          phone: '05132459900',
-          address: 'جاده سیمان، کیلومتر ۴',
-          employerConcern: 'عدم رعایت دوره‌های آزمایشی و بلاتکلیفی حقوقی قراردادهای موقت',
-          followUp1: '-',
-          followUp2: '',
-          followUp3: '',
-          followUp4: '',
-          followUpResult: '- (عدم تمایل به تغییر رویه فعلی)',
-          meetingTopic: '',
-          notes: 'تماس اولیه منفی بود و خاتمه یافت.'
+          meetingTopic: 'مشاوره دفاعیات پرونده‌های مطروحه در هیئت‌های حل اختلاف',
+          notes: 'پیگیری معوق؛ تماس دوم باید فوری انجام شود.'
         }
       ]
     }
   ];
 }
+

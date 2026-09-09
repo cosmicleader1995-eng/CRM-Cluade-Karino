@@ -91,3 +91,41 @@ export interface AIAnalysisResult {
   marketOpportunities: string[];
   strategicActionItems: string[];
 }
+
+export interface ManagerDirective {
+  id: string;
+  targetConsultantId: string; // 'all' or specific consultantId/code
+  targetConsultantName?: string;
+  authorId?: string;
+  authorName: string;
+  content: string; // e.g. "پرونده کریمی رو اولویت بده"
+  priority: 'high' | 'normal';
+  createdAt: string;
+  dateShamsi: string;
+}
+
+export interface UpcomingFollowUpItem {
+  reportId: string;
+  reportDateShamsi: string;
+  createdAt: string;
+  guild: string;
+  rowNumber: number;
+  rowId: string;
+  clientName: string;
+  activityField: string;
+  phone: string;
+  address: string;
+  employerConcern: string;
+  meetingTopic: string;
+  followUp1: string;
+  followUp2: string;
+  followUp3: string;
+  followUp4: string;
+  followUpResult: string;
+  nextStepNumber: number; // 2, 3, or 4
+  elapsedDays: number;
+  daysRemaining: number;
+  statusCategory: 'today' | 'overdue' | 'future';
+}
+
+

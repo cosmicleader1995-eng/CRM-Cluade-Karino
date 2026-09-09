@@ -1,6 +1,6 @@
-import { User, DailyReport, ArchiveRecord, ReportRow } from '../types';
-import { DEFAULT_USERS, EMPLOYER_CONCERNS_LIST, getInitialReports } from '../data/defaultData';
-import { getCurrentShamsiDate, getArchiveFileName, compareReportsLatestFirst, normalizeShamsiDate, shamsiToDate, PERSIAN_WEEK_DAYS } from '../utils/shamsi';
+import { User, DailyReport, ArchiveRecord, ReportRow, ManagerDirective } from '../types';
+import { DEFAULT_USERS, EMPLOYER_CONCERNS_LIST, getInitialReports, DEFAULT_DIRECTIVES } from '../data/defaultData';
+import { getCurrentShamsiDate, getArchiveFileName, compareReportsLatestFirst, normalizeShamsiDate, shamsiToDate, PERSIAN_WEEK_DAYS, toEnglishDigits } from '../utils/shamsi';
 
 const STORAGE_KEYS = {
   USERS: 'karino_users_v2',
@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   REPORTS: 'karino_reports_v2',
   ARCHIVES: 'karino_archives_v2',
   CONCERNS: 'karino_concerns_v2',
+  DIRECTIVES: 'karino_directives_v2',
   DRAFTS: 'karino_draft_v2',
   LAST_ARCHIVE_DATE: 'karino_last_archive_date_v2',
   DOWNLOADED_ARCHIVES: 'karino_downloaded_archives_v3',
@@ -27,6 +28,7 @@ interface CloudDatabaseState {
   reports: DailyReport[];
   archives: ArchiveRecord[];
   concerns: string[];
+  directives?: ManagerDirective[];
   logs?: any[];
   stats?: any;
 }
@@ -36,6 +38,7 @@ let cachedUsers: User[] = [];
 let cachedReports: DailyReport[] = [];
 let cachedArchives: ArchiveRecord[] = [];
 let cachedConcerns: string[] = [];
+let cachedDirectives: ManagerDirective[] = [];
 let isSyncInProgress = false;
 
 // Custom Event to notify React components to re-render
@@ -53,12 +56,10 @@ function getCurrentFullState(): CloudDatabaseState {
     users: getStoredUsers(),
     reports: getStoredReports(),
     archives: getStoredArchives(),
-    concerns: getStoredConcerns()
+    concerns: getStoredConcerns(),
+    directives: getStoredDirectives()
   };
 }
-
-// Import toEnglishDigits from shamsi utils
-import { toEnglishDigits } from '../utils/shamsi';
 
 // Row-level merger to guarantee NO follow-up or client row data is ever dropped
 function mergeReportRows(localRows: ReportRow[], remoteRows: ReportRow[]): ReportRow[] {
@@ -152,13 +153,21 @@ function mergeStates(local: CloudDatabaseState, remote: CloudDatabaseState): Clo
   const concernSet = new Set<string>([...(remote.concerns || []), ...(local.concerns || []), ...EMPLOYER_CONCERNS_LIST]);
   const mergedConcerns = Array.from(concernSet);
 
+  // Merge directives
+  const dirMap = new Map<string, ManagerDirective>();
+  DEFAULT_DIRECTIVES.forEach(d => dirMap.set(d.id, d));
+  (remote.directives || []).forEach(d => dirMap.set(d.id, d));
+  (local.directives || []).forEach(d => dirMap.set(d.id, d));
+  const mergedDirectives = Array.from(dirMap.values());
+
   return {
     version: '2.5',
     lastUpdated: new Date().toISOString(),
     users: mergedUsers,
     reports: mergedReports,
     archives: mergedArchives,
-    concerns: mergedConcerns
+    concerns: mergedConcerns,
+    directives: mergedDirectives
   };
 }
 
@@ -263,6 +272,12 @@ export async function syncWithServer(): Promise<boolean> {
       if (JSON.stringify(merged.concerns) !== JSON.stringify(cachedConcerns)) {
         cachedConcerns = merged.concerns;
         localStorage.setItem(STORAGE_KEYS.CONCERNS, JSON.stringify(merged.concerns));
+        changed = true;
+      }
+
+      if (merged.directives && JSON.stringify(merged.directives) !== JSON.stringify(cachedDirectives)) {
+        cachedDirectives = merged.directives;
+        localStorage.setItem(STORAGE_KEYS.DIRECTIVES, JSON.stringify(merged.directives));
         changed = true;
       }
 
@@ -965,4 +980,80 @@ export function processNightlyArchive(): void {
 
 export function checkAndTriggerNightlyArchive(): void {
   processNightlyArchive();
+}
+
+// -----------------------------------------------------------
+// MANAGER DIRECTIVES (Orders & Notes to Consultants)
+// -----------------------------------------------------------
+export function getStoredDirectives(): ManagerDirective[] {
+  if (cachedDirectives.length > 0) {
+    return cachedDirectives;
+  }
+
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.DIRECTIVES);
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        cachedDirectives = parsed;
+        return parsed;
+      }
+    }
+  } catch (e) {}
+
+  cachedDirectives = DEFAULT_DIRECTIVES;
+  try {
+    localStorage.setItem(STORAGE_KEYS.DIRECTIVES, JSON.stringify(DEFAULT_DIRECTIVES));
+  } catch (e) {}
+  return DEFAULT_DIRECTIVES;
+}
+
+export function saveDirective(directive: ManagerDirective): void {
+  const current = getStoredDirectives();
+  const existingIdx = current.findIndex(d => d.id === directive.id);
+  if (existingIdx >= 0) {
+    current[existingIdx] = directive;
+  } else {
+    current.unshift(directive);
+  }
+
+  cachedDirectives = current;
+  try {
+    localStorage.setItem(STORAGE_KEYS.DIRECTIVES, JSON.stringify(current));
+  } catch (e) {}
+  notifyDbListeners();
+
+  const fullState = getCurrentFullState();
+  persistCloudDatabase(fullState);
+
+  fetch('/api/db/directives', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(directive)
+  }).catch(() => {});
+}
+
+export function deleteDirective(id: string): void {
+  const current = getStoredDirectives().filter(d => d.id !== id);
+  cachedDirectives = current;
+  try {
+    localStorage.setItem(STORAGE_KEYS.DIRECTIVES, JSON.stringify(current));
+  } catch (e) {}
+  notifyDbListeners();
+
+  const fullState = getCurrentFullState();
+  persistCloudDatabase(fullState);
+
+  fetch(`/api/db/directives/${id}`, {
+    method: 'DELETE'
+  }).catch(() => {});
+}
+
+export function getDirectivesForConsultant(consultantId: string, consultantCode?: string): ManagerDirective[] {
+  const all = getStoredDirectives();
+  return all.filter(d => 
+    d.targetConsultantId === 'all' || 
+    d.targetConsultantId === consultantId ||
+    (consultantCode && d.targetConsultantId?.toUpperCase() === consultantCode.toUpperCase())
+  );
 }

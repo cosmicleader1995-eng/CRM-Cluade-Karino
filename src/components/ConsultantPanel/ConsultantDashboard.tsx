@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, DailyReport, ReportRow } from '../../types';
+import { User, DailyReport, ReportRow, ManagerDirective, UpcomingFollowUpItem } from '../../types';
 import { 
   getStoredConcerns, 
   saveReport, 
@@ -7,7 +7,8 @@ import {
   getStoredReports, 
   saveDraft, 
   getDraft, 
-  clearDraft 
+  clearDraft,
+  getStoredDirectives
 } from '../../services/storage';
 import { MEETING_TOPICS_LIST, FOLLOW_UP_STATUS_CODES } from '../../data/defaultData';
 import { getCurrentShamsiDate, toPersianDigits, toEnglishDigits, getCurrentTimeFormatted, shamsiToDate } from '../../utils/shamsi';
@@ -15,6 +16,7 @@ import { exportSingleReportToExcel, printOfficialReport } from '../../utils/expo
 import { FollowUpSelector } from '../common/FollowUpSelector';
 import { FollowUpBadge } from '../common/FollowUpBadge';
 import { ScrollableTabs, TabItem } from '../common/ScrollableTabs';
+import { MorningDashboard } from './MorningDashboard';
 import confetti from 'canvas-confetti';
 
 import { 
@@ -40,41 +42,19 @@ import {
   X,
   AlertTriangle,
   RotateCcw,
-  Check
+  Check,
+  Flame
 } from 'lucide-react';
 
 interface ConsultantDashboardProps {
   currentUser: User;
 }
 
-interface UpcomingFollowUpItem {
-  reportId: string;
-  reportDateShamsi: string;
-  createdAt: string;
-  guild: string;
-  rowNumber: number;
-  rowId: string;
-  clientName: string;
-  activityField: string;
-  phone: string;
-  address: string;
-  employerConcern: string;
-  meetingTopic: string;
-  followUp1: string;
-  followUp2: string;
-  followUp3: string;
-  followUp4: string;
-  followUpResult: string;
-  nextStepNumber: number; // 2, 3, or 4
-  elapsedDays: number;
-  daysRemaining: number;
-  statusCategory: 'today' | 'overdue' | 'future';
-}
-
 export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ currentUser }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'form' | 'upcoming' | 'history'>('form');
+  const [activeSubTab, setActiveSubTab] = useState<'morning' | 'form' | 'upcoming' | 'history'>('morning');
   const [concernsList, setConcernsList] = useState<string[]>(getStoredConcerns());
   const [allReports, setAllReports] = useState<DailyReport[]>(getStoredReports());
+  const [directives, setDirectives] = useState<ManagerDirective[]>(getStoredDirectives());
   
   // Header form states
   const shamsi = getCurrentShamsiDate();
@@ -120,6 +100,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   const reloadData = () => {
     setConcernsList(getStoredConcerns());
     setAllReports(getStoredReports());
+    setDirectives(getStoredDirectives());
   };
 
   // Listen to live database sync from server
@@ -620,6 +601,13 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
           className="w-full sm:w-auto"
           tabs={[
             {
+              id: 'morning',
+              label: '📋 برنامه روزانه (داشبورد هوشمند)',
+              icon: Flame,
+              badge: (overdueFollowUps.length + todayFollowUps.length) > 0 ? toPersianDigits(overdueFollowUps.length + todayFollowUps.length) : undefined,
+              badgeColor: overdueFollowUps.length > 0 ? 'bg-rose-500 text-white animate-pulse' : 'bg-emerald-500 text-white'
+            },
+            {
               id: 'form',
               label: editingReportId ? 'ویرایش و تکمیل گزارش' : 'فرم ثبت گزارش عملکرد روزانه',
               icon: FilePlus
@@ -647,6 +635,19 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
           </div>
         )}
       </div>
+
+      {/* TAB 0: MORNING DASHBOARD (TODAY'S PLAN & OVERDUE ACTIONS) */}
+      {activeSubTab === 'morning' && (
+        <MorningDashboard
+          currentUser={currentUser}
+          reports={allReports}
+          directives={directives}
+          upcomingFollowUps={upcomingFollowUps}
+          onOpenFollowUp={handleOpenFollowUpModal}
+          onGoToReportForm={() => setActiveSubTab('form')}
+          onGoToFollowUpsTab={() => setActiveSubTab('upcoming')}
+        />
+      )}
 
       {/* TAB 1: FORM VIEW (NEW OR EDIT) */}
       {activeSubTab === 'form' && (

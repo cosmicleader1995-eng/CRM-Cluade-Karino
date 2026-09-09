@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, DailyReport, ArchiveRecord, AIAnalysisResult } from '../../types';
+import { User, DailyReport, ArchiveRecord, AIAnalysisResult, ManagerDirective } from '../../types';
 import { 
   getStoredReports, 
   getStoredUsers, 
@@ -7,7 +7,10 @@ import {
   createArchiveRecord, 
   updateReportStatus,
   getStoredConcerns,
-  saveConcerns
+  saveConcerns,
+  getStoredDirectives,
+  saveDirective,
+  deleteDirective
 } from '../../services/storage';
 import { 
   getCurrentShamsiDate, 
@@ -92,6 +95,12 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
   const [users, setUsers] = useState<User[]>(getStoredUsers());
   const [archives, setArchives] = useState<ArchiveRecord[]>(getStoredArchives());
   const [concerns, setConcerns] = useState<string[]>(getStoredConcerns());
+  const [directives, setDirectives] = useState<ManagerDirective[]>(getStoredDirectives());
+  
+  // Directive Form States
+  const [newDirectiveTarget, setNewDirectiveTarget] = useState('all');
+  const [newDirectivePriority, setNewDirectivePriority] = useState<'normal' | 'high'>('normal');
+  const [newDirectiveContent, setNewDirectiveContent] = useState('');
   
   // Filtering & search for All Reports table
   const [searchQuery, setSearchQuery] = useState('');
@@ -122,6 +131,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
     setUsers(getStoredUsers());
     setArchives(getStoredArchives());
     setConcerns(getStoredConcerns());
+    setDirectives(getStoredDirectives());
   };
 
   // Sync listener with cloud storage
@@ -146,6 +156,31 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
   }, [selectedReportDetail, selectedConsultantDetail]);
 
   const todayShamsiInfo = useMemo(() => getCurrentShamsiDate(), []);
+
+  const handleAddDirective = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newDirectiveContent.trim()) return;
+
+    const newDir: ManagerDirective = {
+      id: `dir-${Date.now()}`,
+      authorId: currentUser.id,
+      authorName: currentUser.fullName || 'مدیریت کارینو',
+      targetConsultantId: newDirectiveTarget,
+      content: newDirectiveContent.trim(),
+      priority: newDirectivePriority,
+      dateShamsi: todayShamsiInfo.formatted,
+      createdAt: new Date().toISOString()
+    };
+
+    saveDirective(newDir);
+    setDirectives(getStoredDirectives());
+    setNewDirectiveContent('');
+  };
+
+  const handleDeleteDirective = (id: string) => {
+    deleteDirective(id);
+    setDirectives(getStoredDirectives());
+  };
 
   // Helper to normalize Persian/Arabic digits to English
   const toEnDigits = (str: string) => (str || '').replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d).toString());
@@ -1149,6 +1184,126 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
 
               </div>
             ))}
+          </div>
+
+          {/* MANAGER DIRECTIVES & PRIORITIES MANAGEMENT (Pushed to Morning Dashboard) */}
+          <div id="manager-directives-section" className="bg-white rounded-3xl border border-[#E6DAC8] p-5 sm:p-6 shadow-sm space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6DAC8] pb-4">
+              <div>
+                <h4 className="text-base font-black text-[#2B1810] flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-[#9C6644]" />
+                  <span>ابلاغ دستورات و اولویت‌های کاری به مشاوران (داشبورد صبحگاهی)</span>
+                </h4>
+                <p className="text-xs text-[#6F4E37] mt-0.5">
+                  دستورات ثبت‌شده در این بخش، فوراً در پنل و داشبورد صبحگاهی مشاوران هدف نمایش داده می‌شود.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-[#5C4033] bg-[#FAF7F2] px-3 py-1.5 rounded-xl border border-[#E6DAC8] self-start sm:self-center">
+                {toPersianDigits(directives.length)} دستور ثبت‌شده
+              </span>
+            </div>
+
+            {/* Form to Add New Directive */}
+            <form onSubmit={handleAddDirective} className="bg-[#FAF7F2] p-4 rounded-2xl border border-[#DEC8B0] space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-[#6F4E37] mb-1">مشاور هدف:</label>
+                  <select
+                    value={newDirectiveTarget}
+                    onChange={(e) => setNewDirectiveTarget(e.target.value)}
+                    className="w-full bg-white border border-[#DEC8B0] focus:border-[#9C6644] rounded-xl px-3 py-2 text-xs font-bold text-[#2B1810] focus:outline-none"
+                  >
+                    <option value="all">📢 عمومی (تمام مشاوران اجرایی)</option>
+                    {consultantsAggregatedList.map(c => (
+                      <option key={c.consultantId} value={c.consultantId}>
+                        {c.consultantName} ({c.consultantCode})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#6F4E37] mb-1">اولویت دستور:</label>
+                  <select
+                    value={newDirectivePriority}
+                    onChange={(e) => setNewDirectivePriority(e.target.value as any)}
+                    className="w-full bg-white border border-[#DEC8B0] focus:border-[#9C6644] rounded-xl px-3 py-2 text-xs font-bold text-[#2B1810] focus:outline-none"
+                  >
+                    <option value="normal">عادی</option>
+                    <option value="high">⚡ اولویت فوری و حیاتی</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#6F4E37] mb-1">متن دستور / اولویت پرونده‌ها:</label>
+                <textarea
+                  rows={2}
+                  value={newDirectiveContent}
+                  onChange={(e) => setNewDirectiveContent(e.target.value)}
+                  placeholder="مثال: پرونده کارفرما کریمی (ریخته‌گری) را امروز حتماً در اولویت تماس و ست جلسه قرار دهید..."
+                  className="w-full bg-white border border-[#DEC8B0] focus:border-[#9C6644] rounded-xl p-3 text-xs text-[#2B1810] placeholder-[#8D5B4C] focus:outline-none font-medium"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#9C6644] hover:bg-[#7F4F24] text-white text-xs font-bold shadow-sm flex items-center gap-2 cursor-pointer transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>ثبت و ابلاغ به داشبورد مشاور</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Existing Directives List */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-[#6F4E37] block">دستورات فعال در سامانه:</span>
+              {directives.length === 0 ? (
+                <p className="text-xs text-slate-400 py-3 text-center">هیچ دستور فعالی ثبت نشده است.</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {directives.map(dir => {
+                    const targetName = dir.targetConsultantId === 'all' 
+                      ? 'تمام مشاوران' 
+                      : (consultantsAggregatedList.find(c => c.consultantId === dir.targetConsultantId || c.consultantCode === dir.targetConsultantId)?.consultantName || dir.targetConsultantId);
+                    
+                    return (
+                      <div 
+                        key={dir.id}
+                        className={`p-3.5 rounded-2xl border flex items-start justify-between gap-3 ${
+                          dir.priority === 'high'
+                            ? 'bg-rose-50 border-rose-200 text-rose-950'
+                            : 'bg-[#FAF7F2] border-[#E6DAC8] text-[#2B1810]'
+                        }`}
+                      >
+                        <div className="space-y-1 text-xs">
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              dir.priority === 'high' ? 'bg-rose-200 text-rose-900' : 'bg-[#E6DAC8] text-[#5C4033]'
+                            }`}>
+                              {dir.priority === 'high' ? 'فوری' : 'عادی'}
+                            </span>
+                            <span className="font-bold text-[#6F4E37]">برای: {targetName}</span>
+                            <span className="text-slate-400">• {dir.dateShamsi}</span>
+                          </div>
+                          <p className="font-medium leading-relaxed pt-1">{dir.content}</p>
+                        </div>
+
+                        <button
+                          onClick={() => handleDeleteDirective(dir.id)}
+                          className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-100 rounded-lg transition-colors shrink-0"
+                          title="حذف دستور"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
         </div>

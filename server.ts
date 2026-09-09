@@ -156,6 +156,7 @@ interface DatabaseSchema {
   reports: any[];
   archives: any[];
   concerns: string[];
+  directives?: any[];
   logs: any[];
   stats?: {
     totalWrites: number;
@@ -426,9 +427,6 @@ async function persistDB(data: DatabaseSchema): Promise<void> {
 // ----------------------------------------------------
 // DATABASE REST API ROUTES (Sync across all devices)
 // ----------------------------------------------------
-
-// Import toEnglishDigits from shamsi utilities
-import { toEnglishDigits } from './src/utils/shamsi';
 
 // Direct Real-time Authentication & Login Endpoint (100% Reliable Cross-Device Auth)
 app.post('/api/auth/login', async (req, res) => {
@@ -709,6 +707,39 @@ app.post('/api/db/concerns', async (req, res) => {
   await persistDB(db);
   res.json({ success: true, concerns: db.concerns });
 });
+
+// 4.1. DIRECTIVES Endpoints (Management Notes & Prioritizations)
+app.get('/api/db/directives', async (req, res) => {
+  const db = await getDB();
+  res.json({ success: true, directives: db.directives || [] });
+});
+
+app.post('/api/db/directives', async (req, res) => {
+  const directive = req.body;
+  if (!directive || !directive.id || !directive.content) {
+    return res.status(400).json({ error: 'اطلاعات یادداشت مدیریت ناقص است.' });
+  }
+  const db = await getDB();
+  if (!db.directives) db.directives = [];
+  const idx = db.directives.findIndex((d: any) => d.id === directive.id);
+  if (idx >= 0) {
+    db.directives[idx] = directive;
+  } else {
+    db.directives.unshift(directive);
+  }
+  await persistDB(db);
+  res.json({ success: true, directives: db.directives });
+});
+
+app.delete('/api/db/directives/:id', async (req, res) => {
+  const { id } = req.params;
+  const db = await getDB();
+  if (!db.directives) db.directives = [];
+  db.directives = db.directives.filter((d: any) => d.id !== id);
+  await persistDB(db);
+  res.json({ success: true, directives: db.directives });
+});
+
 
 // 5. ARCHIVES Endpoints
 app.post('/api/db/archive', async (req, res) => {
