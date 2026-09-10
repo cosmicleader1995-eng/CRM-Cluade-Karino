@@ -61,40 +61,47 @@ function getCurrentFullState(): CloudDatabaseState {
   };
 }
 
-// Row-level merger to guarantee NO follow-up or client row data is ever dropped
-function mergeReportRows(localRows: ReportRow[], remoteRows: ReportRow[]): ReportRow[] {
+// Row-level merger to guarantee NO follow-up or client row data is ever dropped while preserving recent edits
+function mergeReportRows(newerRows: ReportRow[], olderRows: ReportRow[]): ReportRow[] {
   const rowMap = new Map<string, ReportRow>();
 
-  // Index remote rows
-  (remoteRows || []).forEach((r, idx) => {
+  // 1. First index older/existing rows
+  (olderRows || []).forEach((r, idx) => {
     const key = r.id || `row-${r.rowNumber || idx + 1}`;
     rowMap.set(key, { ...r });
   });
 
-  // Merge local rows on top
-  (localRows || []).forEach((l, idx) => {
-    const key = l.id || `row-${l.rowNumber || idx + 1}`;
-    const existing = rowMap.get(key);
-    if (!existing) {
-      rowMap.set(key, { ...l });
+  // 2. Overlay newer rows, giving priority to the newer state while preserving missing optional fields
+  (newerRows || []).forEach((n, idx) => {
+    const key = n.id || `row-${n.rowNumber || idx + 1}`;
+    const older = rowMap.get(key);
+    if (!older) {
+      rowMap.set(key, { ...n });
     } else {
-      // Intelligently merge: preserve non-empty follow-ups and updated text
+      // Intelligently merge: newer row values have priority.
+      // Retain older follow-up steps only if newer hasn't set them yet.
       const merged: ReportRow = {
-        ...existing,
-        ...l,
-        clientName: l.clientName || existing.clientName,
-        activityField: l.activityField || existing.activityField,
-        personnelCount: l.personnelCount !== undefined && l.personnelCount !== '' ? l.personnelCount : existing.personnelCount,
-        phone: l.phone || existing.phone,
-        address: l.address || existing.address,
-        employerConcern: l.employerConcern || existing.employerConcern,
-        followUp1: l.followUp1 || existing.followUp1 || '',
-        followUp2: l.followUp2 || existing.followUp2 || '',
-        followUp3: l.followUp3 || existing.followUp3 || '',
-        followUp4: l.followUp4 || existing.followUp4 || '',
-        followUpResult: l.followUpResult || existing.followUpResult || '',
-        meetingTopic: l.meetingTopic || existing.meetingTopic || '',
-        notes: l.notes || existing.notes || ''
+        ...older,
+        ...n,
+        clientName: n.clientName !== undefined && n.clientName !== '' ? n.clientName : older.clientName,
+        activityField: n.activityField !== undefined && n.activityField !== '' ? n.activityField : older.activityField,
+        personnelCount: n.personnelCount !== undefined && n.personnelCount !== '' ? n.personnelCount : older.personnelCount,
+        phone: n.phone !== undefined && n.phone !== '' ? n.phone : older.phone,
+        address: n.address !== undefined && n.address !== '' ? n.address : older.address,
+        employerConcern: n.employerConcern !== undefined && n.employerConcern !== '' ? n.employerConcern : older.employerConcern,
+        // For follow-up stages 1 to 4: newer row's explicit value wins; if empty, preserve older if present
+        followUp1: n.followUp1 || older.followUp1 || '',
+        followUp2: n.followUp2 || older.followUp2 || '',
+        followUp3: n.followUp3 || older.followUp3 || '',
+        followUp4: n.followUp4 || older.followUp4 || '',
+        followUp1Date: n.followUp1Date || older.followUp1Date,
+        followUp2Date: n.followUp2Date || older.followUp2Date,
+        followUp3Date: n.followUp3Date || older.followUp3Date,
+        followUp4Date: n.followUp4Date || older.followUp4Date,
+        // For followUpResult and meetingTopic: newer row takes priority (even if edited or refined)
+        followUpResult: n.followUpResult !== undefined && n.followUpResult !== '' ? n.followUpResult : (older.followUpResult || ''),
+        meetingTopic: n.meetingTopic !== undefined ? n.meetingTopic : (older.meetingTopic || ''),
+        notes: n.notes !== undefined ? n.notes : (older.notes || '')
       };
       rowMap.set(key, merged);
     }
@@ -125,7 +132,7 @@ function mergeStates(local: CloudDatabaseState, remote: CloudDatabaseState): Clo
       const base = timeLocal >= timeRemote ? r : existing;
       const other = timeLocal >= timeRemote ? existing : r;
 
-      const mergedRows = mergeReportRows(r.rows || [], existing.rows || []);
+      const mergedRows = mergeReportRows(base.rows || [], other.rows || []);
 
       reportMap.set(r.id, {
         ...other,
@@ -143,11 +150,27 @@ function mergeStates(local: CloudDatabaseState, remote: CloudDatabaseState): Clo
 
   const mergedReports = Array.from(reportMap.values()).sort(compareReportsLatestFirst);
 
-  // Merge archives uniquely by id
+  // Merge archives uniquely by dateShamsi (1 daily archive file per calendar day)
   const archiveMap = new Map<string, ArchiveRecord>();
-  (remote.archives || []).forEach(a => archiveMap.set(a.id, a));
-  (local.archives || []).forEach(a => archiveMap.set(a.id, a));
-  const mergedArchives = Array.from(archiveMap.values());
+  const allArchs = [...(remote.archives || []), ...(local.archives || [])];
+  allArchs.forEach(a => {
+    if (!a || !a.dateShamsi) return;
+    const norm = normalizeShamsiDate(a.dateShamsi);
+    if (!norm) return;
+    const existing = archiveMap.get(norm);
+    const aCount = Array.isArray(a.reports) ? a.reports.length : 0;
+    const exCount = existing && Array.isArray(existing.reports) ? existing.reports.length : 0;
+    if (!existing || aCount > exCount || (aCount === exCount && new Date(a.timestamp || 0) > new Date(existing.timestamp || 0))) {
+      archiveMap.set(norm, {
+        ...a,
+        id: `arch-${norm.replace(/\//g, '')}`,
+        dateShamsi: norm
+      });
+    }
+  });
+  const mergedArchives = Array.from(archiveMap.values())
+    .filter(a => (Array.isArray(a.reports) && a.reports.length > 0) || !a.autoGenerated)
+    .sort((a, b) => (b.dateShamsi || '').localeCompare(a.dateShamsi || ''));
 
   // Merge concerns
   const concernSet = new Set<string>([...(remote.concerns || []), ...(local.concerns || []), ...EMPLOYER_CONCERNS_LIST]);
@@ -172,9 +195,23 @@ function mergeStates(local: CloudDatabaseState, remote: CloudDatabaseState): Clo
 }
 
 // -----------------------------------------------------------
-// Direct Supabase Cloud I/O
+// Cloud & Server Persistent Storage I/O
 // -----------------------------------------------------------
 async function fetchCloudDatabase(): Promise<CloudDatabaseState | null> {
+  // 1. Primary: Query the server-side API (/api/db/all) which holds persistent disk DB and merges with Supabase
+  try {
+    const res = await fetch('/api/db/all');
+    if (res.ok) {
+      const json = await res.json();
+      if (json && json.data) {
+        return json.data as CloudDatabaseState;
+      }
+    }
+  } catch (_) {
+    // Server API momentarily unreachable
+  }
+
+  // 2. Secondary fallback: Direct Supabase fetch if running in a detached/static context
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/karino_store?id=eq.main_state&select=*`, {
       headers: {
@@ -189,8 +226,8 @@ async function fetchCloudDatabase(): Promise<CloudDatabaseState | null> {
         return rows[0].data as CloudDatabaseState;
       }
     }
-  } catch (err) {
-    // Network or offline fallback
+  } catch (_) {
+    // Network filtered or offline
   }
   return null;
 }
@@ -202,35 +239,56 @@ async function persistCloudDatabase(localData: CloudDatabaseState): Promise<bool
     const finalData = remote ? mergeStates(localData, remote) : localData;
     finalData.lastUpdated = new Date().toISOString();
 
-    // 2. Update local caches immediately
+    // 2. Update local memory and localStorage caches immediately
     cachedUsers = finalData.users;
     cachedReports = finalData.reports;
     cachedArchives = finalData.archives;
     cachedConcerns = finalData.concerns;
+    if (finalData.directives) cachedDirectives = finalData.directives;
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(finalData.users));
     localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(finalData.reports));
     localStorage.setItem(STORAGE_KEYS.ARCHIVES, JSON.stringify(finalData.archives));
     localStorage.setItem(STORAGE_KEYS.CONCERNS, JSON.stringify(finalData.concerns));
+    if (finalData.directives) localStorage.setItem(STORAGE_KEYS.DIRECTIVES, JSON.stringify(finalData.directives));
     notifyDbListeners();
 
-    // 3. Persist merged data to Supabase
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/karino_store`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=representation'
-      },
-      body: JSON.stringify({
-        id: 'main_state',
-        data: finalData,
-        updated_at: new Date().toISOString()
-      })
-    });
-    return res.ok;
+    // 3. Primary & Secure: Persist via Server API (/api/db/sync)
+    // The server securely saves to data/db.json on disk AND syncs to Supabase on the backend
+    try {
+      const serverRes = await fetch('/api/db/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(finalData)
+      });
+      if (serverRes.ok) {
+        return true;
+      }
+    } catch (_) {
+      // Backend not reached, attempt direct fallback
+    }
+
+    // 4. Secondary fallback: Direct Supabase call (if backend service is unavailable)
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/karino_store`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates,return=representation'
+        },
+        body: JSON.stringify({
+          id: 'main_state',
+          data: finalData,
+          updated_at: new Date().toISOString()
+        })
+      });
+      return res.ok;
+    } catch (_) {
+      // Offline fallback: data is safely kept in local storage and will sync upon reconnection
+      return false;
+    }
   } catch (err) {
-    console.error('[Supabase Direct] Save error:', err);
     return false;
   }
 }
@@ -243,7 +301,6 @@ export async function syncWithServer(): Promise<boolean> {
   isSyncInProgress = true;
 
   try {
-    // 1. Direct Cloud Fetch from Supabase
     const cloudState = await fetchCloudDatabase();
 
     if (cloudState) {
@@ -286,48 +343,10 @@ export async function syncWithServer(): Promise<boolean> {
       if (changed) {
         notifyDbListeners();
       }
-      isSyncInProgress = false;
       return true;
     }
-
-    // 2. Secondary fallback to /api/db/all if local server is active
-    try {
-      const res = await fetch('/api/db/all');
-      if (res.ok) {
-        const json = await res.json();
-        if (json && json.data) {
-          const currentState = getCurrentFullState();
-          const merged = mergeStates(currentState, json.data);
-          let changed = false;
-          if (JSON.stringify(merged.users) !== JSON.stringify(cachedUsers)) {
-            cachedUsers = merged.users;
-            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(merged.users));
-            changed = true;
-          }
-          if (JSON.stringify(merged.reports) !== JSON.stringify(cachedReports)) {
-            cachedReports = merged.reports;
-            localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(merged.reports));
-            changed = true;
-          }
-          if (JSON.stringify(merged.archives) !== JSON.stringify(cachedArchives)) {
-            cachedArchives = merged.archives;
-            localStorage.setItem(STORAGE_KEYS.ARCHIVES, JSON.stringify(merged.archives));
-            changed = true;
-          }
-          if (JSON.stringify(merged.concerns) !== JSON.stringify(cachedConcerns)) {
-            cachedConcerns = merged.concerns;
-            localStorage.setItem(STORAGE_KEYS.CONCERNS, JSON.stringify(merged.concerns));
-            changed = true;
-          }
-          if (changed) notifyDbListeners();
-          isSyncInProgress = false;
-          return true;
-        }
-      }
-    } catch (_) {}
-
-  } catch (err) {
-    console.error('Sync error:', err);
+  } catch (_) {
+    // Network or sync delay, continue with local cache
   } finally {
     isSyncInProgress = false;
   }
@@ -722,18 +741,42 @@ export function getReportsByConsultant(consultantIdOrCode: string): DailyReport[
 // ARCHIVES Management
 // -----------------------------------------------------------
 export function getStoredArchives(): ArchiveRecord[] {
-  if (cachedArchives.length > 0) return cachedArchives;
+  let list: ArchiveRecord[] = cachedArchives;
 
-  try {
-    const data = localStorage.getItem(STORAGE_KEYS.ARCHIVES);
-    if (data) {
-      const parsed = JSON.parse(data);
-      cachedArchives = parsed;
-      return parsed;
+  if (list.length === 0) {
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.ARCHIVES);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) list = parsed;
+      }
+    } catch (e) {}
+  }
+
+  // Enforce strict 1-archive-per-date deduplication
+  const map = new Map<string, ArchiveRecord>();
+  list.forEach(a => {
+    if (!a || !a.dateShamsi) return;
+    const norm = normalizeShamsiDate(a.dateShamsi);
+    if (!norm) return;
+    const existing = map.get(norm);
+    const aCount = Array.isArray(a.reports) ? a.reports.length : 0;
+    const exCount = existing && Array.isArray(existing.reports) ? existing.reports.length : 0;
+    if (!existing || aCount > exCount || (aCount === exCount && new Date(a.timestamp || 0) > new Date(existing.timestamp || 0))) {
+      map.set(norm, {
+        ...a,
+        id: `arch-${norm.replace(/\//g, '')}`,
+        dateShamsi: norm
+      });
     }
-  } catch (e) {}
-  
-  return [];
+  });
+
+  const clean = Array.from(map.values())
+    .filter(a => (Array.isArray(a.reports) && a.reports.length > 0) || !a.autoGenerated)
+    .sort((a, b) => (b.dateShamsi || '').localeCompare(a.dateShamsi || ''));
+
+  cachedArchives = clean;
+  return clean;
 }
 
 export function createArchiveRecord(
@@ -741,7 +784,7 @@ export function createArchiveRecord(
   isAuto: boolean = false,
   targetDateShamsi?: string,
   targetDayOfWeek?: string
-): ArchiveRecord {
+): ArchiveRecord | null {
   const shamsi = getCurrentShamsiDate();
   const dateShamsi = targetDateShamsi ? normalizeShamsiDate(targetDateShamsi) : shamsi.formatted;
   
@@ -757,6 +800,11 @@ export function createArchiveRecord(
   const dayReports = Array.isArray(reports)
     ? reports.filter(r => normalizeShamsiDate(r.dateShamsi) === dateShamsi)
     : [];
+
+  // If automated run and day has 0 reports, do NOT create an archive
+  if (isAuto && dayReports.length === 0) {
+    return null;
+  }
 
   const concernMap: Record<string, number> = {};
   let totalRows = 0;
@@ -776,10 +824,10 @@ export function createArchiveRecord(
     .slice(0, 5);
 
   const archives = getStoredArchives();
-  const existingIdx = archives.findIndex(a => normalizeShamsiDate(a.dateShamsi) === dateShamsi);
+  const fixedId = `arch-${dateShamsi.replace(/\//g, '')}`;
 
   const newArchive: ArchiveRecord = {
-    id: existingIdx >= 0 ? archives[existingIdx].id : `arch-${dateShamsi.replace(/\//g, '')}-${Date.now()}`,
+    id: fixedId,
     fileName,
     dateShamsi,
     dayOfWeek,
@@ -791,17 +839,25 @@ export function createArchiveRecord(
     autoGenerated: isAuto
   };
 
+  const existingIdx = archives.findIndex(a => normalizeShamsiDate(a.dateShamsi) === dateShamsi);
   if (existingIdx >= 0) {
     archives[existingIdx] = newArchive;
   } else {
     archives.unshift(newArchive);
   }
 
-  // Always keep archives sorted latest date first
-  archives.sort((a, b) => (b.dateShamsi || '').localeCompare(a.dateShamsi || ''));
+  // Deduplicate and sort
+  const map = new Map<string, ArchiveRecord>();
+  archives.forEach(a => {
+    const norm = normalizeShamsiDate(a.dateShamsi);
+    map.set(norm, a);
+  });
+  const cleanArchives = Array.from(map.values())
+    .filter(a => (Array.isArray(a.reports) && a.reports.length > 0) || !a.autoGenerated)
+    .sort((a, b) => (b.dateShamsi || '').localeCompare(a.dateShamsi || ''));
 
-  cachedArchives = [...archives];
-  localStorage.setItem(STORAGE_KEYS.ARCHIVES, JSON.stringify(archives));
+  cachedArchives = [...cleanArchives];
+  localStorage.setItem(STORAGE_KEYS.ARCHIVES, JSON.stringify(cleanArchives));
   notifyDbListeners();
 
   const fullState = getCurrentFullState();
@@ -961,11 +1017,14 @@ export function processNightlyArchive(): void {
       const normDate = normalizeShamsiDate(item.dateShamsi);
       const dayReports = allReports.filter(r => normalizeShamsiDate(r.dateShamsi) === normDate);
 
+      // STRICT: Never create archive for dates with zero reports
+      if (!dayReports || dayReports.length === 0) return;
+
       let arch = archives.find(a => normalizeShamsiDate(a.dateShamsi) === normDate);
 
-      const hasOnlySeeds = arch && arch.reports.some(r => r.id && r.id.startsWith('rep-seed-'));
+      const hasOnlySeeds = arch && (arch.reports || []).some(r => r.id && r.id.startsWith('rep-seed-'));
       const hasRealUserReports = dayReports.some(r => r.id && !r.id.startsWith('rep-seed-'));
-      const countMismatch = !arch || arch.reports.length !== dayReports.length;
+      const countMismatch = !arch || (arch.reports || []).length !== dayReports.length;
 
       if (!arch || countMismatch || (hasOnlySeeds && hasRealUserReports)) {
         createArchiveRecord(dayReports, true, normDate, item.dayOfWeek);

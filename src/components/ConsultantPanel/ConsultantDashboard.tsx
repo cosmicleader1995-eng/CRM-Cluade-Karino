@@ -146,7 +146,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
     }
   }, [rows, guild, personalOpinion, dateShamsi, currentUser.id, editingReportId]);
 
-  // Calculate Upcoming Follow-ups (4-Day Cycle)
+  // Calculate Upcoming Follow-ups (Strict 4-Day Interval Between Each Step)
   const upcomingFollowUps = useMemo<UpcomingFollowUpItem[]>(() => {
     const list: UpcomingFollowUpItem[] = [];
     const todayMidnight = new Date();
@@ -154,7 +154,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
     const todayMs = todayMidnight.getTime();
 
     myReports.forEach(rep => {
-      // Use dateShamsi for accurate calendar-day calculation (avoids timezone/partial-day bugs)
+      // Base creation/report date in ms
       let reportDateMs: number;
       if (rep.dateShamsi) {
         const parsed = shamsiToDate(rep.dateShamsi);
@@ -172,8 +172,6 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
         reportDateMs = fallback.getTime();
       }
 
-      const elapsedDays = Math.round((todayMs - reportDateMs) / (1000 * 60 * 60 * 24));
-      
       rep.rows.forEach(r => {
         // Exclude if already concluded:
         // Final states: '✓' (جلسه ست شد / قرارداد), '-' (پاسخ منفی), '*' (اشتباه / باطل), or completed followUp4
@@ -204,9 +202,39 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             nextStep = 3;
           }
 
-          // Target cycle days: Step 2 = 4 days, Step 3 = 8 days, Step 4 = 12 days
-          const targetCycleDays = (nextStep - 1) * 4;
-          const daysRemaining = targetCycleDays - elapsedDays;
+          // Determine the timestamp of the last recorded follow-up
+          let lastStepDateMs: number = reportDateMs;
+          if (nextStep === 4 && r.followUp3Date) {
+            const p = new Date(r.followUp3Date);
+            if (!isNaN(p.getTime())) {
+              p.setHours(0, 0, 0, 0);
+              lastStepDateMs = p.getTime();
+            }
+          } else if (nextStep === 3 && r.followUp2Date) {
+            const p = new Date(r.followUp2Date);
+            if (!isNaN(p.getTime())) {
+              p.setHours(0, 0, 0, 0);
+              lastStepDateMs = p.getTime();
+            }
+          } else if (nextStep === 2 && r.followUp1Date) {
+            const p = new Date(r.followUp1Date);
+            if (!isNaN(p.getTime())) {
+              p.setHours(0, 0, 0, 0);
+              lastStepDateMs = p.getTime();
+            }
+          } else if (rep.updatedAt && (r.followUp2 || r.followUp3)) {
+            // Fallback for steps 2/3 when explicit followUp date wasn't set
+            const upd = new Date(rep.updatedAt);
+            if (!isNaN(upd.getTime()) && upd.getTime() > reportDateMs) {
+              upd.setHours(0, 0, 0, 0);
+              lastStepDateMs = upd.getTime();
+            }
+          }
+
+          // Strict 4-day interval between each follow-up step
+          const elapsedDays = Math.round((todayMs - lastStepDateMs) / (1000 * 60 * 60 * 24));
+          const targetIntervalDays = 4;
+          const daysRemaining = targetIntervalDays - elapsedDays;
 
           let statusCategory: 'today' | 'overdue' | 'future' = 'future';
           if (daysRemaining === 0) {
@@ -381,11 +409,18 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
     const reportIdToSave = editingReportId || `rep-${Date.now()}`;
     const existingRep = editingReportId ? allReports.find(r => r.id === editingReportId) : null;
     
-    // Ensure all row follow-up results are populated and normalized
-    const sanitizedRows = rows.map(r => ({
-      ...r,
-      followUpResult: r.followUpResult.trim() || (FOLLOW_UP_STATUS_CODES.find(c => c.code === r.followUp1 || c.symbol === r.followUp1)?.label || 'در حال پیگیری')
-    }));
+    // Ensure all row follow-up results are populated and normalized without overwriting user edits
+    const sanitizedRows = rows.map(r => {
+      const trimmedResult = (r.followUpResult || '').trim();
+      const latestSymbol = r.followUp4 || r.followUp3 || r.followUp2 || r.followUp1;
+      const defaultLabel = FOLLOW_UP_STATUS_CODES.find(c => c.code === latestSymbol || c.symbol === latestSymbol)?.label || 'در حال پیگیری';
+      
+      return {
+        ...r,
+        followUpResult: trimmedResult || defaultLabel,
+        meetingTopic: (r.meetingTopic || '').trim()
+      };
+    });
 
     const reportToSave: DailyReport = {
       id: reportIdToSave,
@@ -502,12 +537,16 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
 
       if (isTargetRow) {
         const updatedRow: ReportRow = { ...row };
+        const nowIso = new Date().toISOString();
         if (activeFollowUpTarget.nextStepNumber === 2) {
           updatedRow.followUp2 = newFollowUpSymbol;
+          updatedRow.followUp2Date = nowIso;
         } else if (activeFollowUpTarget.nextStepNumber === 3) {
           updatedRow.followUp3 = newFollowUpSymbol;
+          updatedRow.followUp3Date = nowIso;
         } else if (activeFollowUpTarget.nextStepNumber === 4) {
           updatedRow.followUp4 = newFollowUpSymbol;
+          updatedRow.followUp4Date = nowIso;
         }
         if (newFollowUpResultText.trim()) {
           updatedRow.followUpResult = newFollowUpResultText.trim();

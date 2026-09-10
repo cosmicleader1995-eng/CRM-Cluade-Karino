@@ -39,6 +39,10 @@ export interface ReportRow {
   followUp2: string; // پیگیری ۲
   followUp3: string; // پیگیری ۳
   followUp4: string; // پیگیری ۴
+  followUp1Date?: string; // تاریخ انجام پیگیری ۱ (ISO string)
+  followUp2Date?: string; // تاریخ انجام پیگیری ۲ (ISO string)
+  followUp3Date?: string; // تاریخ انجام پیگیری ۳ (ISO string)
+  followUp4Date?: string; // تاریخ انجام پیگیری ۴ (ISO string)
   followUpResult: string; // نتیجه پیگیری
   meetingTopic: string; // موضوع جلسه
   notes?: string;

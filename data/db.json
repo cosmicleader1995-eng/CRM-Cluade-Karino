@@ -1,6 +1,6 @@
 {
   "version": "2.5",
-  "lastUpdated": "2026-09-03T12:00:00.000Z",
+  "lastUpdated": "2026-09-10T12:44:30.653Z",
   "users": [
     {
       "id": "user-ceo",
@@ -61,10 +61,2464 @@
       "password": "1234",
       "phone": "09154445566",
       "branch": "تیم اجرایی مشهد"
+    },
+    {
+      "id": "user-1788870728032",
+      "role": "consultant",
+      "phone": "",
+      "branch": "تیم اجرایی مشهد",
+      "fullName": "علی زارع",
+      "password": "1995",
+      "username": "a.z",
+      "consultantCode": "110"
+    },
+    {
+      "id": "user-1788870918188",
+      "role": "consultant",
+      "phone": "",
+      "branch": "تیم اجرایی مشهد",
+      "fullName": "اصغر",
+      "password": "123456",
+      "username": "asghar",
+      "consultantCode": "897"
     }
   ],
-  "reports": [],
-  "archives": [],
+  "reports": [
+    {
+      "id": "rep-c101-today",
+      "rows": [
+        {
+          "id": "row-c101-today-1",
+          "notes": "جلسه با مهندس صادقی (مدیرعامل) دوشنبه ساعت ۱۰:۰۰ در محل کارخانه تنظیم شد.",
+          "phone": "05138401122",
+          "address": "شهرک صنعتی توس، فاز ۱، تلاش جنوبی",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "✓",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "صنایع ریخته‌گری توس فولاد",
+          "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+          "activityField": "تولید قطعات چدنی خودرو",
+          "followUpResult": "✓ (جلسه حضوری ست شد)",
+          "personnelCount": 48,
+          "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+        },
+        {
+          "id": "row-c101-today-2",
+          "notes": "مدیر کارگاه در خط تولید بود؛ تماس مجدد هماهنگ خواهد شد.",
+          "phone": "05132456677",
+          "address": "بزرگراه آسیایی، آزادی ۱۲۵",
+          "followUp1": ".",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 2,
+          "clientName": "کارگاه تراشکاری نوین صنعت",
+          "meetingTopic": "",
+          "activityField": "تراشکاری قطعات برنجی",
+          "followUpResult": "",
+          "personnelCount": 14,
+          "employerConcern": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی"
+        },
+        {
+          "id": "row-c101-today-3",
+          "notes": "کارفرما عنوان کرد فعلاً برنامه اصلاح ساختار ندارند.",
+          "phone": "05136518899",
+          "address": "شهرک صنعتی کلات",
+          "followUp1": "-",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 3,
+          "clientName": "قالب‌سازی دقیق البرز",
+          "meetingTopic": "",
+          "activityField": "طراحی قالب‌های سنبه ماتریس",
+          "followUpResult": "- (اعلام عدم نیاز فعلی)",
+          "personnelCount": 9,
+          "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)"
+        }
+      ],
+      "guild": "تولیدی قطعات خودرو و ریخته‌گری",
+      "status": "approved",
+      "createdAt": "2026-09-10T11:51:45.966Z",
+      "updatedAt": "2026-09-10T11:51:45.966Z",
+      "dateShamsi": "1405/06/19",
+      "reviewedAt": "2026-09-10T11:51:45.966Z",
+      "submittedAt": "۱۴:۳۰",
+      "consultantId": "user-c101",
+      "managerRating": 5,
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "dayOfWeekShamsi": "پنج‌شنبه",
+      "managerFeedback": "عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری به خوبی هماهنگ شد.",
+      "personalOpinion": "به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند."
+    },
+    {
+      "id": "rep-1788869621659",
+      "rows": [
+        {
+          "id": "row-1788869523910-2",
+          "notes": "",
+          "phone": "09995443211",
+          "address": "سیلیکون ولی",
+          "followUp1": "✓",
+          "followUp2": "✓",
+          "followUp3": "-",
+          "followUp4": "✓",
+          "rowNumber": 1,
+          "clientName": "مهندس زارع",
+          "meetingTopic": "بسیار خوش برخورد و متشخص میباشند این مهندس",
+          "activityField": "هوش مصنوعی",
+          "followUpResult": "میگن که بدرد من نمیخوره و زنگ نزنید دیگه",
+          "personnelCount": "۱۰۰۰",
+          "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)"
+        }
+      ],
+      "guild": "صنف سیستم",
+      "status": "submitted",
+      "createdAt": "2026-09-08T12:13:41.659Z",
+      "updatedAt": "2026-09-09T10:08:51.330Z",
+      "dateShamsi": "1405/06/17",
+      "submittedAt": "۱۵:۴۳",
+      "consultantId": "user-c103",
+      "consultantCode": "C-103",
+      "consultantName": "سعید حسینی",
+      "dayOfWeekShamsi": "سه‌شنبه",
+      "personalOpinion": "ایشان خفنه جهانن"
+    },
+    {
+      "id": "rep-c102-today",
+      "rows": [
+        {
+          "id": "row-c102-1",
+          "notes": "جلسه گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.",
+          "phone": "05138479900",
+          "address": "بلوار سجاد، خیابان بهار",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "✓",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "شرکت دانش‌بنیان داده‌پردازان عصر نوین",
+          "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+          "activityField": "توسعه نرم‌افزارهای سازمانی و هوش مصنوعی",
+          "followUpResult": "✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)",
+          "personnelCount": 36,
+          "employerConcern": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری"
+        }
+      ],
+      "guild": "فناوری اطلاعات و تجارت الکترونیک",
+      "status": "approved",
+      "createdAt": "2026-09-10T11:51:45.966Z",
+      "updatedAt": "2026-09-10T11:51:45.966Z",
+      "dateShamsi": "1405/06/19",
+      "reviewedAt": "2026-09-10T11:51:45.966Z",
+      "submittedAt": "۱۳:۱۵",
+      "consultantId": "user-c102",
+      "managerRating": 5,
+      "consultantCode": "C-102",
+      "consultantName": "مریم محمدی",
+      "dayOfWeekShamsi": "پنج‌شنبه",
+      "managerFeedback": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
+      "personalOpinion": "شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند."
+    },
+    {
+      "id": "rep-1788868003406",
+      "rows": [
+        {
+          "id": "row-1788867608718-1",
+          "notes": "",
+          "phone": "09154324567",
+          "address": "شهرک سراجیان",
+          "followUp1": "*",
+          "followUp2": "+",
+          "followUp3": "✓",
+          "followUp4": "-",
+          "rowNumber": 1,
+          "clientName": "سراجی",
+          "meetingTopic": "شنبلیله فروشی",
+          "activityField": "سراج فروشی",
+          "followUpResult": "مخشو زدم بلاخره",
+          "personnelCount": "۱",
+          "employerConcern": "ریزش مداوم نیروی انسانی و تعارضات درون‌سازمانی"
+        }
+      ],
+      "guild": "اصناف و بنگاه‌های اقتصادی",
+      "status": "approved",
+      "createdAt": "2026-09-08T11:46:43.406Z",
+      "updatedAt": "2026-09-09T09:34:35.123Z",
+      "dateShamsi": "1405/06/17",
+      "reviewedAt": "2026-09-08T12:06:28.491Z",
+      "submittedAt": "۱۵:۲۹",
+      "consultantId": "user-c102",
+      "managerRating": 2,
+      "consultantCode": "C-102",
+      "consultantName": "مریم محمدی",
+      "dayOfWeekShamsi": "سه‌شنبه",
+      "managerFeedback": "شانگاریلیلا",
+      "personalOpinion": "طرف نمیخواد"
+    },
+    {
+      "id": "rep-c104-today",
+      "rows": [
+        {
+          "id": "row-c104-1",
+          "notes": "پیگیری معوق؛ تماس دوم باید فوری انجام شود.",
+          "phone": "05138447788",
+          "address": "مشهد، بلوار فلسطین، تقاطع خیام",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "کارفرما ابراهیمی (شرکت ابنیه عمران گستر)",
+          "meetingTopic": "مشاوره دفاعیات پرونده‌های مطروحه در هیئت‌های حل اختلاف",
+          "activityField": "پیمانکاری پروژه‌های مسکونی و تجاری",
+          "followUpResult": "حله دادا",
+          "personnelCount": 115,
+          "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+        }
+      ],
+      "guild": "ساختمانی، انبوه‌سازی و تأسیسات",
+      "status": "approved",
+      "createdAt": "2026-09-02T11:34:11.215Z",
+      "updatedAt": "2026-09-08T12:11:08.180Z",
+      "dateShamsi": "1405/06/11",
+      "reviewedAt": "2026-09-08T12:11:08.180Z",
+      "submittedAt": "۱۵:۳۶",
+      "consultantId": "user-c104",
+      "managerRating": 5,
+      "consultantCode": "C-104",
+      "consultantName": "ندا کریمی",
+      "dayOfWeekShamsi": "چهارشنبه",
+      "managerFeedback": "حله پس",
+      "personalOpinion": "شرکت‌های پیمانکاری بیشترین حجم احضاریه‌های هیئت‌های تشخیص را دارند."
+    },
+    {
+      "id": "rep-seed-3",
+      "rows": [
+        {
+          "id": "row-seed-3-1",
+          "notes": "مدیر اداری آقای رجبی بسیار پیگیر بودند؛ جلسه پنج‌شنبه ساعت ۱۱ صبح.",
+          "phone": "05135421100",
+          "address": "شهرک صنعتی چناران",
+          "followUp1": "+",
+          "followUp2": "✓",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "فرآورده‌های لبنی کوهستان مشهد",
+          "meetingTopic": "تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی",
+          "activityField": "تولید دوغ و ماست پاستوریزه",
+          "followUpResult": "✓ (جلسه حضوری با مدیر اداری ست شد)",
+          "personnelCount": 92,
+          "employerConcern": "پرونده‌های سخت و زیان‌آور و بازنشستگی‌های زودرس پیش‌بینی نشده"
+        },
+        {
+          "id": "row-seed-3-2",
+          "notes": "مذاکره اولیه انجام شد؛ منتظر تماس مجدد در چرخه پیگیری هستند.",
+          "phone": "05135413344",
+          "address": "شهرک صنعتی توس، فاز ۲",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 2,
+          "clientName": "صنایع بسته‌بندی ترنج سبز",
+          "meetingTopic": "",
+          "activityField": "بسته‌بندی حبوبات و خشکبار صادراتی",
+          "followUpResult": "",
+          "personnelCount": 38,
+          "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ"
+        },
+        {
+          "id": "row-seed-3-3",
+          "notes": "مدیرعامل در جلسه بازرسی استاندارد بود.",
+          "phone": "05136517722",
+          "address": "شهرک صنعتی ماشین‌سازی",
+          "followUp1": ".",
+          "followUp2": ".",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 3,
+          "clientName": "تولیدی کیک و کلوچه پردیس",
+          "meetingTopic": "",
+          "activityField": "شیرینی و بیسکویت صنعتی",
+          "followUpResult": "شاپسیان",
+          "personnelCount": 25,
+          "employerConcern": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری"
+        }
+      ],
+      "guild": "صنایع غذایی و بسته‌بندی",
+      "status": "approved",
+      "createdAt": "2026-09-07T08:52:10.140Z",
+      "updatedAt": "2026-09-08T11:55:21.829Z",
+      "dateShamsi": "1405/06/16",
+      "reviewedAt": "2026-09-07T08:52:10.140Z",
+      "submittedAt": "۱۵:۲۵",
+      "consultantId": "user-c102",
+      "managerRating": 5,
+      "consultantCode": "C-102",
+      "consultantName": "مریم محمدی",
+      "dayOfWeekShamsi": "دوشنبه",
+      "managerFeedback": "نکات درج شده در خصوص شرکت فرآورده‌های لبنی کوهستان فوق‌العاده است. پشتیبانی کامل حقوقی داده شود.",
+      "personalOpinion": "صنایع غذایی به دلیل شیفت‌های گردشی و سختی کار، ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند."
+    },
+    {
+      "id": "rep-c102-overdue",
+      "rows": [
+        {
+          "id": "row-c102-overdue-1",
+          "notes": "نیازمند تماس فوری پیگیری دوم (۲ روز معوق).",
+          "phone": "05135413344",
+          "address": "شهرک صنعتی توس، فاز ۲",
+          "followUp1": "+",
+          "followUp2": "*",
+          "followUp3": "✓",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "کارفرما کاظمی (صنایع بسته‌بندی ترنج سبز)",
+          "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+          "activityField": "بسته‌بندی حبوبات و خشکبار صادراتی",
+          "followUpResult": "جوالدوز",
+          "personnelCount": 38,
+          "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ"
+        }
+      ],
+      "guild": "صنایع غذایی و کشاورزی",
+      "status": "approved",
+      "createdAt": "2026-09-02T11:34:11.215Z",
+      "updatedAt": "2026-09-08T11:52:51.515Z",
+      "dateShamsi": "1405/06/11",
+      "reviewedAt": "2026-09-02T11:34:11.215Z",
+      "submittedAt": "۱۵:۱۴",
+      "consultantId": "user-c102",
+      "managerRating": 4,
+      "consultantCode": "C-102",
+      "consultantName": "مریم محمدی",
+      "dayOfWeekShamsi": "چهارشنبه",
+      "managerFeedback": "پشتیبانی کامل حقوقی داده شود.",
+      "personalOpinion": "صنایع غذایی ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند."
+    },
+    {
+      "id": "rep-seed-2",
+      "rows": [
+        {
+          "id": "row-seed-2-1",
+          "notes": "جلسه تخصصی گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.",
+          "phone": "05138479900",
+          "address": "بلوار سجاد، خیابان بهار",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "✓",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "شرکت دانش‌بنیان داده‌پردازان عصر نوین",
+          "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+          "activityField": "توسعه نرم‌افزارهای سازمانی و هوش مصنوعی",
+          "followUpResult": "✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)",
+          "personnelCount": 36,
+          "employerConcern": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری"
+        },
+        {
+          "id": "row-seed-2-2",
+          "notes": "مدیر مالی شرکت استقبال کرد؛ مستندات مقایسه‌ای مالیات حقوق ارسال شد.",
+          "phone": "05137614455",
+          "address": "بلوار دستغیب، مجتمع تک",
+          "followUp1": "+",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 2,
+          "clientName": "پلتفرم خدمات ابری رایان‌سرویس",
+          "meetingTopic": "",
+          "activityField": "ارائه زیرساخت و سرور ابری",
+          "followUpResult": "",
+          "personnelCount": 24,
+          "employerConcern": "ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد"
+        },
+        {
+          "id": "row-seed-2-3",
+          "notes": "درخواست راهنمایی در خصوص فرمول پورسانت پلکانی کارشناسان فروش.",
+          "phone": "05138435566",
+          "address": "احمدآباد، خیابان عدالت",
+          "followUp1": "+",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 3,
+          "clientName": "آژانس دیجیتال مارکتینگ صبا",
+          "meetingTopic": "",
+          "activityField": "سئو و تبلیغات دیجیتال",
+          "followUpResult": "",
+          "personnelCount": 16,
+          "employerConcern": "ابهام در فرمول‌های پورسانت، پاداش و تارگت‌های فروش"
+        }
+      ],
+      "guild": "فناوری اطلاعات و تجارت الکترونیک",
+      "status": "approved",
+      "createdAt": "2026-09-08T08:52:10.140Z",
+      "updatedAt": "2026-09-08T11:43:25.885Z",
+      "dateShamsi": "1405/06/17",
+      "reviewedAt": "2026-09-08T11:43:25.885Z",
+      "submittedAt": "۱۳:۱۵",
+      "consultantId": "user-c102",
+      "managerRating": 5,
+      "consultantCode": "C-102",
+      "consultantName": "مریم محمدی",
+      "dayOfWeekShamsi": "سه‌شنبه",
+      "managerFeedback": "آفرین مریم",
+      "personalOpinion": "شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند."
+    },
+    {
+      "id": "rep-seed-4",
+      "rows": [
+        {
+          "id": "row-seed-4-1",
+          "notes": "امروز دقیقاً موعد تماس دوم در چرخه ۴ روزه است و سیستم آلارم پیگیری صادر کرده است.",
+          "phone": "02188991122",
+          "address": "تهران، خیابان مطهری، پلاک ۱۱۴",
+          "followUp1": "+",
+          "followUp2": "*",
+          "followUp3": "-",
+          "followUp4": "-",
+          "rowNumber": 1,
+          "clientName": "شرکت بازرگانی پخش مویرگی کیان",
+          "meetingTopic": "",
+          "activityField": "پخش سراسری مواد شوینده و بهداشتی",
+          "followUpResult": "کوفته",
+          "personnelCount": 65,
+          "employerConcern": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار"
+        },
+        {
+          "id": "row-seed-4-2",
+          "notes": "موعد تماس دوم فرارسیده؛ مدیر منابع انسانی تمایل به دریافت نمونه قرارداد امانی دارد.",
+          "phone": "02166554433",
+          "address": "تهران، خیابان آزادی، نبش شادمان",
+          "followUp1": "+",
+          "followUp2": "-",
+          "followUp3": "-",
+          "followUp4": "+",
+          "rowNumber": 2,
+          "clientName": "توزیع و پخش دارویی رازیان سلامت",
+          "meetingTopic": "",
+          "activityField": "پخش اقلام دارویی و مکمل‌ها",
+          "followUpResult": "شاپسین",
+          "personnelCount": 42,
+          "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی"
+        },
+        {
+          "id": "row-seed-4-3",
+          "notes": "در چرخه پیگیری قرار دارد.",
+          "phone": "02155443322",
+          "address": "تهران، جاده مخصوص کرج، کیلومتر ۱۱",
+          "followUp1": ".",
+          "followUp2": "+",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 3,
+          "clientName": "شرکت لجستیک سپهر ترابر",
+          "meetingTopic": "",
+          "activityField": "خدمات انبارداری و ارسال مرسولات",
+          "followUpResult": "مثبته",
+          "personnelCount": 28,
+          "employerConcern": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی"
+        }
+      ],
+      "guild": "بازرگانی و پخش مویرگی",
+      "status": "approved",
+      "createdAt": "2026-09-04T08:52:10.140Z",
+      "updatedAt": "2026-09-10T11:34:26.309Z",
+      "dateShamsi": "1405/06/13",
+      "reviewedAt": "2026-09-08T11:41:45.450Z",
+      "submittedAt": "۱۵:۰۳",
+      "consultantId": "user-c103",
+      "managerRating": 4,
+      "consultantCode": "C-103",
+      "consultantName": "سعید حسینی",
+      "dayOfWeekShamsi": "جمعه",
+      "managerFeedback": "تو شنبلیله ای",
+      "personalOpinion": "شرکت‌های پخش به دلیل مبالغ سنگین ضمانت‌نامه‌های ویزیتورها و رانندگان، دغدغه فوری تنظیم سفته و قرارداد ضمانت دارند."
+    },
+    {
+      "id": "rep-c103-today",
+      "rows": [
+        {
+          "id": "row-c103-1",
+          "notes": "امروز موعد تماس دوم است.",
+          "phone": "02188991122",
+          "address": "تهران، خیابان مطهری، پلاک ۱۱۴",
+          "followUp1": "+",
+          "followUp2": ".",
+          "followUp3": "-",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "کارفرما شجاعی (شرکت بازرگانی پخش مویرگی کیان)",
+          "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+          "activityField": "پخش سراسری مواد شوینده و بهداشتی",
+          "followUpResult": "نمیخواد اصن",
+          "personnelCount": 65,
+          "employerConcern": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار"
+        }
+      ],
+      "guild": "بازرگانی و پخش مویرگی",
+      "status": "approved",
+      "createdAt": "2026-09-04T11:34:11.215Z",
+      "updatedAt": "2026-09-10T11:47:58.738Z",
+      "dateShamsi": "1405/06/13",
+      "reviewedAt": "2026-09-08T11:38:23.061Z",
+      "submittedAt": "۱۵:۰۳",
+      "consultantId": "user-c103",
+      "managerRating": 2,
+      "consultantCode": "C-103",
+      "consultantName": "سعید حسینی",
+      "dayOfWeekShamsi": "جمعه",
+      "managerFeedback": "تمرک",
+      "personalOpinion": "شرکت‌های پخش دغدغه فوری تنظیم سفته و قرارداد ضمانت دارند."
+    },
+    {
+      "id": "rep-seed-1",
+      "rows": [
+        {
+          "id": "row-seed-1-1",
+          "notes": "جلسه با مهندس صادقی (مدیرعامل) دوشنبه ساعت ۱۰:۰۰ در محل کارخانه تنظیم شد.",
+          "phone": "05138401122",
+          "address": "شهرک صنعتی توس، فاز ۱، تلاش جنوبی",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "✓",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "صنایع ریخته‌گری توس فولاد",
+          "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+          "activityField": "تولید قطعات چدنی خودرو",
+          "followUpResult": "✓ (جلسه حضوری ست شد)",
+          "personnelCount": 48,
+          "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+        },
+        {
+          "id": "row-seed-1-2",
+          "notes": "تماس دوم انجام شد؛ پیش‌نویس چک‌لیست حقوقی ارسال گردید، منتظر بررسی هیئت‌مدیره هستند.",
+          "phone": "05135412233",
+          "address": "شهرک صنعتی فناوری‌های برتر",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 2,
+          "clientName": "صنعتی پارت سازان خاور",
+          "meetingTopic": "",
+          "activityField": "ماشین‌کاری قطعات حساس",
+          "followUpResult": "",
+          "personnelCount": 22,
+          "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی"
+        },
+        {
+          "id": "row-seed-1-3",
+          "notes": "مدیر کارگاه در خط تولید بود؛ تماس مجدد در نوبت عصر هماهنگ خواهد شد.",
+          "phone": "05132456677",
+          "address": "بزرگراه آسیایی، آزادی ۱۲۵",
+          "followUp1": ".",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 3,
+          "clientName": "کارگاه تراشکاری نوین صنعت",
+          "meetingTopic": "",
+          "activityField": "تراشکاری قطعات برنجی",
+          "followUpResult": "",
+          "personnelCount": 14,
+          "employerConcern": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی"
+        },
+        {
+          "id": "row-seed-1-4",
+          "notes": "کارفرما عنوان کرد فعلاً به دلیل نوسانات بازار برنامه اصلاح ساختار ندارند.",
+          "phone": "05136518899",
+          "address": "شهرک صنعتی کلات",
+          "followUp1": "-",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 4,
+          "clientName": "قالب‌سازی دقیق البرز",
+          "meetingTopic": "",
+          "activityField": "طراحی قالب‌های سنبه ماتریس",
+          "followUpResult": "- (اعلام عدم نیاز فعلی)",
+          "personnelCount": 9,
+          "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)"
+        },
+        {
+          "id": "row-seed-1-5",
+          "notes": "خط قطع بود؛ نیاز به اصلاح شماره در پایگاه داده داده‌کاوی.",
+          "phone": "05138810011",
+          "address": "جاده قدیم نیشابور",
+          "followUp1": "*",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 5,
+          "clientName": "ریخته‌گری آلومینیوم خاوران",
+          "meetingTopic": "",
+          "activityField": "ریخته‌گری تحت فشار دایکست",
+          "followUpResult": "* (شماره کارخانه تغییر یافته است)",
+          "personnelCount": 30,
+          "employerConcern": "عدم تطابق فیش حقوقی، مزایای قانونی و تراز مالی با پرداختی واقعی"
+        }
+      ],
+      "guild": "تولیدی قطعات خودرو و ریخته‌گری",
+      "status": "approved",
+      "createdAt": "2026-09-08T08:52:10.140Z",
+      "updatedAt": "2026-09-08T08:52:10.147Z",
+      "dateShamsi": "1405/06/17",
+      "reviewedAt": "2026-09-08T08:52:10.140Z",
+      "submittedAt": "۱۴:۳۰",
+      "consultantId": "user-c101",
+      "managerRating": 5,
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "dayOfWeekShamsi": "سه‌شنبه",
+      "managerFeedback": "عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری هماهنگ شود.",
+      "personalOpinion": "به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند."
+    },
+    {
+      "id": "rep-seed-5",
+      "rows": [
+        {
+          "id": "row-seed-5-1",
+          "notes": "بیش از ۶ روز از تماس اول گذشته؛ نیازمند تماس فوری پیگیری دوم (معوق).",
+          "phone": "05138447788",
+          "address": "مشهد، بلوار فلسطین، تقاطع خیام",
+          "followUp1": "+",
+          "followUp2": "✓",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "شرکت ساختمانی و ابنیه عمران گستر پارس",
+          "meetingTopic": "محرمانگی",
+          "activityField": "پیمانکاری پروژه‌های مسکونی و تجاری",
+          "followUpResult": "جلسه در حال ست",
+          "personnelCount": 115,
+          "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+        },
+        {
+          "id": "row-seed-5-2",
+          "notes": "پیگیری معوق؛ در انتظار تماس بعدی.",
+          "phone": "05137682211",
+          "address": "مشهد، بلوار پیروزی، نبش پیروزی ۳۴",
+          "followUp1": "+",
+          "followUp2": "✓",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 2,
+          "clientName": "تأسیسات سرمایش و گرمایش آریا سازه",
+          "meetingTopic": "",
+          "activityField": "اجرای موتورخانه و تأسیسات برج‌ها",
+          "followUpResult": "جلسه تیک",
+          "personnelCount": 29,
+          "employerConcern": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی"
+        },
+        {
+          "id": "row-seed-5-3",
+          "notes": "تماس اولیه منفی بود و خاتمه یافت.",
+          "phone": "05132459900",
+          "address": "جاده سیمان، کیلومتر ۴",
+          "followUp1": "-",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 3,
+          "clientName": "تولیدی سازه‌های بتنی پایدار",
+          "meetingTopic": "",
+          "activityField": "تیرچه، بلوک و قطعات پیش‌ساخته بتنی",
+          "followUpResult": "- (عدم تمایل به تغییر رویه فعلی)",
+          "personnelCount": 18,
+          "employerConcern": "عدم رعایت دوره‌های آزمایشی و بلاتکلیفی حقوقی قراردادهای موقت"
+        }
+      ],
+      "guild": "ساختمانی، انبوه‌سازی و تأسیسات",
+      "status": "approved",
+      "createdAt": "2026-09-01T08:52:10.140Z",
+      "updatedAt": "2026-09-08T10:44:52.908Z",
+      "dateShamsi": "1405/06/10",
+      "reviewedAt": "2026-09-08T10:44:52.908Z",
+      "submittedAt": "۱۴:۱۳",
+      "consultantId": "user-c104",
+      "managerRating": 5,
+      "consultantCode": "C-104",
+      "consultantName": "ندا کریمی",
+      "dayOfWeekShamsi": "سه‌شنبه",
+      "managerFeedback": "آفرین ",
+      "personalOpinion": "شرکت‌های پیمانکاری ساختمانی"
+    },
+    {
+      "id": "rep-c101-today-due-4d",
+      "rows": [
+        {
+          "id": "row-c101-hosseini-client",
+          "notes": "امروز دقیقاً موعد تماس دوم (روز چهارم) است.",
+          "phone": "05135412233",
+          "address": "شهرک صنعتی فناوری‌های برتر",
+          "followUp1": "+",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "کارفرما حسینی (صنعتی پارت سازان خاور)",
+          "meetingTopic": "عارضه‌یابی منابع انسانی و طراحی نظام پاداش و ارزیابی عملکرد",
+          "activityField": "ماشین‌کاری قطعات حساس موتور",
+          "followUpResult": "",
+          "personnelCount": 22,
+          "employerConcern": "ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد"
+        }
+      ],
+      "guild": "صنعتی و مهندسی دقیق",
+      "status": "submitted",
+      "createdAt": "2026-09-06T11:51:45.966Z",
+      "updatedAt": "2026-09-06T11:51:45.966Z",
+      "dateShamsi": "1405/06/15",
+      "submittedAt": "۱۱:۴۰",
+      "consultantId": "user-c101",
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "dayOfWeekShamsi": "یکشنبه",
+      "managerFeedback": "",
+      "personalOpinion": "استقبال مدیرعامل در جلسه نخست امیدوارکننده بود."
+    },
+    {
+      "id": "rep-c101-overdue-6d",
+      "rows": [
+        {
+          "id": "row-c101-ahmadi",
+          "notes": "در تماس اول بسیار مشتاق بودند؛ قرار شد بعد از ۴ روز برای ارسال پیش‌نویس تماس گرفته شود.",
+          "phone": "05138491122",
+          "address": "شهرک صنعتی توس، تلاش شمالی ۶",
+          "followUp1": "+",
+          "followUp2": "",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "کارفرما احمدی (گروه صنعتی پارت گستر)",
+          "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+          "activityField": "تولید قطعات پرسی بدنه خودرو",
+          "followUpResult": "",
+          "personnelCount": 35,
+          "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی"
+        }
+      ],
+      "guild": "ماشین‌سازی و قطعه‌سازی خودرو",
+      "status": "approved",
+      "createdAt": "2026-09-04T11:51:45.966Z",
+      "updatedAt": "2026-09-04T11:51:45.966Z",
+      "dateShamsi": "1405/06/13",
+      "reviewedAt": "2026-09-04T11:51:45.966Z",
+      "submittedAt": "۱۶:۱۵",
+      "consultantId": "user-c101",
+      "managerRating": 4,
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "dayOfWeekShamsi": "جمعه",
+      "managerFeedback": "پرونده کارفرما احمدی را سریعاً تماس گرفته و تعیین تکلیف نمایید.",
+      "personalOpinion": "کارفرمایان این گروه به دلیل چالش تضامین و قراردادهای کارگری نیازمند پیگیری منظم هستند."
+    },
+    {
+      "id": "rep-c101-today-due-8d",
+      "rows": [
+        {
+          "id": "row-c101-nouri-client",
+          "notes": "پیگیری ۱ و ۲ با موفقیت انجام شده؛ امروز موعد تماس سوم برای ست کردن جلسه است.",
+          "phone": "05136514455",
+          "address": "شهرک صنعتی کلات، خیابان تلاش ۳",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "کارفرما نوری (تولیدی قطعات آسانسور پارس نوری)",
+          "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+          "activityField": "تولید درب و کابین آسانسور",
+          "followUp1Date": "2026-09-02T11:51:45.966Z",
+          "followUp2Date": "2026-09-06T11:51:45.966Z",
+          "followUpResult": "",
+          "personnelCount": 31,
+          "employerConcern": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی"
+        }
+      ],
+      "guild": "تولید تجهیزات بالابری و صنعتی",
+      "status": "approved",
+      "createdAt": "2026-09-02T11:51:45.966Z",
+      "updatedAt": "2026-09-02T11:51:45.966Z",
+      "dateShamsi": "1405/06/11",
+      "reviewedAt": "2026-09-02T11:51:45.966Z",
+      "submittedAt": "۱۷:۲۰",
+      "consultantId": "user-c101",
+      "managerRating": 5,
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "dayOfWeekShamsi": "چهارشنبه",
+      "managerFeedback": "این پرونده شانس بالایی برای تبدیل به قرارداد سالانه دارد.",
+      "personalOpinion": "نیاز جدی به استقرار نظام ایمنی و مسئولیت مدنی کارفرما دارند."
+    },
+    {
+      "id": "rep-c101-overdue-9d",
+      "rows": [
+        {
+          "id": "row-c101-rezaei-client",
+          "notes": "تماس دوم عالی بود؛ پیش‌فاکتور ارسال شده و برای نهایی‌سازی نیاز به پیگیری ۳ دارد.",
+          "phone": "05135429988",
+          "address": "شهرک صنعتی فناوری‌های برتر، صنعت ۴",
+          "followUp1": "+",
+          "followUp2": "+",
+          "followUp3": "",
+          "followUp4": "",
+          "rowNumber": 1,
+          "clientName": "کارفرما رضایی (صنایع بسته‌بندی آرین نگین)",
+          "meetingTopic": "تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی",
+          "activityField": "تولید جعبه‌های دارویی و صادراتی",
+          "followUp1Date": "2026-09-01T11:51:45.966Z",
+          "followUp2Date": "2026-09-05T11:51:45.966Z",
+          "followUpResult": "",
+          "personnelCount": 52,
+          "employerConcern": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری"
+        }
+      ],
+      "guild": "صنایع چاپ و بسته‌بندی صادراتی",
+      "status": "approved",
+      "createdAt": "2026-09-01T11:51:45.966Z",
+      "updatedAt": "2026-09-01T11:51:45.966Z",
+      "dateShamsi": "1405/06/10",
+      "reviewedAt": "2026-09-01T11:51:45.966Z",
+      "submittedAt": "۱۵:۰۰",
+      "consultantId": "user-c101",
+      "managerRating": 5,
+      "consultantCode": "C-101",
+      "consultantName": "علیرضا رضایی",
+      "dayOfWeekShamsi": "سه‌شنبه",
+      "managerFeedback": "پیگیری سوم کارفرما رضایی برای نهایی‌سازی قرارداد مشاوره بسیار حساس است.",
+      "personalOpinion": "چاپخانه‌ها با مسائل بیمه تأمین اجتماعی کارگران شیفت شب درگیرند."
+    }
+  ],
+  "archives": [
+    {
+      "id": "arch-14050619",
+      "reports": [
+        {
+          "id": "rep-c101-today",
+          "rows": [
+            {
+              "id": "row-c101-today-1",
+              "notes": "جلسه با مهندس صادقی (مدیرعامل) دوشنبه ساعت ۱۰:۰۰ در محل کارخانه تنظیم شد.",
+              "phone": "05138401122",
+              "address": "شهرک صنعتی توس، فاز ۱، تلاش جنوبی",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "صنایع ریخته‌گری توس فولاد",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "تولید قطعات چدنی خودرو",
+              "followUpResult": "✓ (جلسه حضوری ست شد)",
+              "personnelCount": 48,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+            },
+            {
+              "id": "row-c101-today-2",
+              "notes": "مدیر کارگاه در خط تولید بود؛ تماس مجدد هماهنگ خواهد شد.",
+              "phone": "05132456677",
+              "address": "بزرگراه آسیایی، آزادی ۱۲۵",
+              "followUp1": ".",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 2,
+              "clientName": "کارگاه تراشکاری نوین صنعت",
+              "meetingTopic": "",
+              "activityField": "تراشکاری قطعات برنجی",
+              "followUpResult": "",
+              "personnelCount": 14,
+              "employerConcern": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی"
+            },
+            {
+              "id": "row-c101-today-3",
+              "notes": "کارفرما عنوان کرد فعلاً برنامه اصلاح ساختار ندارند.",
+              "phone": "05136518899",
+              "address": "شهرک صنعتی کلات",
+              "followUp1": "-",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "قالب‌سازی دقیق البرز",
+              "meetingTopic": "",
+              "activityField": "طراحی قالب‌های سنبه ماتریس",
+              "followUpResult": "- (اعلام عدم نیاز فعلی)",
+              "personnelCount": 9,
+              "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)"
+            }
+          ],
+          "guild": "تولیدی قطعات خودرو و ریخته‌گری",
+          "status": "approved",
+          "createdAt": "2026-09-10T11:51:45.966Z",
+          "updatedAt": "2026-09-10T11:51:45.966Z",
+          "dateShamsi": "1405/06/19",
+          "reviewedAt": "2026-09-10T11:51:45.966Z",
+          "submittedAt": "۱۴:۳۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "پنج‌شنبه",
+          "managerFeedback": "عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری به خوبی هماهنگ شد.",
+          "personalOpinion": "به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند."
+        },
+        {
+          "id": "rep-c102-today",
+          "rows": [
+            {
+              "id": "row-c102-1",
+              "notes": "جلسه گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.",
+              "phone": "05138479900",
+              "address": "بلوار سجاد، خیابان بهار",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "شرکت دانش‌بنیان داده‌پردازان عصر نوین",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "توسعه نرم‌افزارهای سازمانی و هوش مصنوعی",
+              "followUpResult": "✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)",
+              "personnelCount": 36,
+              "employerConcern": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری"
+            }
+          ],
+          "guild": "فناوری اطلاعات و تجارت الکترونیک",
+          "status": "approved",
+          "createdAt": "2026-09-10T11:51:45.966Z",
+          "updatedAt": "2026-09-10T11:51:45.966Z",
+          "dateShamsi": "1405/06/19",
+          "reviewedAt": "2026-09-10T11:51:45.966Z",
+          "submittedAt": "۱۳:۱۵",
+          "consultantId": "user-c102",
+          "managerRating": 5,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "پنج‌شنبه",
+          "managerFeedback": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
+          "personalOpinion": "شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند."
+        }
+      ],
+      "fileName": "گزارش_روزانه_پنج‌شنبه_1405-06-19.xlsx",
+      "dayOfWeek": "پنج‌شنبه",
+      "timestamp": "2026-09-10T11:51:46.350Z",
+      "dateShamsi": "1405/06/19",
+      "topConcerns": [
+        {
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "count": 1
+        },
+        {
+          "name": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی",
+          "count": 1
+        },
+        {
+          "name": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)",
+          "count": 1
+        },
+        {
+          "name": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری",
+          "count": 1
+        }
+      ],
+      "autoGenerated": true,
+      "totalConsultants": 2,
+      "totalClientsContacted": 4
+    },
+    {
+      "id": "arch-14050618",
+      "reports": [
+        {
+          "id": "rep-c101-today",
+          "rows": [
+            {
+              "id": "row-c101-today-1",
+              "notes": "جلسه با مهندس صادقی (مدیرعامل) دوشنبه ساعت ۱۰:۰۰ در محل کارخانه تنظیم شد.",
+              "phone": "05138401122",
+              "address": "شهرک صنعتی توس، فاز ۱، تلاش جنوبی",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "صنایع ریخته‌گری توس فولاد",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "تولید قطعات چدنی خودرو",
+              "followUpResult": "✓ (جلسه حضوری ست شد)",
+              "personnelCount": 48,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+            },
+            {
+              "id": "row-c101-today-2",
+              "notes": "مدیر کارگاه در خط تولید بود؛ تماس مجدد هماهنگ خواهد شد.",
+              "phone": "05132456677",
+              "address": "بزرگراه آسیایی، آزادی ۱۲۵",
+              "followUp1": ".",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 2,
+              "clientName": "کارگاه تراشکاری نوین صنعت",
+              "meetingTopic": "",
+              "activityField": "تراشکاری قطعات برنجی",
+              "followUpResult": "",
+              "personnelCount": 14,
+              "employerConcern": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی"
+            },
+            {
+              "id": "row-c101-today-3",
+              "notes": "کارفرما عنوان کرد فعلاً برنامه اصلاح ساختار ندارند.",
+              "phone": "05136518899",
+              "address": "شهرک صنعتی کلات",
+              "followUp1": "-",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "قالب‌سازی دقیق البرز",
+              "meetingTopic": "",
+              "activityField": "طراحی قالب‌های سنبه ماتریس",
+              "followUpResult": "- (اعلام عدم نیاز فعلی)",
+              "personnelCount": 9,
+              "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)"
+            }
+          ],
+          "guild": "تولیدی قطعات خودرو و ریخته‌گری",
+          "status": "approved",
+          "createdAt": "2026-09-09T10:05:47.491Z",
+          "updatedAt": "2026-09-09T10:05:47.491Z",
+          "dateShamsi": "1405/06/18",
+          "reviewedAt": "2026-09-09T10:05:47.491Z",
+          "submittedAt": "۱۴:۳۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "چهارشنبه",
+          "managerFeedback": "عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری به خوبی هماهنگ شد.",
+          "personalOpinion": "به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند."
+        },
+        {
+          "id": "rep-c102-today",
+          "rows": [
+            {
+              "id": "row-c102-1",
+              "notes": "جلسه گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.",
+              "phone": "05138479900",
+              "address": "بلوار سجاد، خیابان بهار",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "شرکت دانش‌بنیان داده‌پردازان عصر نوین",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "توسعه نرم‌افزارهای سازمانی و هوش مصنوعی",
+              "followUpResult": "✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)",
+              "personnelCount": 36,
+              "employerConcern": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری"
+            }
+          ],
+          "guild": "فناوری اطلاعات و تجارت الکترونیک",
+          "status": "approved",
+          "createdAt": "2026-09-09T10:05:47.491Z",
+          "updatedAt": "2026-09-09T10:05:47.491Z",
+          "dateShamsi": "1405/06/18",
+          "reviewedAt": "2026-09-09T10:05:47.491Z",
+          "submittedAt": "۱۳:۱۵",
+          "consultantId": "user-c102",
+          "managerRating": 5,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "چهارشنبه",
+          "managerFeedback": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
+          "personalOpinion": "شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند."
+        }
+      ],
+      "fileName": "گزارش_روزانه_چهارشنبه_1405-06-18.xlsx",
+      "dayOfWeek": "چهارشنبه",
+      "timestamp": "2026-09-09T10:05:47.560Z",
+      "dateShamsi": "1405/06/18",
+      "topConcerns": [
+        {
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "count": 1
+        },
+        {
+          "name": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی",
+          "count": 1
+        },
+        {
+          "name": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)",
+          "count": 1
+        },
+        {
+          "name": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری",
+          "count": 1
+        }
+      ],
+      "autoGenerated": true,
+      "totalConsultants": 2,
+      "totalClientsContacted": 4
+    },
+    {
+      "id": "arch-14050617",
+      "fileName": "گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx",
+      "dateShamsi": "1405/06/17",
+      "dayOfWeek": "سه‌شنبه",
+      "timestamp": "2026-09-09T09:42:16.963Z",
+      "totalConsultants": 3,
+      "totalClientsContacted": 14,
+      "topConcerns": [
+        {
+          "name": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)",
+          "count": 3
+        },
+        {
+          "name": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری",
+          "count": 2
+        },
+        {
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "count": 2
+        },
+        {
+          "name": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی",
+          "count": 2
+        },
+        {
+          "name": "ریزش مداوم نیروی انسانی و تعارضات درون‌سازمانی",
+          "count": 1
+        }
+      ],
+      "reports": [
+        {
+          "id": "rep-1788869621659",
+          "rows": [
+            {
+              "id": "row-1788869523910-2",
+              "notes": "",
+              "phone": "09995443211",
+              "address": "سیلیکون ولی",
+              "followUp1": "✓",
+              "followUp2": "✓",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "مهندس زارع",
+              "meetingTopic": "بسیار خوش برخورد و متشخص",
+              "activityField": "هوش مصنوعی",
+              "followUpResult": "منتظر جلسه هستند",
+              "personnelCount": "۱۰۰۰",
+              "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)"
+            }
+          ],
+          "guild": "صنف سیستم",
+          "status": "submitted",
+          "createdAt": "2026-09-08T12:13:41.659Z",
+          "updatedAt": "2026-09-08T12:17:06.342Z",
+          "dateShamsi": "1405/06/17",
+          "submittedAt": "۱۵:۴۳",
+          "consultantId": "user-c103",
+          "consultantCode": "C-103",
+          "consultantName": "سعید حسینی",
+          "dayOfWeekShamsi": "سه‌شنبه",
+          "personalOpinion": "ایشان خفن هستند"
+        },
+        {
+          "id": "rep-1788868003406",
+          "rows": [
+            {
+              "id": "row-1788867608718-1",
+              "notes": "",
+              "phone": "09154324567",
+              "address": "شهرک سراجیان",
+              "followUp1": "*",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "سراجی",
+              "meetingTopic": "شنبلیله فروشی",
+              "activityField": "سراج فروشی",
+              "followUpResult": "مخشو زدم بلاخره",
+              "personnelCount": "۱",
+              "employerConcern": "ریزش مداوم نیروی انسانی و تعارضات درون‌سازمانی"
+            }
+          ],
+          "guild": "اصناف و بنگاه‌های اقتصادی",
+          "status": "approved",
+          "createdAt": "2026-09-08T11:46:43.406Z",
+          "updatedAt": "2026-09-08T12:06:28.491Z",
+          "dateShamsi": "1405/06/17",
+          "reviewedAt": "2026-09-08T12:06:28.491Z",
+          "submittedAt": "۱۵:۲۹",
+          "consultantId": "user-c102",
+          "managerRating": 2,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "سه‌شنبه",
+          "managerFeedback": "شانگاریلیلا",
+          "personalOpinion": "طرف بدفازه"
+        },
+        {
+          "id": "rep-seed-2",
+          "rows": [
+            {
+              "id": "row-seed-2-1",
+              "notes": "جلسه تخصصی گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.",
+              "phone": "05138479900",
+              "address": "بلوار سجاد، خیابان بهار",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "شرکت دانش‌بنیان داده‌پردازان عصر نوین",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "توسعه نرم‌افزارهای سازمانی و هوش مصنوعی",
+              "followUpResult": "✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)",
+              "personnelCount": 36,
+              "employerConcern": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری"
+            },
+            {
+              "id": "row-seed-2-2",
+              "notes": "مدیر مالی شرکت استقبال کرد؛ مستندات مقایسه‌ای مالیات حقوق ارسال شد.",
+              "phone": "05137614455",
+              "address": "بلوار دستغیب، مجتمع تک",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 2,
+              "clientName": "پلتفرم خدمات ابری رایان‌سرویس",
+              "meetingTopic": "",
+              "activityField": "ارائه زیرساخت و سرور ابری",
+              "followUpResult": "",
+              "personnelCount": 24,
+              "employerConcern": "ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد"
+            },
+            {
+              "id": "row-seed-2-3",
+              "notes": "درخواست راهنمایی در خصوص فرمول پورسانت پلکانی کارشناسان فروش.",
+              "phone": "05138435566",
+              "address": "احمدآباد، خیابان عدالت",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "آژانس دیجیتال مارکتینگ صبا",
+              "meetingTopic": "",
+              "activityField": "سئو و تبلیغات دیجیتال",
+              "followUpResult": "",
+              "personnelCount": 16,
+              "employerConcern": "ابهام در فرمول‌های پورسانت، پاداش و تارگت‌های فروش"
+            }
+          ],
+          "guild": "فناوری اطلاعات و تجارت الکترونیک",
+          "status": "approved",
+          "createdAt": "2026-09-08T08:52:10.140Z",
+          "updatedAt": "2026-09-08T11:43:25.885Z",
+          "dateShamsi": "1405/06/17",
+          "reviewedAt": "2026-09-08T11:43:25.885Z",
+          "submittedAt": "۱۳:۱۵",
+          "consultantId": "user-c102",
+          "managerRating": 5,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "سه‌شنبه",
+          "managerFeedback": "آفرین مریم",
+          "personalOpinion": "شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند."
+        },
+        {
+          "id": "rep-c101-today",
+          "rows": [
+            {
+              "id": "row-c101-today-1",
+              "notes": "جلسه با مهندس صادقی (مدیرعامل) دوشنبه ساعت ۱۰:۰۰ در محل کارخانه تنظیم شد.",
+              "phone": "05138401122",
+              "address": "شهرک صنعتی توس، فاز ۱، تلاش جنوبی",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "صنایع ریخته‌گری توس فولاد",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "تولید قطعات چدنی خودرو",
+              "followUpResult": "✓ (جلسه حضوری ست شد)",
+              "personnelCount": 48,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+            },
+            {
+              "id": "row-c101-today-2",
+              "notes": "مدیر کارگاه در خط تولید بود؛ تماس مجدد هماهنگ خواهد شد.",
+              "phone": "05132456677",
+              "address": "بزرگراه آسیایی، آزادی ۱۲۵",
+              "followUp1": ".",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 2,
+              "clientName": "کارگاه تراشکاری نوین صنعت",
+              "meetingTopic": "",
+              "activityField": "تراشکاری قطعات برنجی",
+              "followUpResult": "",
+              "personnelCount": 14,
+              "employerConcern": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی"
+            },
+            {
+              "id": "row-c101-today-3",
+              "notes": "کارفرما عنوان کرد فعلاً برنامه اصلاح ساختار ندارند.",
+              "phone": "05136518899",
+              "address": "شهرک صنعتی کلات",
+              "followUp1": "-",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "قالب‌سازی دقیق البرز",
+              "meetingTopic": "",
+              "activityField": "طراحی قالب‌های سنبه ماتریس",
+              "followUpResult": "- (اعلام عدم نیاز فعلی)",
+              "personnelCount": 9,
+              "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)"
+            }
+          ],
+          "guild": "تولیدی قطعات خودرو و ریخته‌گری",
+          "status": "approved",
+          "createdAt": "2026-09-08T11:34:11.215Z",
+          "updatedAt": "2026-09-08T11:34:11.215Z",
+          "dateShamsi": "1405/06/17",
+          "reviewedAt": "2026-09-08T11:34:11.215Z",
+          "submittedAt": "۱۴:۳۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "سه‌شنبه",
+          "managerFeedback": "عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری به خوبی هماهنگ شد.",
+          "personalOpinion": "به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند."
+        },
+        {
+          "id": "rep-seed-1",
+          "rows": [
+            {
+              "id": "row-seed-1-1",
+              "notes": "جلسه با مهندس صادقی (مدیرعامل) دوشنبه ساعت ۱۰:۰۰ در محل کارخانه تنظیم شد.",
+              "phone": "05138401122",
+              "address": "شهرک صنعتی توس، فاز ۱، تلاش جنوبی",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "صنایع ریخته‌گری توس فولاد",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "تولید قطعات چدنی خودرو",
+              "followUpResult": "✓ (جلسه حضوری ست شد)",
+              "personnelCount": 48,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+            },
+            {
+              "id": "row-seed-1-2",
+              "notes": "تماس دوم انجام شد؛ پیش‌نویس چک‌لیست حقوقی ارسال گردید، منتظر بررسی هیئت‌مدیره هستند.",
+              "phone": "05135412233",
+              "address": "شهرک صنعتی فناوری‌های برتر",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 2,
+              "clientName": "صنعتی پارت سازان خاور",
+              "meetingTopic": "",
+              "activityField": "ماشین‌کاری قطعات حساس",
+              "followUpResult": "",
+              "personnelCount": 22,
+              "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی"
+            },
+            {
+              "id": "row-seed-1-3",
+              "notes": "مدیر کارگاه در خط تولید بود؛ تماس مجدد در نوبت عصر هماهنگ خواهد شد.",
+              "phone": "05132456677",
+              "address": "بزرگراه آسیایی، آزادی ۱۲۵",
+              "followUp1": ".",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "کارگاه تراشکاری نوین صنعت",
+              "meetingTopic": "",
+              "activityField": "تراشکاری قطعات برنجی",
+              "followUpResult": "",
+              "personnelCount": 14,
+              "employerConcern": "جرایم بازرسی و مغایرت‌های حق بیمه تأمین اجتماعی"
+            },
+            {
+              "id": "row-seed-1-4",
+              "notes": "کارفرما عنوان کرد فعلاً به دلیل نوسانات بازار برنامه اصلاح ساختار ندارند.",
+              "phone": "05136518899",
+              "address": "شهرک صنعتی کلات",
+              "followUp1": "-",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 4,
+              "clientName": "قالب‌سازی دقیق البرز",
+              "meetingTopic": "",
+              "activityField": "طراحی قالب‌های سنبه ماتریس",
+              "followUpResult": "- (اعلام عدم نیاز فعلی)",
+              "personnelCount": 9,
+              "employerConcern": "افت شدید بهره‌وری و نبود نظام ارزیابی عملکرد (KPI)"
+            },
+            {
+              "id": "row-seed-1-5",
+              "notes": "خط قطع بود؛ نیاز به اصلاح شماره در پایگاه داده داده‌کاوی.",
+              "phone": "05138810011",
+              "address": "جاده قدیم نیشابور",
+              "followUp1": "*",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 5,
+              "clientName": "ریخته‌گری آلومینیوم خاوران",
+              "meetingTopic": "",
+              "activityField": "ریخته‌گری تحت فشار دایکست",
+              "followUpResult": "* (شماره کارخانه تغییر یافته است)",
+              "personnelCount": 30,
+              "employerConcern": "عدم تطابق فیش حقوقی، مزایای قانونی و تراز مالی با پرداختی واقعی"
+            }
+          ],
+          "guild": "تولیدی قطعات خودرو و ریخته‌گری",
+          "status": "approved",
+          "createdAt": "2026-09-08T08:52:10.140Z",
+          "updatedAt": "2026-09-08T08:52:10.147Z",
+          "dateShamsi": "1405/06/17",
+          "reviewedAt": "2026-09-08T08:52:10.140Z",
+          "submittedAt": "۱۴:۳۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "سه‌شنبه",
+          "managerFeedback": "عملکرد بسیار عالی در برقراری ارتباط با صنایع ریخته‌گری توس فولاد. جلسه حضوری هماهنگ شود.",
+          "personalOpinion": "به دلیل افزایش نظارت و بازرسی‌های تأمین اجتماعی، کارفرمایان این صنف استقبال چشمگیری از خدمات بازبینی قراردادها و تراز مالی دارند."
+        },
+        {
+          "id": "rep-c102-today",
+          "rows": [
+            {
+              "id": "row-c102-1",
+              "notes": "جلسه گوگل میت چهارشنبه ساعت ۱۴:۳۰ ست شد.",
+              "phone": "05138479900",
+              "address": "بلوار سجاد، خیابان بهار",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "شرکت دانش‌بنیان داده‌پردازان عصر نوین",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "توسعه نرم‌افزارهای سازمانی و هوش مصنوعی",
+              "followUpResult": "✓ (جلسه آنلاین با هم‌بنیان‌گذار ست شد)",
+              "personnelCount": 36,
+              "employerConcern": "ترک کار ناگهانی پرسنل کلیدی و بردن اطلاعات/اسرار تجاری"
+            }
+          ],
+          "guild": "فناوری اطلاعات و تجارت الکترونیک",
+          "status": "approved",
+          "createdAt": "2026-09-08T11:34:11.215Z",
+          "updatedAt": "2026-09-08T11:34:11.215Z",
+          "dateShamsi": "1405/06/17",
+          "reviewedAt": "2026-09-08T11:34:11.215Z",
+          "submittedAt": "۱۳:۱۵",
+          "consultantId": "user-c102",
+          "managerRating": 5,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "سه‌شنبه",
+          "managerFeedback": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
+          "personalOpinion": "شرکت‌های نرم‌افزاری به شدت نگران حفظ محرمانگی کدها و ترک ناگهانی برنامه‌نویسان ارشد هستند."
+        }
+      ],
+      "autoGenerated": true
+    },
+    {
+      "id": "arch-14050616",
+      "fileName": "گزارش_روزانه_دوشنبه_1405-06-16.xlsx",
+      "dateShamsi": "1405/06/16",
+      "dayOfWeek": "دوشنبه",
+      "timestamp": "2026-09-10T11:55:49.263Z",
+      "totalConsultants": 1,
+      "totalClientsContacted": 3,
+      "topConcerns": [
+        {
+          "name": "پرونده‌های سخت و زیان‌آور و بازنشستگی‌های زودرس پیش‌بینی نشده",
+          "count": 1
+        },
+        {
+          "name": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ",
+          "count": 1
+        },
+        {
+          "name": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری",
+          "count": 1
+        }
+      ],
+      "reports": [
+        {
+          "id": "rep-seed-3",
+          "rows": [
+            {
+              "id": "row-seed-3-1",
+              "notes": "مدیر اداری آقای رجبی بسیار پیگیر بودند؛ جلسه پنج‌شنبه ساعت ۱۱ صبح.",
+              "phone": "05135421100",
+              "address": "شهرک صنعتی چناران",
+              "followUp1": "+",
+              "followUp2": "✓",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "فرآورده‌های لبنی کوهستان مشهد",
+              "meetingTopic": "تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی",
+              "activityField": "تولید دوغ و ماست پاستوریزه",
+              "followUpResult": "✓ (جلسه حضوری با مدیر اداری ست شد)",
+              "personnelCount": 92,
+              "employerConcern": "پرونده‌های سخت و زیان‌آور و بازنشستگی‌های زودرس پیش‌بینی نشده"
+            },
+            {
+              "id": "row-seed-3-2",
+              "notes": "مذاکره اولیه انجام شد؛ منتظر تماس مجدد در چرخه پیگیری هستند.",
+              "phone": "05135413344",
+              "address": "شهرک صنعتی توس، فاز ۲",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 2,
+              "clientName": "صنایع بسته‌بندی ترنج سبز",
+              "meetingTopic": "",
+              "activityField": "بسته‌بندی حبوبات و خشکبار صادراتی",
+              "followUpResult": "",
+              "personnelCount": 38,
+              "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ"
+            },
+            {
+              "id": "row-seed-3-3",
+              "notes": "مدیرعامل در جلسه بازرسی استاندارد بود.",
+              "phone": "05136517722",
+              "address": "شهرک صنعتی ماشین‌سازی",
+              "followUp1": ".",
+              "followUp2": ".",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "تولیدی کیک و کلوچه پردیس",
+              "meetingTopic": "",
+              "activityField": "شیرینی و بیسکویت صنعتی",
+              "followUpResult": "شاپسیان",
+              "personnelCount": 25,
+              "employerConcern": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری"
+            }
+          ],
+          "guild": "صنایع غذایی و بسته‌بندی",
+          "status": "approved",
+          "createdAt": "2026-09-07T08:52:10.140Z",
+          "updatedAt": "2026-09-08T11:55:21.829Z",
+          "dateShamsi": "1405/06/16",
+          "reviewedAt": "2026-09-07T08:52:10.140Z",
+          "submittedAt": "۱۵:۲۵",
+          "consultantId": "user-c102",
+          "managerRating": 5,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "دوشنبه",
+          "managerFeedback": "نکات درج شده در خصوص شرکت فرآورده‌های لبنی کوهستان فوق‌العاده است. پشتیبانی کامل حقوقی داده شود.",
+          "personalOpinion": "صنایع غذایی به دلیل شیفت‌های گردشی و سختی کار، ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند."
+        }
+      ],
+      "autoGenerated": true
+    },
+    {
+      "id": "arch-14050615",
+      "reports": [
+        {
+          "id": "rep-c103-today",
+          "rows": [
+            {
+              "id": "row-c103-1",
+              "notes": "امروز موعد تماس دوم است.",
+              "phone": "02188991122",
+              "address": "تهران، خیابان مطهری، پلاک ۱۱۴",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما شجاعی (شرکت بازرگانی پخش مویرگی کیان)",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "پخش سراسری مواد شوینده و بهداشتی",
+              "followUpResult": "",
+              "personnelCount": 65,
+              "employerConcern": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار"
+            }
+          ],
+          "guild": "بازرگانی و پخش مویرگی",
+          "status": "approved",
+          "createdAt": "2026-09-06T11:51:45.966Z",
+          "updatedAt": "2026-09-06T11:51:45.966Z",
+          "dateShamsi": "1405/06/15",
+          "reviewedAt": "2026-09-06T11:51:45.966Z",
+          "submittedAt": "۱۵:۴۵",
+          "consultantId": "user-c103",
+          "managerRating": 4,
+          "consultantCode": "C-103",
+          "consultantName": "سعید حسینی",
+          "dayOfWeekShamsi": "یکشنبه",
+          "managerFeedback": "تمرکز بر روی مبالغ سفته و تضامین ویزیتورها باشد.",
+          "personalOpinion": "شرکت‌های پخش دغدغه فوری تنظیم سفته و قرارداد ضمانت دارند."
+        },
+        {
+          "id": "rep-c101-today-due-4d",
+          "rows": [
+            {
+              "id": "row-c101-hosseini-client",
+              "notes": "امروز دقیقاً موعد تماس دوم (روز چهارم) است.",
+              "phone": "05135412233",
+              "address": "شهرک صنعتی فناوری‌های برتر",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما حسینی (صنعتی پارت سازان خاور)",
+              "meetingTopic": "عارضه‌یابی منابع انسانی و طراحی نظام پاداش و ارزیابی عملکرد",
+              "activityField": "ماشین‌کاری قطعات حساس موتور",
+              "followUpResult": "",
+              "personnelCount": 22,
+              "employerConcern": "ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد"
+            }
+          ],
+          "guild": "صنعتی و مهندسی دقیق",
+          "status": "submitted",
+          "createdAt": "2026-09-06T11:51:45.966Z",
+          "updatedAt": "2026-09-06T11:51:45.966Z",
+          "dateShamsi": "1405/06/15",
+          "submittedAt": "۱۱:۴۰",
+          "consultantId": "user-c101",
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "یکشنبه",
+          "managerFeedback": "",
+          "personalOpinion": "استقبال مدیرعامل در جلسه نخست امیدوارکننده بود."
+        }
+      ],
+      "fileName": "گزارش_روزانه_یکشنبه_1405-06-15.xlsx",
+      "dayOfWeek": "یکشنبه",
+      "timestamp": "2026-09-10T11:51:46.290Z",
+      "dateShamsi": "1405/06/15",
+      "topConcerns": [
+        {
+          "name": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار",
+          "count": 1
+        },
+        {
+          "name": "ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد",
+          "count": 1
+        }
+      ],
+      "autoGenerated": true,
+      "totalConsultants": 2,
+      "totalClientsContacted": 2
+    },
+    {
+      "id": "arch-14050614",
+      "reports": [
+        {
+          "id": "rep-c103-today",
+          "rows": [
+            {
+              "id": "row-c103-1",
+              "notes": "امروز موعد تماس دوم است.",
+              "phone": "02188991122",
+              "address": "تهران، خیابان مطهری، پلاک ۱۱۴",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما شجاعی (شرکت بازرگانی پخش مویرگی کیان)",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "پخش سراسری مواد شوینده و بهداشتی",
+              "followUpResult": "",
+              "personnelCount": 65,
+              "employerConcern": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار"
+            }
+          ],
+          "guild": "بازرگانی و پخش مویرگی",
+          "status": "approved",
+          "createdAt": "2026-09-05T10:04:51.406Z",
+          "updatedAt": "2026-09-05T10:04:51.406Z",
+          "dateShamsi": "1405/06/14",
+          "reviewedAt": "2026-09-05T10:04:51.406Z",
+          "submittedAt": "۱۵:۴۵",
+          "consultantId": "user-c103",
+          "managerRating": 4,
+          "consultantCode": "C-103",
+          "consultantName": "سعید حسینی",
+          "dayOfWeekShamsi": "شنبه",
+          "managerFeedback": "تمرکز بر روی مبالغ سفته و تضامین ویزیتورها باشد.",
+          "personalOpinion": "شرکت‌های پخش دغدغه فوری تنظیم سفته و قرارداد ضمانت دارند."
+        },
+        {
+          "id": "rep-c101-today-due-4d",
+          "rows": [
+            {
+              "id": "row-c101-hosseini-client",
+              "notes": "امروز دقیقاً موعد تماس دوم (روز چهارم) است.",
+              "phone": "05135412233",
+              "address": "شهرک صنعتی فناوری‌های برتر",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما حسینی (صنعتی پارت سازان خاور)",
+              "meetingTopic": "عارضه‌یابی منابع انسانی و طراحی نظام پاداش و ارزیابی عملکرد",
+              "activityField": "ماشین‌کاری قطعات حساس موتور",
+              "followUpResult": "",
+              "personnelCount": 22,
+              "employerConcern": "ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد"
+            }
+          ],
+          "guild": "صنعتی و مهندسی دقیق",
+          "status": "submitted",
+          "createdAt": "2026-09-05T10:04:51.406Z",
+          "updatedAt": "2026-09-05T10:04:51.406Z",
+          "dateShamsi": "1405/06/14",
+          "submittedAt": "۱۱:۴۰",
+          "consultantId": "user-c101",
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "شنبه",
+          "managerFeedback": "",
+          "personalOpinion": "استقبال مدیرعامل در جلسه نخست امیدوارکننده بود."
+        }
+      ],
+      "fileName": "گزارش_روزانه_شنبه_1405-06-14.xlsx",
+      "dayOfWeek": "شنبه",
+      "timestamp": "2026-09-09T10:04:51.467Z",
+      "dateShamsi": "1405/06/14",
+      "topConcerns": [
+        {
+          "name": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار",
+          "count": 1
+        },
+        {
+          "name": "ریسک‌های مالیاتی و حسابداری مرتبط با حقوق و دستمزد",
+          "count": 1
+        }
+      ],
+      "autoGenerated": true,
+      "totalConsultants": 2,
+      "totalClientsContacted": 2
+    },
+    {
+      "id": "arch-14050613",
+      "fileName": "گزارش_روزانه_جمعه_1405-06-13.xlsx",
+      "dateShamsi": "1405/06/13",
+      "dayOfWeek": "جمعه",
+      "timestamp": "2026-09-10T12:48:11.816Z",
+      "totalConsultants": 2,
+      "totalClientsContacted": 5,
+      "topConcerns": [
+        {
+          "name": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار",
+          "count": 2
+        },
+        {
+          "name": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی",
+          "count": 2
+        },
+        {
+          "name": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی",
+          "count": 1
+        }
+      ],
+      "reports": [
+        {
+          "id": "rep-c103-today",
+          "rows": [
+            {
+              "id": "row-c103-1",
+              "notes": "امروز موعد تماس دوم است.",
+              "phone": "02188991122",
+              "address": "تهران، خیابان مطهری، پلاک ۱۱۴",
+              "followUp1": "+",
+              "followUp2": ".",
+              "followUp3": "-",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما شجاعی (شرکت بازرگانی پخش مویرگی کیان)",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "پخش سراسری مواد شوینده و بهداشتی",
+              "followUpResult": "نمیخواد اصن",
+              "personnelCount": 65,
+              "employerConcern": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار"
+            }
+          ],
+          "guild": "بازرگانی و پخش مویرگی",
+          "status": "approved",
+          "createdAt": "2026-09-04T11:34:11.215Z",
+          "updatedAt": "2026-09-10T11:47:58.738Z",
+          "dateShamsi": "1405/06/13",
+          "reviewedAt": "2026-09-08T11:38:23.061Z",
+          "submittedAt": "۱۵:۰۳",
+          "consultantId": "user-c103",
+          "managerRating": 2,
+          "consultantCode": "C-103",
+          "consultantName": "سعید حسینی",
+          "dayOfWeekShamsi": "جمعه",
+          "managerFeedback": "تمرک",
+          "personalOpinion": "شرکت‌های پخش دغدغه فوری تنظیم سفته و قرارداد ضمانت دارند."
+        },
+        {
+          "id": "rep-seed-4",
+          "rows": [
+            {
+              "id": "row-seed-4-1",
+              "notes": "امروز دقیقاً موعد تماس دوم در چرخه ۴ روزه است و سیستم آلارم پیگیری صادر کرده است.",
+              "phone": "02188991122",
+              "address": "تهران، خیابان مطهری، پلاک ۱۱۴",
+              "followUp1": "+",
+              "followUp2": "*",
+              "followUp3": "-",
+              "followUp4": "-",
+              "rowNumber": 1,
+              "clientName": "شرکت بازرگانی پخش مویرگی کیان",
+              "meetingTopic": "",
+              "activityField": "پخش سراسری مواد شوینده و بهداشتی",
+              "followUpResult": "کوفته",
+              "personnelCount": 65,
+              "employerConcern": "چالش‌های توزیع مویرگی، وصول مطالبات و کسری انبار"
+            },
+            {
+              "id": "row-seed-4-2",
+              "notes": "موعد تماس دوم فرارسیده؛ مدیر منابع انسانی تمایل به دریافت نمونه قرارداد امانی دارد.",
+              "phone": "02166554433",
+              "address": "تهران، خیابان آزادی، نبش شادمان",
+              "followUp1": "+",
+              "followUp2": "-",
+              "followUp3": "-",
+              "followUp4": "+",
+              "rowNumber": 2,
+              "clientName": "توزیع و پخش دارویی رازیان سلامت",
+              "meetingTopic": "",
+              "activityField": "پخش اقلام دارویی و مکمل‌ها",
+              "followUpResult": "شاپسین",
+              "personnelCount": 42,
+              "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی"
+            },
+            {
+              "id": "row-seed-4-3",
+              "notes": "در چرخه پیگیری قرار دارد.",
+              "phone": "02155443322",
+              "address": "تهران، جاده مخصوص کرج، کیلومتر ۱۱",
+              "followUp1": ".",
+              "followUp2": "+",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "شرکت لجستیک سپهر ترابر",
+              "meetingTopic": "",
+              "activityField": "خدمات انبارداری و ارسال مرسولات",
+              "followUpResult": "مثبته",
+              "personnelCount": 28,
+              "employerConcern": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی"
+            }
+          ],
+          "guild": "بازرگانی و پخش مویرگی",
+          "status": "approved",
+          "createdAt": "2026-09-04T08:52:10.140Z",
+          "updatedAt": "2026-09-10T11:34:26.309Z",
+          "dateShamsi": "1405/06/13",
+          "reviewedAt": "2026-09-08T11:41:45.450Z",
+          "submittedAt": "۱۵:۰۳",
+          "consultantId": "user-c103",
+          "managerRating": 4,
+          "consultantCode": "C-103",
+          "consultantName": "سعید حسینی",
+          "dayOfWeekShamsi": "جمعه",
+          "managerFeedback": "تو شنبلیله ای",
+          "personalOpinion": "شرکت‌های پخش به دلیل مبالغ سنگین ضمانت‌نامه‌های ویزیتورها و رانندگان، دغدغه فوری تنظیم سفته و قرارداد ضمانت دارند."
+        },
+        {
+          "id": "rep-c101-overdue-6d",
+          "rows": [
+            {
+              "id": "row-c101-ahmadi",
+              "notes": "در تماس اول بسیار مشتاق بودند؛ قرار شد بعد از ۴ روز برای ارسال پیش‌نویس تماس گرفته شود.",
+              "phone": "05138491122",
+              "address": "شهرک صنعتی توس، تلاش شمالی ۶",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما احمدی (گروه صنعتی پارت گستر)",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "تولید قطعات پرسی بدنه خودرو",
+              "followUpResult": "",
+              "personnelCount": 35,
+              "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی"
+            }
+          ],
+          "guild": "ماشین‌سازی و قطعه‌سازی خودرو",
+          "status": "approved",
+          "createdAt": "2026-09-04T11:51:45.966Z",
+          "updatedAt": "2026-09-04T11:51:45.966Z",
+          "dateShamsi": "1405/06/13",
+          "reviewedAt": "2026-09-04T11:51:45.966Z",
+          "submittedAt": "۱۶:۱۵",
+          "consultantId": "user-c101",
+          "managerRating": 4,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "جمعه",
+          "managerFeedback": "پرونده کارفرما احمدی را سریعاً تماس گرفته و تعیین تکلیف نمایید.",
+          "personalOpinion": "کارفرمایان این گروه به دلیل چالش تضامین و قراردادهای کارگری نیازمند پیگیری منظم هستند."
+        }
+      ],
+      "autoGenerated": true
+    },
+    {
+      "id": "arch-14050612",
+      "reports": [
+        {
+          "id": "rep-c101-overdue-6d",
+          "rows": [
+            {
+              "id": "row-c101-ahmadi",
+              "notes": "در تماس اول بسیار مشتاق بودند؛ قرار شد بعد از ۴ روز برای ارسال پیش‌نویس تماس گرفته شود.",
+              "phone": "05138491122",
+              "address": "شهرک صنعتی توس، تلاش شمالی ۶",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما احمدی (گروه صنعتی پارت گستر)",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "تولید قطعات پرسی بدنه خودرو",
+              "followUpResult": "",
+              "personnelCount": 35,
+              "employerConcern": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی"
+            }
+          ],
+          "guild": "ماشین‌سازی و قطعه‌سازی خودرو",
+          "status": "approved",
+          "createdAt": "2026-09-03T10:04:51.406Z",
+          "updatedAt": "2026-09-03T10:04:51.406Z",
+          "dateShamsi": "1405/06/12",
+          "reviewedAt": "2026-09-03T10:04:51.406Z",
+          "submittedAt": "۱۶:۱۵",
+          "consultantId": "user-c101",
+          "managerRating": 4,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "پنج‌شنبه",
+          "managerFeedback": "پرونده کارفرما احمدی را سریعاً تماس گرفته و تعیین تکلیف نمایید.",
+          "personalOpinion": "کارفرمایان این گروه به دلیل چالش تضامین و قراردادهای کارگری نیازمند پیگیری منظم هستند."
+        },
+        {
+          "id": "rep-c102-overdue",
+          "rows": [
+            {
+              "id": "row-c102-overdue-1",
+              "notes": "نیازمند تماس فوری پیگیری دوم (۲ روز معوق).",
+              "phone": "05135413344",
+              "address": "شهرک صنعتی توس، فاز ۲",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما کاظمی (صنایع بسته‌بندی ترنج سبز)",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "بسته‌بندی حبوبات و خشکبار صادراتی",
+              "followUpResult": "",
+              "personnelCount": 38,
+              "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ"
+            }
+          ],
+          "guild": "صنایع غذایی و کشاورزی",
+          "status": "approved",
+          "createdAt": "2026-09-03T10:04:51.406Z",
+          "updatedAt": "2026-09-03T10:04:51.406Z",
+          "dateShamsi": "1405/06/12",
+          "reviewedAt": "2026-09-03T10:04:51.406Z",
+          "submittedAt": "۱۶:۰۰",
+          "consultantId": "user-c102",
+          "managerRating": 4,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "پنج‌شنبه",
+          "managerFeedback": "پشتیبانی کامل حقوقی داده شود.",
+          "personalOpinion": "صنایع غذایی ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند."
+        },
+        {
+          "id": "rep-c104-today",
+          "rows": [
+            {
+              "id": "row-c104-1",
+              "notes": "پیگیری معوق؛ تماس دوم باید فوری انجام شود.",
+              "phone": "05138447788",
+              "address": "مشهد، بلوار فلسطین، تقاطع خیام",
+              "followUp1": "+",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما ابراهیمی (شرکت ابنیه عمران گستر)",
+              "meetingTopic": "مشاوره دفاعیات پرونده‌های مطروحه در هیئت‌های حل اختلاف",
+              "activityField": "پیمانکاری پروژه‌های مسکونی و تجاری",
+              "followUpResult": "",
+              "personnelCount": 115,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+            }
+          ],
+          "guild": "ساختمانی، انبوه‌سازی و تأسیسات",
+          "status": "approved",
+          "createdAt": "2026-09-03T10:04:51.406Z",
+          "updatedAt": "2026-09-03T10:04:51.406Z",
+          "dateShamsi": "1405/06/12",
+          "reviewedAt": "2026-09-03T10:04:51.406Z",
+          "submittedAt": "۱۲:۳۰",
+          "consultantId": "user-c104",
+          "managerRating": 4,
+          "consultantCode": "C-104",
+          "consultantName": "ندا کریمی",
+          "dayOfWeekShamsi": "پنج‌شنبه",
+          "managerFeedback": "پکیج مشاوره آیین‌نامه انضباطی برای کارگاه‌های بالای ۲۰ نفر معرفی شود.",
+          "personalOpinion": "شرکت‌های پیمانکاری بیشترین حجم احضاریه‌های هیئت‌های تشخیص را دارند."
+        }
+      ],
+      "fileName": "گزارش_روزانه_پنج‌شنبه_1405-06-12.xlsx",
+      "dayOfWeek": "پنج‌شنبه",
+      "timestamp": "2026-09-09T10:04:51.493Z",
+      "dateShamsi": "1405/06/12",
+      "topConcerns": [
+        {
+          "name": "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی",
+          "count": 1
+        },
+        {
+          "name": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ",
+          "count": 1
+        },
+        {
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "count": 1
+        }
+      ],
+      "autoGenerated": true,
+      "totalConsultants": 3,
+      "totalClientsContacted": 3
+    },
+    {
+      "id": "arch-14050611",
+      "fileName": "گزارش_روزانه_چهارشنبه_1405-06-11.xlsx",
+      "dateShamsi": "1405/06/11",
+      "dayOfWeek": "چهارشنبه",
+      "timestamp": "2026-09-10T11:52:49.290Z",
+      "totalConsultants": 3,
+      "totalClientsContacted": 3,
+      "topConcerns": [
+        {
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "count": 1
+        },
+        {
+          "name": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ",
+          "count": 1
+        },
+        {
+          "name": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی",
+          "count": 1
+        }
+      ],
+      "reports": [
+        {
+          "id": "rep-c104-today",
+          "rows": [
+            {
+              "id": "row-c104-1",
+              "notes": "پیگیری معوق؛ تماس دوم باید فوری انجام شود.",
+              "phone": "05138447788",
+              "address": "مشهد، بلوار فلسطین، تقاطع خیام",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما ابراهیمی (شرکت ابنیه عمران گستر)",
+              "meetingTopic": "مشاوره دفاعیات پرونده‌های مطروحه در هیئت‌های حل اختلاف",
+              "activityField": "پیمانکاری پروژه‌های مسکونی و تجاری",
+              "followUpResult": "حله دادا",
+              "personnelCount": 115,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+            }
+          ],
+          "guild": "ساختمانی، انبوه‌سازی و تأسیسات",
+          "status": "approved",
+          "createdAt": "2026-09-02T11:34:11.215Z",
+          "updatedAt": "2026-09-08T12:11:08.180Z",
+          "dateShamsi": "1405/06/11",
+          "reviewedAt": "2026-09-08T12:11:08.180Z",
+          "submittedAt": "۱۵:۳۶",
+          "consultantId": "user-c104",
+          "managerRating": 5,
+          "consultantCode": "C-104",
+          "consultantName": "ندا کریمی",
+          "dayOfWeekShamsi": "چهارشنبه",
+          "managerFeedback": "حله پس",
+          "personalOpinion": "شرکت‌های پیمانکاری بیشترین حجم احضاریه‌های هیئت‌های تشخیص را دارند."
+        },
+        {
+          "id": "rep-c102-overdue",
+          "rows": [
+            {
+              "id": "row-c102-overdue-1",
+              "notes": "نیازمند تماس فوری پیگیری دوم (۲ روز معوق).",
+              "phone": "05135413344",
+              "address": "شهرک صنعتی توس، فاز ۲",
+              "followUp1": "+",
+              "followUp2": "*",
+              "followUp3": "✓",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما کاظمی (صنایع بسته‌بندی ترنج سبز)",
+              "meetingTopic": "تنظیم آیین‌نامه انضباطی مصوب و الحاقیه‌های محرمانگی",
+              "activityField": "بسته‌بندی حبوبات و خشکبار صادراتی",
+              "followUpResult": "جوالدوز",
+              "personnelCount": 38,
+              "employerConcern": "فقدان آیین‌نامه انضباطی مصوب و رویه مشخص اخراج یا توبیخ"
+            }
+          ],
+          "guild": "صنایع غذایی و کشاورزی",
+          "status": "approved",
+          "createdAt": "2026-09-02T11:34:11.215Z",
+          "updatedAt": "2026-09-08T11:52:51.515Z",
+          "dateShamsi": "1405/06/11",
+          "reviewedAt": "2026-09-02T11:34:11.215Z",
+          "submittedAt": "۱۵:۱۴",
+          "consultantId": "user-c102",
+          "managerRating": 4,
+          "consultantCode": "C-102",
+          "consultantName": "مریم محمدی",
+          "dayOfWeekShamsi": "چهارشنبه",
+          "managerFeedback": "پشتیبانی کامل حقوقی داده شود.",
+          "personalOpinion": "صنایع غذایی ریسک بسیار بالایی در پرونده‌های بازنشستگی پیش‌ازموعد دارند."
+        },
+        {
+          "id": "rep-c101-today-due-8d",
+          "rows": [
+            {
+              "id": "row-c101-nouri-client",
+              "notes": "پیگیری ۱ و ۲ با موفقیت انجام شده؛ امروز موعد تماس سوم برای ست کردن جلسه است.",
+              "phone": "05136514455",
+              "address": "شهرک صنعتی کلات، خیابان تلاش ۳",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما نوری (تولیدی قطعات آسانسور پارس نوری)",
+              "meetingTopic": "آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار",
+              "activityField": "تولید درب و کابین آسانسور",
+              "followUpResult": "",
+              "personnelCount": 31,
+              "employerConcern": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی",
+              "followUp1Date": "2026-09-02T11:51:45.966Z",
+              "followUp2Date": "2026-09-06T11:51:45.966Z"
+            }
+          ],
+          "guild": "تولید تجهیزات بالابری و صنعتی",
+          "status": "approved",
+          "createdAt": "2026-09-02T11:51:45.966Z",
+          "updatedAt": "2026-09-02T11:51:45.966Z",
+          "dateShamsi": "1405/06/11",
+          "reviewedAt": "2026-09-02T11:51:45.966Z",
+          "submittedAt": "۱۷:۲۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "چهارشنبه",
+          "managerFeedback": "این پرونده شانس بالایی برای تبدیل به قرارداد سالانه دارد.",
+          "personalOpinion": "نیاز جدی به استقرار نظام ایمنی و مسئولیت مدنی کارفرما دارند."
+        }
+      ],
+      "autoGenerated": true
+    },
+    {
+      "id": "arch-14050610",
+      "fileName": "گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx",
+      "dateShamsi": "1405/06/10",
+      "dayOfWeek": "سه‌شنبه",
+      "timestamp": "2026-09-10T12:48:11.834Z",
+      "totalConsultants": 2,
+      "totalClientsContacted": 4,
+      "topConcerns": [
+        {
+          "name": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
+          "count": 1
+        },
+        {
+          "name": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی",
+          "count": 1
+        },
+        {
+          "name": "عدم رعایت دوره‌های آزمایشی و بلاتکلیفی حقوقی قراردادهای موقت",
+          "count": 1
+        },
+        {
+          "name": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری",
+          "count": 1
+        }
+      ],
+      "reports": [
+        {
+          "id": "rep-seed-5",
+          "rows": [
+            {
+              "id": "row-seed-5-1",
+              "notes": "بیش از ۶ روز از تماس اول گذشته؛ نیازمند تماس فوری پیگیری دوم (معوق).",
+              "phone": "05138447788",
+              "address": "مشهد، بلوار فلسطین، تقاطع خیام",
+              "followUp1": "+",
+              "followUp2": "✓",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "شرکت ساختمانی و ابنیه عمران گستر پارس",
+              "meetingTopic": "محرمانگی",
+              "activityField": "پیمانکاری پروژه‌های مسکونی و تجاری",
+              "followUpResult": "جلسه در حال ست",
+              "personnelCount": 115,
+              "employerConcern": "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف"
+            },
+            {
+              "id": "row-seed-5-2",
+              "notes": "پیگیری معوق؛ در انتظار تماس بعدی.",
+              "phone": "05137682211",
+              "address": "مشهد، بلوار پیروزی، نبش پیروزی ۳۴",
+              "followUp1": "+",
+              "followUp2": "✓",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 2,
+              "clientName": "تأسیسات سرمایش و گرمایش آریا سازه",
+              "meetingTopic": "",
+              "activityField": "اجرای موتورخانه و تأسیسات برج‌ها",
+              "followUpResult": "جلسه تیک",
+              "personnelCount": 29,
+              "employerConcern": "حوادث ناشی از کار، مسئولیت‌های مدنی و دیه کارفرمایی"
+            },
+            {
+              "id": "row-seed-5-3",
+              "notes": "تماس اولیه منفی بود و خاتمه یافت.",
+              "phone": "05132459900",
+              "address": "جاده سیمان، کیلومتر ۴",
+              "followUp1": "-",
+              "followUp2": "",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 3,
+              "clientName": "تولیدی سازه‌های بتنی پایدار",
+              "meetingTopic": "",
+              "activityField": "تیرچه، بلوک و قطعات پیش‌ساخته بتنی",
+              "followUpResult": "- (عدم تمایل به تغییر رویه فعلی)",
+              "personnelCount": 18,
+              "employerConcern": "عدم رعایت دوره‌های آزمایشی و بلاتکلیفی حقوقی قراردادهای موقت"
+            }
+          ],
+          "guild": "ساختمانی، انبوه‌سازی و تأسیسات",
+          "status": "approved",
+          "createdAt": "2026-09-01T08:52:10.140Z",
+          "updatedAt": "2026-09-08T10:44:52.908Z",
+          "dateShamsi": "1405/06/10",
+          "reviewedAt": "2026-09-08T10:44:52.908Z",
+          "submittedAt": "۱۴:۱۳",
+          "consultantId": "user-c104",
+          "managerRating": 5,
+          "consultantCode": "C-104",
+          "consultantName": "ندا کریمی",
+          "dayOfWeekShamsi": "سه‌شنبه",
+          "managerFeedback": "آفرین ",
+          "personalOpinion": "شرکت‌های پیمانکاری ساختمانی"
+        },
+        {
+          "id": "rep-c101-overdue-9d",
+          "rows": [
+            {
+              "id": "row-c101-rezaei-client",
+              "notes": "تماس دوم عالی بود؛ پیش‌فاکتور ارسال شده و برای نهایی‌سازی نیاز به پیگیری ۳ دارد.",
+              "phone": "05135429988",
+              "address": "شهرک صنعتی فناوری‌های برتر، صنعت ۴",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما رضایی (صنایع بسته‌بندی آرین نگین)",
+              "meetingTopic": "تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی",
+              "activityField": "تولید جعبه‌های دارویی و صادراتی",
+              "followUp1Date": "2026-09-01T11:51:45.966Z",
+              "followUp2Date": "2026-09-05T11:51:45.966Z",
+              "followUpResult": "",
+              "personnelCount": 52,
+              "employerConcern": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری"
+            }
+          ],
+          "guild": "صنایع چاپ و بسته‌بندی صادراتی",
+          "status": "approved",
+          "createdAt": "2026-09-01T11:51:45.966Z",
+          "updatedAt": "2026-09-01T11:51:45.966Z",
+          "dateShamsi": "1405/06/10",
+          "reviewedAt": "2026-09-01T11:51:45.966Z",
+          "submittedAt": "۱۵:۰۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "سه‌شنبه",
+          "managerFeedback": "پیگیری سوم کارفرما رضایی برای نهایی‌سازی قرارداد مشاوره بسیار حساس است.",
+          "personalOpinion": "چاپخانه‌ها با مسائل بیمه تأمین اجتماعی کارگران شیفت شب درگیرند."
+        }
+      ],
+      "autoGenerated": true
+    },
+    {
+      "id": "arch-14050609",
+      "reports": [
+        {
+          "id": "rep-c101-overdue-9d",
+          "rows": [
+            {
+              "id": "row-c101-rezaei-client",
+              "notes": "تماس دوم عالی بود؛ پیش‌فاکتور ارسال شده و برای نهایی‌سازی نیاز به پیگیری ۳ دارد.",
+              "phone": "05135429988",
+              "address": "شهرک صنعتی فناوری‌های برتر، صنعت ۴",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما رضایی (صنایع بسته‌بندی آرین نگین)",
+              "meetingTopic": "تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی",
+              "activityField": "تولید جعبه‌های دارویی و صادراتی",
+              "followUpResult": "",
+              "personnelCount": 52,
+              "employerConcern": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری"
+            }
+          ],
+          "guild": "صنایع چاپ و بسته‌بندی صادراتی",
+          "status": "approved",
+          "createdAt": "2026-08-31T10:05:47.491Z",
+          "updatedAt": "2026-08-31T10:05:47.491Z",
+          "dateShamsi": "1405/06/09",
+          "reviewedAt": "2026-08-31T10:05:47.491Z",
+          "submittedAt": "۱۵:۰۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "دوشنبه",
+          "managerFeedback": "پیگیری سوم کارفرما رضایی برای نهایی‌سازی قرارداد مشاوره بسیار حساس است.",
+          "personalOpinion": "چاپخانه‌ها با مسائل بیمه تأمین اجتماعی کارگران شیفت شب درگیرند."
+        }
+      ],
+      "fileName": "گزارش_روزانه_دوشنبه_1405-06-09.xlsx",
+      "dayOfWeek": "دوشنبه",
+      "timestamp": "2026-09-09T10:05:47.573Z",
+      "dateShamsi": "1405/06/09",
+      "topConcerns": [
+        {
+          "name": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری",
+          "count": 1
+        }
+      ],
+      "autoGenerated": true,
+      "totalConsultants": 1,
+      "totalClientsContacted": 1
+    },
+    {
+      "id": "arch-14050608",
+      "reports": [
+        {
+          "id": "rep-c101-overdue-9d",
+          "rows": [
+            {
+              "id": "row-c101-rezaei-client",
+              "notes": "تماس دوم عالی بود؛ پیش‌فاکتور ارسال شده و برای نهایی‌سازی نیاز به پیگیری ۳ دارد.",
+              "phone": "05135429988",
+              "address": "شهرک صنعتی فناوری‌های برتر، صنعت ۴",
+              "followUp1": "+",
+              "followUp2": "+",
+              "followUp3": "",
+              "followUp4": "",
+              "rowNumber": 1,
+              "clientName": "کارفرما رضایی (صنایع بسته‌بندی آرین نگین)",
+              "meetingTopic": "تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی",
+              "activityField": "تولید جعبه‌های دارویی و صادراتی",
+              "followUpResult": "",
+              "personnelCount": 52,
+              "employerConcern": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری"
+            }
+          ],
+          "guild": "صنایع چاپ و بسته‌بندی صادراتی",
+          "status": "approved",
+          "createdAt": "2026-08-30T11:34:11.215Z",
+          "updatedAt": "2026-08-30T11:34:11.215Z",
+          "dateShamsi": "1405/06/08",
+          "reviewedAt": "2026-08-30T11:34:11.215Z",
+          "submittedAt": "۱۵:۰۰",
+          "consultantId": "user-c101",
+          "managerRating": 5,
+          "consultantCode": "C-101",
+          "consultantName": "علیرضا رضایی",
+          "dayOfWeekShamsi": "یکشنبه",
+          "managerFeedback": "پیگیری سوم کارفرما رضایی برای نهایی‌سازی قرارداد مشاوره بسیار حساس است.",
+          "personalOpinion": "چاپخانه‌ها با مسائل بیمه تأمین اجتماعی کارگران شیفت شب درگیرند."
+        }
+      ],
+      "fileName": "گزارش_روزانه_یکشنبه_1405-06-08.xlsx",
+      "dayOfWeek": "یکشنبه",
+      "timestamp": "2026-09-08T11:34:11.255Z",
+      "dateShamsi": "1405/06/08",
+      "topConcerns": [
+        {
+          "name": "چالش محاسبه اضافه کاری، شب‌کاری، نوبت‌کاری و تعطیل‌کاری",
+          "count": 1
+        }
+      ],
+      "autoGenerated": true,
+      "totalConsultants": 1,
+      "totalClientsContacted": 1
+    }
+  ],
   "concerns": [
     "دعاوی و شکایات در اداره کار و هیئت‌های تشخیص/حل اختلاف",
     "عدم شفافیت قراردادهای کار، الحاقیه‌ها و تضامین پرسنلی",
@@ -92,18 +2546,871 @@
     "عدم تسلط تیم مالی شرکت به آخرین بخشنامه‌های اداره کار",
     "سایر دغدغه‌ها (نیاز به عارضه‌یابی تخصصی و مشاوره حضوری)"
   ],
+  "directives": [
+    {
+      "id": "dir-seed-1",
+      "targetConsultantId": "user-c101",
+      "targetConsultantName": "علیرضا رضایی",
+      "authorName": "مدیریت کارینو (CEO)",
+      "content": "پرونده کریمی و صنایع ریخته‌گری توس فولاد رو در اولویت قطعی امروز قرار بده.",
+      "priority": "high",
+      "createdAt": "2026-09-08T10:02:50.486Z",
+      "dateShamsi": "امروز"
+    },
+    {
+      "id": "dir-seed-2",
+      "targetConsultantId": "all",
+      "authorName": "مدیریت کارینو (CEO)",
+      "content": "تمرکز تماس‌های این هفته بر روی عارضه‌یابی قراردادهای کار و پیشگیری از جرایم بازرسی تأمین اجتماعی است.",
+      "priority": "normal",
+      "createdAt": "2026-09-08T10:02:50.486Z",
+      "dateShamsi": "امروز"
+    },
+    {
+      "id": "dir-seed-3",
+      "targetConsultantId": "user-c102",
+      "targetConsultantName": "مریم محمدی",
+      "authorName": "مدیریت کارینو (CEO)",
+      "content": "جلسه شرکت فرآورده‌های لبنی کوهستان رو با بسته پیشنهادی سطح ۲ هماهنگ فرمایید.",
+      "priority": "high",
+      "createdAt": "2026-09-08T10:02:50.486Z",
+      "dateShamsi": "امروز"
+    },
+    {
+      "id": "dir-seed-4",
+      "targetConsultantId": "user-c103",
+      "targetConsultantName": "سعید حسینی",
+      "authorName": "مدیریت کارینو (CEO)",
+      "content": "تمرکز تماس‌های امروز بر مبالغ سفته و تضامین پرسنلی ویزیتورها و رانندگان پخش باشد.",
+      "priority": "normal",
+      "createdAt": "2026-09-08T10:02:50.486Z",
+      "dateShamsi": "امروز"
+    },
+    {
+      "id": "dir-1788861935011",
+      "authorId": "user-ceo",
+      "authorName": "مدیریت کارینو (CEO)",
+      "targetConsultantId": "all",
+      "content": "فورا دستور میدهیم با تمام توان رو به جلو",
+      "priority": "high",
+      "dateShamsi": "1405/06/17",
+      "createdAt": "2026-09-08T10:05:35.011Z"
+    },
+    {
+      "id": "dir-1788864359175",
+      "authorId": "user-ceo",
+      "authorName": "مدیریت کارینو (CEO)",
+      "targetConsultantId": "user-c102",
+      "content": "شنبلیله هارو بردی یا نه؟؟؟؟",
+      "priority": "high",
+      "dateShamsi": "1405/06/17",
+      "createdAt": "2026-09-08T10:45:59.175Z"
+    }
+  ],
   "logs": [
     {
-      "id": "log-init",
-      "timestamp": "2026-09-03T12:00:00.000Z",
-      "timeShamsi": "راه‌اندازی پایگاه داده ابری",
+      "id": "log-1789044268992-gkcv",
+      "timestamp": "2026-09-10T12:44:28.992Z",
+      "timeShamsi": "1405/06/13",
       "category": "SYSTEM",
-      "level": "SUCCESS",
-      "message": "پایگاه داده متمرکز ابری کارینو با قابلیت همگام‌سازی سراسری مستقر گردید."
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «گزارش_روزانه_جمعه_1405-06-13.xlsx» ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789044268986-rfj4",
+      "timestamp": "2026-09-10T12:44:28.986Z",
+      "timeShamsi": "1405/06/10",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789044268970-nilb",
+      "timestamp": "2026-09-10T12:44:28.970Z",
+      "timeShamsi": "1405/06/17",
+      "category": "SYSTEM",
+      "level": "INFO",
+      "message": "رکورد بایگانی مکانیزه «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» ذخیره و به‌روزرسانی شد."
+    },
+    {
+      "id": "log-1789044208410-x1xu",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:43:28.410Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789044208385-ebbs",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:43:28.385Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789044208363-dzya",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:43:28.363Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789044148246-93sp",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:42:28.246Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789044148229-l3ru",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:42:28.229Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789044148211-65o2",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:42:28.211Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789044088222-nim9",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:41:28.222Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789044088206-gpye",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:41:28.206Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789044088187-41ye",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:41:28.187Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789044028169-6oev",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:40:28.169Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789044028155-oth2",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:40:28.155Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789044028138-zr6g",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:40:28.138Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043968389-w59e",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:39:28.389Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043968373-4lk9",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:39:28.373Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043968349-p88m",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:39:28.349Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043968323-ilh7",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:39:28.323Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043968248-rfbp",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:39:28.248Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043968234-ojnn",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:39:28.234Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043331400-7060",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:28:51.400Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043331388-wff0",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:28:51.388Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043331372-blj8",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:28:51.372Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043271394-z7ie",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:27:51.394Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043271383-tjpf",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:27:51.383Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043271367-tqrv",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:27:51.367Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043211523-k6td",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:26:51.523Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043211502-7f6u",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:26:51.502Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043211485-qhdo",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:26:51.485Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043211473-xwkh",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:26:51.473Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043211460-k5ki",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:26:51.460Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043211440-hiwb",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:26:51.440Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043158133-5ygk",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:25:58.133Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043158105-wsxs",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:25:58.105Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043158073-lewq",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:25:58.073Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043098089-gvxx",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:24:58.089Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043098062-bpkg",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:24:58.062Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043098035-e6sh",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:24:58.035Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789043038085-zb3g",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:23:58.085Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789043038057-1wk6",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:23:58.057Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789043038030-khx0",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:23:58.030Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789042979179-8kpl",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:22:59.179Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789042979148-7j4e",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:22:59.148Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789042979089-i6it",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:22:59.089Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789042859080-rbmt",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:20:59.080Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789042858819-ridg",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:20:58.819Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789042858792-n72e",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:20:58.792Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789042738716-zah9",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:18:58.716Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789042738690-hkeu",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:18:58.690Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789042738615-uysg",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:18:58.615Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789042618911-t9rj",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:16:58.911Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789042618827-drx7",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:16:58.827Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789042618798-8dfh",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:16:58.799Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789042500295-cpg5",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:15:00.295Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789042499297-umly",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:14:59.297Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789042498920-qgm0",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:14:58.920Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789042100066-jyc1",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:08:20.066Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789042100041-q3ey",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:08:20.041Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789042099943-8fnz",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:08:19.943Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041898670-f3pl",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:04:58.670Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041898646-w4mc",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:04:58.646Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041898612-6kmp",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:04:58.612Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041779253-i8d6",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:02:59.253Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041779230-vsba",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:02:59.230Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041779207-83dn",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:02:59.207Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041679291-p1zm",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:01:19.291Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041679267-n3oe",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:01:19.267Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041679240-2w4m",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T12:01:19.240Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041593957-1psi",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:59:53.957Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041593933-wiqh",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:59:53.933Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041593798-bey1",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:59:53.798Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041418362-u92r",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:56:58.362Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041418340-uav1",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:56:58.340Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041418316-jboi",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:56:58.316Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041414199-3qjc",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:56:54.199Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041414175-h5j9",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:56:54.175Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041414153-04k3",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:56:54.153Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041298074-qbs3",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:54:58.074Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041298051-gjzt",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:54:58.051Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041298025-7816",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:54:58.025Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041238049-358w",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:53:58.049Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041238028-g1l9",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:53:58.028Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041238002-ush9",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:53:58.002Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041186609-tiz3",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:53:06.609Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041186589-87jh",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:53:06.589Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041186569-zk67",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:53:06.569Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041126309-fw20",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:52:06.309Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041126288-54y6",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:52:06.288Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041126267-2r11",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:52:06.267Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041126246-5s85",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_دوشنبه_1405-06-16.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:52:06.246Z",
+      "timeShamsi": "1405/06/16"
+    },
+    {
+      "id": "log-1789041079159-ac7e",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:51:19.159Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041079141-963y",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:51:19.141Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789041079123-ai7u",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:51:19.123Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041009839-ak1x",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:50:09.839Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789041009818-q1up",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:50:09.818Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789041009800-jjje",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-17.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:50:09.800Z",
+      "timeShamsi": "1405/06/17"
+    },
+    {
+      "id": "log-1789040946218-buhw",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_سه‌شنبه_1405-06-10.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:49:06.218Z",
+      "timeShamsi": "1405/06/10"
+    },
+    {
+      "id": "log-1789040946199-r0ri",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_جمعه_1405-06-13.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:49:06.199Z",
+      "timeShamsi": "1405/06/13"
+    },
+    {
+      "id": "log-1789040946177-b8fu",
+      "level": "INFO",
+      "message": "رکورد بایگانی «گزارش_روزانه_چهارشنبه_1405-06-11.xlsx» در پایگاه داده ذخیره شد.",
+      "category": "SYSTEM",
+      "timestamp": "2026-09-10T11:49:06.177Z",
+      "timeShamsi": "1405/06/11"
     }
   ],
   "stats": {
-    "totalWrites": 0,
-    "lastBackup": "2026-09-03T12:00:00.000Z"
+    "lastBackup": "2026-09-03T12:00:00.000Z",
+    "totalWrites": 269
   }
 }

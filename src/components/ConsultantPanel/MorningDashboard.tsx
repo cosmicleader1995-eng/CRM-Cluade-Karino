@@ -495,7 +495,7 @@ export const MorningDashboard: React.FC<MorningDashboardProps> = ({
                   <div className="space-y-1.5 flex-1">
                     <div className="flex flex-wrap items-center gap-2.5">
                       <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/50 text-xs font-bold">
-                        موعد امروز (روز {item.elapsedDays})
+                        موعد امروز (۴ روز از مرحله قبل)
                       </span>
                       <h4 className="text-base font-bold text-white flex items-center gap-2">
                         {item.clientName}

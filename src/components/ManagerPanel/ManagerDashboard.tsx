@@ -138,6 +138,11 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
   useEffect(() => {
     const handleSync = () => {
       reloadData();
+      setSelectedReportDetail(prev => {
+        if (!prev) return null;
+        const fresh = getStoredReports().find(r => r.id === prev.id);
+        return fresh || prev;
+      });
     };
     window.addEventListener('karino_db_synced', handleSync);
     return () => window.removeEventListener('karino_db_synced', handleSync);
@@ -678,7 +683,11 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
     }
     const newArch = createArchiveRecord(reports, false);
     setArchives(getStoredArchives());
-    setArchiveSuccessMsg(`آرشیو روزانه با نام «${newArch.fileName}» در کتابخانه ذخیره گردید.`);
+    if (newArch) {
+      setArchiveSuccessMsg(`آرشیو روزانه با نام «${newArch.fileName}» در کتابخانه ذخیره گردید.`);
+    } else {
+      setArchiveSuccessMsg('گزارشی مطابق تاریخ مورد نظر برای ایجاد پکیج آرشیو یافت نشد.');
+    }
     setTimeout(() => setArchiveSuccessMsg(''), 4000);
   };
 

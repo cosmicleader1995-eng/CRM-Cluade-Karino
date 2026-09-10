@@ -11,12 +11,12 @@ export default function App() {
   const [currentUser, setCurrentUserState] = useState<User | null>(() => getCurrentUser());
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  // Background 23:00 archive watcher
+  // Background 23:00 archive watcher (checks periodically without redundant duplicates)
   useEffect(() => {
     checkAndTriggerNightlyArchive();
     const interval = setInterval(() => {
       checkAndTriggerNightlyArchive();
-    }, 60000);
+    }, 10 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 

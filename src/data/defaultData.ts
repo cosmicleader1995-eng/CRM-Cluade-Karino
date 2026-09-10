@@ -368,6 +368,8 @@ export function getInitialReports(): DailyReport[] {
           followUp2: '+',
           followUp3: '',
           followUp4: '',
+          followUp1Date: day9.iso,
+          followUp2Date: getRelativeInfo(5).iso, // Follow-up 2 done 5 days ago -> 1 day overdue for step 3!
           followUpResult: '',
           meetingTopic: 'تراز فیش حقوقی و بهینه‌سازی فرآیندهای بیمه تأمین اجتماعی',
           notes: 'تماس دوم عالی بود؛ پیش‌فاکتور ارسال شده و برای نهایی‌سازی نیاز به پیگیری ۳ دارد.'
@@ -443,6 +445,8 @@ export function getInitialReports(): DailyReport[] {
           followUp2: '+',
           followUp3: '',
           followUp4: '',
+          followUp1Date: day8.iso,
+          followUp2Date: getRelativeInfo(4).iso, // Follow-up 2 done 4 days ago -> exactly due TODAY for step 3!
           followUpResult: '',
           meetingTopic: 'آنالیز ریسک حقوقی قراردادها و پیشگیری از شکایات اداره کار',
           notes: 'پیگیری ۱ و ۲ با موفقیت انجام شده؛ امروز موعد تماس سوم برای ست کردن جلسه است.'
