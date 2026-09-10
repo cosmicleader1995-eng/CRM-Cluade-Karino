@@ -5,12 +5,15 @@ import {
   getStoredUsers, 
   getStoredArchives, 
   createArchiveRecord, 
+  createPeriodicArchiveRecord,
+  getStoredPeriodicReports,
   updateReportStatus,
   getStoredConcerns,
   saveConcerns,
   getStoredDirectives,
   saveDirective,
-  deleteDirective
+  deleteDirective,
+  syncWithServer
 } from '../../services/storage';
 import { 
   getCurrentShamsiDate, 
@@ -20,9 +23,10 @@ import {
   normalizeShamsiDate, 
   compareReportsLatestFirst 
 } from '../../utils/shamsi';
-import { exportAggregatedReportsToExcel, exportSingleReportToExcel, printOfficialReport } from '../../utils/export';
+import { exportAggregatedReportsToExcel, exportSingleReportToExcel, exportArchiveToExcel, printOfficialReport } from '../../utils/export';
 import { FollowUpBadge } from '../common/FollowUpBadge';
 import { ScrollableTabs, TabItem } from '../common/ScrollableTabs';
+import { PeriodicReportsManager } from './PeriodicReportsManager';
 import { FOLLOW_UP_STATUS_CODES } from '../../data/defaultData';
 import { 
   BarChart3, 
@@ -57,7 +61,10 @@ import {
   MessageSquare,
   X,
   AlertTriangle,
-  Filter
+  Filter,
+  Zap,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface ManagerDashboardProps {
@@ -87,7 +94,7 @@ interface AggregatedConsultantData {
 }
 
 export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser }) => {
-  const [activeTab, setActiveTab] = useState<'analytics' | 'consultants' | 'aggregated' | 'gemini' | 'archive' | 'settings'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'consultants' | 'periodic' | 'aggregated' | 'gemini' | 'archive' | 'settings'>('analytics');
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('today');
   
   // Storage states
@@ -124,6 +131,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
   // Settings: New Concern
   const [newConcernInput, setNewConcernInput] = useState('');
   const [archiveSuccessMsg, setArchiveSuccessMsg] = useState('');
+  const [selectedArchiveTypeFilter, setSelectedArchiveTypeFilter] = useState<'all' | 'calls_daily' | 'periodic_daily' | 'periodic_weekly' | 'periodic_monthly'>('all');
+  const [expandedArchiveId, setExpandedArchiveId] = useState<string | null>(null);
 
   // Reload data from storage
   const reloadData = () => {
@@ -675,21 +684,114 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
     }
   };
 
-  // Manual trigger for 23:00 Archive
-  const handleManualArchiveNow = () => {
-    if (reports.length === 0) {
-      alert('گزارشی برای آرشیو وجود ندارد.');
-      return;
+  // Manual Archive Trigger: Specific Category
+  const handleManualArchiveCategory = (type: 'calls_daily' | 'periodic_daily' | 'periodic_weekly' | 'periodic_monthly') => {
+    let createdArch: ArchiveRecord | null = null;
+    const allPeriodic = getStoredPeriodicReports();
+
+    if (type === 'calls_daily') {
+      const dayCalls = reports.filter(r => normalizeShamsiDate(r.dateShamsi) === todayShamsiInfo.formatted);
+      const targetCalls = dayCalls.length > 0 ? dayCalls : reports;
+      createdArch = createArchiveRecord(targetCalls, false, todayShamsiInfo.formatted, todayShamsiInfo.dayOfWeek);
+      if (createdArch) {
+        setArchiveSuccessMsg(`بایگانی روزانه تماس‌ها و پیگیری‌ها (${toPersianDigits(createdArch.totalClientsContacted)} کارفرما در ${toPersianDigits(createdArch.reports?.length || 0)} فرم) با موفقیت ثبت شد.`);
+      }
+    } else if (type === 'periodic_daily') {
+      const dayPeriodic = allPeriodic.filter(p => normalizeShamsiDate(p.dateShamsi) === todayShamsiInfo.formatted && p.periodType === 'daily');
+      const targetPeriodic = dayPeriodic.length > 0 ? dayPeriodic : allPeriodic.filter(p => p.periodType === 'daily');
+      createdArch = createPeriodicArchiveRecord(
+        targetPeriodic, 
+        'periodic_daily', 
+        false, 
+        todayShamsiInfo.formatted, 
+        todayShamsiInfo.dayOfWeek, 
+        'بایگانی روزانه گزارشات تحلیلی مشاورین'
+      );
+      if (createdArch) {
+        setArchiveSuccessMsg(`بایگانی تحلیلی روزانه مشاورین (${toPersianDigits(createdArch.overallReports?.length || 0)} گزارش تحلیلی) با موفقیت ثبت گردید.`);
+      }
+    } else if (type === 'periodic_weekly') {
+      const weekly = allPeriodic.filter(p => p.periodType === 'weekly');
+      createdArch = createPeriodicArchiveRecord(
+        weekly,
+        'periodic_weekly',
+        false,
+        todayShamsiInfo.formatted,
+        todayShamsiInfo.dayOfWeek,
+        'بایگانی هفتگی پنج‌شنبه گزارشات مشاورین'
+      );
+      if (createdArch) {
+        setArchiveSuccessMsg(`بایگانی هفتگی پنج‌شنبه مشاورین (${toPersianDigits(createdArch.overallReports?.length || 0)} گزارش هفتگی) با موفقیت ثبت شد.`);
+      }
+    } else if (type === 'periodic_monthly') {
+      const monthly = allPeriodic.filter(p => p.periodType === 'monthly');
+      createdArch = createPeriodicArchiveRecord(
+        monthly,
+        'periodic_monthly',
+        false,
+        todayShamsiInfo.formatted,
+        todayShamsiInfo.dayOfWeek,
+        'بایگانی ماهانه پایان ماه گزارشات استراتژیک'
+      );
+      if (createdArch) {
+        setArchiveSuccessMsg(`بایگانی ماهانه استراتژیک (${toPersianDigits(createdArch.overallReports?.length || 0)} گزارش راهبردی) با موفقیت ثبت گردید.`);
+      }
     }
-    const newArch = createArchiveRecord(reports, false);
+
     setArchives(getStoredArchives());
-    if (newArch) {
-      setArchiveSuccessMsg(`آرشیو روزانه با نام «${newArch.fileName}» در کتابخانه ذخیره گردید.`);
-    } else {
-      setArchiveSuccessMsg('گزارشی مطابق تاریخ مورد نظر برای ایجاد پکیج آرشیو یافت نشد.');
-    }
-    setTimeout(() => setArchiveSuccessMsg(''), 4000);
+    syncWithServer();
+    setTimeout(() => setArchiveSuccessMsg(''), 5000);
   };
+
+  // Manual Trigger: All 4 Archive Categories (Comprehensive Test Suite)
+  const handleManualArchiveAll = () => {
+    const allPeriodic = getStoredPeriodicReports();
+    const dayCalls = reports.filter(r => normalizeShamsiDate(r.dateShamsi) === todayShamsiInfo.formatted);
+    const targetCalls = dayCalls.length > 0 ? dayCalls : reports;
+
+    // 1. Calls daily
+    createArchiveRecord(targetCalls, false, todayShamsiInfo.formatted, todayShamsiInfo.dayOfWeek);
+
+    // 2. Periodic daily
+    const dailyPeriodic = allPeriodic.filter(p => p.periodType === 'daily');
+    createPeriodicArchiveRecord(
+      dailyPeriodic,
+      'periodic_daily',
+      false,
+      todayShamsiInfo.formatted,
+      todayShamsiInfo.dayOfWeek,
+      'بایگانی روزانه گزارشات تحلیلی مشاورین'
+    );
+
+    // 3. Periodic weekly
+    const weeklyPeriodic = allPeriodic.filter(p => p.periodType === 'weekly');
+    createPeriodicArchiveRecord(
+      weeklyPeriodic,
+      'periodic_weekly',
+      false,
+      todayShamsiInfo.formatted,
+      todayShamsiInfo.dayOfWeek,
+      'بایگانی هفتگی پنج‌شنبه گزارشات مشاورین'
+    );
+
+    // 4. Periodic monthly
+    const monthlyPeriodic = allPeriodic.filter(p => p.periodType === 'monthly');
+    createPeriodicArchiveRecord(
+      monthlyPeriodic,
+      'periodic_monthly',
+      false,
+      todayShamsiInfo.formatted,
+      todayShamsiInfo.dayOfWeek,
+      'بایگانی ماهانه پایان ماه گزارشات استراتژیک'
+    );
+
+    setArchives(getStoredArchives());
+    syncWithServer();
+    setArchiveSuccessMsg('🚀 بایگانی دستی جامع با موفقیت انجام شد: هر ۴ دسته‌بندی (تماس‌های روزانه، تحلیلی روزانه، هفتگی پنج‌شنبه و ماهانه استراتژیک) در کتابخانه و دیتابیس ابری ثبت و همگام شدند.');
+    setTimeout(() => setArchiveSuccessMsg(''), 6000);
+  };
+
+  const handleManualArchiveNow = handleManualArchiveAll;
 
   // Add new custom concern
   const handleAddConcern = (e: React.FormEvent) => {
@@ -819,6 +921,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
           tabs={[
             { id: 'analytics', label: 'خلاصه استراتژیک و شاخص‌ها', icon: BarChart3 },
             { id: 'consultants', label: `عملکرد تفکیکی مشاورین (${toPersianDigits(consultantsAggregatedList.length)})`, icon: Users },
+            { id: 'periodic', label: 'گزارشات دوره‌ای و پیگیری‌ها (نظارت)', icon: FileSpreadsheet, badge: 'جدید' },
             { id: 'aggregated', label: `جدول کل گزارشات (${toPersianDigits(totalRowsCount)})`, icon: Layers },
             { id: 'gemini', label: 'تحلیل هوشمند بازار (AI)', icon: BrainCircuit, badge: 'هوشمند' },
             { id: 'archive', label: `بایگانی مکانیزه (${toPersianDigits(archives.length)})`, icon: Archive },
@@ -1315,6 +1418,18 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* TAB: PERIODIC REPORTS (DAILY/WEEKLY/MONTHLY) & FOLLOW-UP DATES CALENDAR TRACKER */}
+      {activeTab === 'periodic' && (
+        <div className="space-y-6 animate-fadeIn">
+          <PeriodicReportsManager
+            currentUser={currentUser}
+            allReports={reports}
+            users={users}
+            onReload={reloadData}
+          />
         </div>
       )}
 
@@ -1846,69 +1961,410 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
       {activeTab === 'archive' && (
         <div className="space-y-6 animate-fadeIn">
           
-          <div className="bg-white rounded-3xl border border-[#E6DAC8] p-6 sm:p-7 shadow-sm space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Executive Manual Archive & Test Suite Hub */}
+          <div className="bg-gradient-to-l from-[#F5EDE2] via-[#FAF7F2] to-white rounded-3xl border border-[#DEC8B0] p-6 sm:p-7 shadow-sm space-y-5">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
-                <h3 className="text-base sm:text-lg font-black text-[#2B1810] flex items-center gap-2">
-                  <Archive className="w-5 h-5 text-[#9C6644]" />
-                  <span>کتابخانه بایگانی مکانیزه گزارشات روزانه (ساعت ۲۳:۰۰)</span>
-                </h3>
-                <p className="text-xs sm:text-sm text-[#6F4E37] font-medium mt-0.5">
-                  تمام اطلاعات روزانه به صورت دائمی با فرمت اکسل و تاریخ شمسی ذخیره شده و قابل بازخوانی می‌باشند.
+                <div className="flex items-center gap-2.5">
+                  <span className="p-2 rounded-2xl bg-[#9C6644] text-white shadow-sm">
+                    <Zap className="w-5 h-5" />
+                  </span>
+                  <h3 className="text-base sm:text-lg font-black text-[#2B1810]">
+                    میز کار بایگانی دستی و تست جامع مکانیزه سیستم (ساعت ۲۳:۰۰)
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-[#6F4E37] font-medium mt-1.5 leading-relaxed max-w-3xl">
+                  جهت تست و اعتبارسنجی ثبت در دیتابیس، می‌توانید به صورت دستی ردیف‌های تماس و گزارشات تحلیلی را در هر ۴ دسته‌بندی (تماس‌های روزانه، تحلیلی روزانه، هفتگی پنج‌شنبه و ماهانه استراتژیک) بایگانی کنید و بلافاصله پیش‌نمایش ردیف‌ها را بررسی یا فایل استاندارد اکسل را دریافت نمایید.
                 </p>
               </div>
+
+              {/* Master Test Button */}
               <button
-                onClick={handleManualArchiveNow}
-                className="px-5 py-2.5 bg-[#9C6644] hover:bg-[#7F4F24] text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-2 shadow transition-all cursor-pointer shrink-0"
+                onClick={handleManualArchiveAll}
+                className="px-6 py-3.5 bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-black rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0"
               >
-                <Plus className="w-4 h-4" />
-                <span>ایجاد پکیج آرشیو از داده‌های جاری</span>
+                <Zap className="w-4 h-4 text-[#F3E5F5]" />
+                <span>🚀 اجرای دستی و بایگانی همگانی (تست جامع همه دسته‌ها)</span>
+              </button>
+            </div>
+
+            {/* Individual Category Manual Triggers */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+              <button
+                onClick={() => handleManualArchiveCategory('calls_daily')}
+                className="p-3.5 rounded-2xl bg-white hover:bg-[#FDF0ED] border border-[#DEC8B0] hover:border-[#9C6644] text-[#9C6644] font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+              >
+                <Phone className="w-4 h-4" />
+                <span>بایگانی دستی روزانه تماس‌ها</span>
+              </button>
+
+              <button
+                onClick={() => handleManualArchiveCategory('periodic_daily')}
+                className="p-3.5 rounded-2xl bg-white hover:bg-[#E8F5E9] border border-[#DEC8B0] hover:border-[#2E7D32] text-[#2E7D32] font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+              >
+                <FileCheck className="w-4 h-4" />
+                <span>بایگانی دستی تحلیلی روزانه</span>
+              </button>
+
+              <button
+                onClick={() => handleManualArchiveCategory('periodic_weekly')}
+                className="p-3.5 rounded-2xl bg-white hover:bg-[#E3F2FD] border border-[#DEC8B0] hover:border-[#1565C0] text-[#1565C0] font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+              >
+                <CalendarDays className="w-4 h-4" />
+                <span>بایگانی دستی هفتگی پنج‌شنبه</span>
+              </button>
+
+              <button
+                onClick={() => handleManualArchiveCategory('periodic_monthly')}
+                className="p-3.5 rounded-2xl bg-white hover:bg-[#F3E5F5] border border-[#DEC8B0] hover:border-[#7B1FA2] text-[#7B1FA2] font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
+              >
+                <Building className="w-4 h-4" />
+                <span>بایگانی دستی ماهانه استراتژیک</span>
+              </button>
+            </div>
+
+            {/* Success toast notification */}
+            {archiveSuccessMsg && (
+              <div className="p-3.5 rounded-2xl bg-[#E8F5E9] border border-[#A5D6A7] text-[#1B5E20] text-xs sm:text-sm font-bold flex items-center gap-2.5 animate-fadeIn">
+                <CheckCircle2 className="w-5 h-5 shrink-0 text-[#2E7D32]" />
+                <span>{archiveSuccessMsg}</span>
+              </div>
+            )}
+
+            {/* Archive Type Filters */}
+            <div className="flex items-center gap-2 flex-wrap pt-3 border-t border-[#DEC8B0]">
+              <span className="text-xs font-bold text-[#6F4E37] ml-1">فیلتر دسته‌بندی کتابخانه:</span>
+              
+              <button
+                onClick={() => setSelectedArchiveTypeFilter('all')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  selectedArchiveTypeFilter === 'all'
+                    ? 'bg-[#2B1810] text-white shadow-sm font-black'
+                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                }`}
+              >
+                همه بایگانی‌ها ({toPersianDigits(archives.length)})
+              </button>
+
+              <button
+                onClick={() => setSelectedArchiveTypeFilter('calls_daily')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedArchiveTypeFilter === 'calls_daily'
+                    ? 'bg-[#9C6644] text-white shadow-sm font-black'
+                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                }`}
+              >
+                <Phone className="w-3.5 h-3.5" />
+                <span>روزانه تماس‌ها ({toPersianDigits(archives.filter(a => a.archiveType === 'calls_daily' || !a.archiveType).length)})</span>
+              </button>
+
+              <button
+                onClick={() => setSelectedArchiveTypeFilter('periodic_daily')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedArchiveTypeFilter === 'periodic_daily'
+                    ? 'bg-[#2D6A4F] text-white shadow-sm font-black'
+                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                }`}
+              >
+                <FileCheck className="w-3.5 h-3.5" />
+                <span>تحلیلی روزانه ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_daily').length)})</span>
+              </button>
+
+              <button
+                onClick={() => setSelectedArchiveTypeFilter('periodic_weekly')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedArchiveTypeFilter === 'periodic_weekly'
+                    ? 'bg-[#1E40AF] text-white shadow-sm font-black'
+                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                }`}
+              >
+                <CalendarDays className="w-3.5 h-3.5" />
+                <span>هفتگی پنج‌شنبه‌ها ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_weekly').length)})</span>
+              </button>
+
+              <button
+                onClick={() => setSelectedArchiveTypeFilter('periodic_monthly')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  selectedArchiveTypeFilter === 'periodic_monthly'
+                    ? 'bg-[#6B21A8] text-white shadow-sm font-black'
+                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                }`}
+              >
+                <Building className="w-3.5 h-3.5" />
+                <span>ماهانه استراتژیک ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_monthly').length)})</span>
               </button>
             </div>
           </div>
 
           {/* Archive Cards Grid */}
-          <div className="space-y-3.5">
-            {archives.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-[#E6DAC8] p-12 text-center text-sm font-bold text-[#8D5B4C]">
-                هنوز پکیج آرشیوی ذخیره نشده است.
-              </div>
-            ) : (
-              archives.map((arch) => (
-                <div 
-                  key={arch.id}
-                  className="bg-white rounded-3xl border border-[#E6DAC8] hover:border-[#9C6644] p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#F5EDE2] text-[#9C6644] flex items-center justify-center border border-[#DEC8B0] shrink-0">
-                      <FileSpreadsheet className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-black text-[#2B1810] text-sm sm:text-base">{arch.fileName}</h4>
-                      <div className="flex items-center gap-3 mt-1 text-xs text-[#6F4E37] font-medium flex-wrap">
-                        <span>تاریخ شمسی: <strong>{arch.dateShamsi}</strong></span>
-                        <span>•</span>
-                        <span>تعداد گزارش: <strong>{toPersianDigits(arch.reports.length)}</strong></span>
-                        <span>•</span>
-                        <span>مجموع کارفرمایان: <strong className="text-[#9C6644] font-black">{toPersianDigits(arch.totalClientsContacted)}</strong></span>
+          <div className="space-y-4">
+            {(() => {
+              const filteredArchives = archives.filter(arch => {
+                if (selectedArchiveTypeFilter === 'all') return true;
+                const type = arch.archiveType || 'calls_daily';
+                return type === selectedArchiveTypeFilter;
+              });
+
+              if (filteredArchives.length === 0) {
+                return (
+                  <div className="bg-white rounded-3xl border border-[#E6DAC8] p-12 text-center text-sm font-bold text-[#8D5B4C]">
+                    هیچ پکیج آرشیوی با فیلتر انتخابی یافت نشد.
+                  </div>
+                );
+              }
+
+              return filteredArchives.map((arch) => {
+                const type = arch.archiveType || 'calls_daily';
+                const isPeriodic = type.startsWith('periodic');
+                const isExpanded = expandedArchiveId === arch.id;
+
+                const typeBadgeConfig = {
+                  calls_daily: { bg: 'bg-[#FDF0ED]', text: 'text-[#9C6644]', border: 'border-[#F8D5CE]', label: 'تماس‌ها و پیگیری‌ها' },
+                  periodic_daily: { bg: 'bg-[#E8F5E9]', text: 'text-[#2E7D32]', border: 'border-[#C8E6C9]', label: 'گزارش تحلیلی روزانه' },
+                  periodic_weekly: { bg: 'bg-[#E3F2FD]', text: 'text-[#1565C0]', border: 'border-[#BBDEFB]', label: 'گزارش هفتگی پنج‌شنبه' },
+                  periodic_monthly: { bg: 'bg-[#F3E5F5]', text: 'text-[#7B1FA2]', border: 'border-[#E1BEE7]', label: 'گزارش ماهانه استراتژیک' }
+                }[type] || { bg: 'bg-[#FAF7F2]', text: 'text-[#5C4033]', border: 'border-[#DEC8B0]', label: 'بایگانی' };
+
+                return (
+                  <div 
+                    key={arch.id}
+                    className={`bg-white rounded-3xl border transition-all duration-200 shadow-sm ${
+                      isExpanded ? 'border-[#9C6644] ring-2 ring-[#9C6644]/15' : 'border-[#E6DAC8] hover:border-[#DEC8B0]'
+                    }`}
+                  >
+                    {/* Card Summary Header */}
+                    <div className="p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="flex items-start sm:items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-[#F5EDE2] text-[#9C6644] flex items-center justify-center border border-[#DEC8B0] shrink-0 mt-1 sm:mt-0">
+                          <FileSpreadsheet className="w-6 h-6" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="font-black text-[#2B1810] text-sm sm:text-base">{arch.fileName}</h4>
+                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${typeBadgeConfig.bg} ${typeBadgeConfig.text} ${typeBadgeConfig.border}`}>
+                              {typeBadgeConfig.label}
+                            </span>
+                            {arch.autoGenerated ? (
+                              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FAF7F2] text-[#6F4E37] border border-[#DEC8B0]">
+                                مکانیزه ۲۳:۰۰
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9]">
+                                بایگانی دستی
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 text-xs text-[#6F4E37] font-medium flex-wrap">
+                            <span>تاریخ شمسی: <strong>{arch.dateShamsi}</strong> ({arch.dayOfWeek || 'روزانه'})</span>
+                            <span>•</span>
+                            {isPeriodic ? (
+                              <>
+                                <span>گزارشات تحلیلی: <strong className="text-[#2D6A4F] font-black">{toPersianDigits(arch.overallReports?.length || 0)}</strong></span>
+                                <span>•</span>
+                                <span>تعداد مشاوران: <strong>{toPersianDigits(arch.totalConsultants || 0)}</strong></span>
+                              </>
+                            ) : (
+                              <>
+                                <span>تعداد گزارش: <strong>{toPersianDigits(arch.reports?.length || 0)}</strong></span>
+                                <span>•</span>
+                                <span>مجموع کارفرمایان ثبت‌شده: <strong className="text-[#9C6644] font-black">{toPersianDigits(arch.totalClientsContacted)}</strong></span>
+                              </>
+                            )}
+                            {arch.periodTitle && (
+                              <>
+                                <span>•</span>
+                                <span className="text-[#8D5B4C] font-bold">{arch.periodTitle}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Card Actions */}
+                      <div className="flex items-center gap-2.5 self-end lg:self-center flex-wrap">
+                        <button
+                          onClick={() => setExpandedArchiveId(isExpanded ? null : arch.id)}
+                          className={`px-3.5 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer border ${
+                            isExpanded 
+                              ? 'bg-[#F5EDE2] text-[#7F4F24] border-[#DEC8B0]' 
+                              : 'bg-white hover:bg-[#FAF7F2] text-[#5C4033] border-[#DEC8B0]'
+                          }`}
+                        >
+                          {isExpanded ? (
+                            <>
+                              <ChevronUp className="w-4 h-4" />
+                              <span>بستن پیش‌نمایش</span>
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="w-4 h-4" />
+                              <span>بررسی و پیش‌نمایش ردیف‌ها</span>
+                            </>
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => exportArchiveToExcel(arch)}
+                          className="px-4 py-2 bg-[#2D6A4F] hover:bg-[#1B4332] text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm cursor-pointer transition-all active:scale-95"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>دانلود فایل اکسل</span>
+                        </button>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-2.5 self-end sm:self-center">
-                    <button
-                      onClick={() => {
-                        exportAggregatedReportsToExcel(arch.reports);
-                      }}
-                      className="px-4 py-2 bg-[#2D6A4F] hover:bg-[#1B4332] text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm cursor-pointer transition-all"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>دانلود فایل اکسل</span>
-                    </button>
+                    {/* EXPANDED ROWS INSPECTOR TABLE */}
+                    {isExpanded && (
+                      <div className="border-t border-[#E6DAC8] bg-[#FAF7F2] p-5 rounded-b-3xl space-y-4 animate-fadeIn">
+                        <div className="flex items-center justify-between">
+                          <h5 className="font-black text-xs sm:text-sm text-[#2B1810] flex items-center gap-2">
+                            <Eye className="w-4 h-4 text-[#9C6644]" />
+                            <span>پیش‌نمایش جزئیات ردیف‌های ثبت‌شده در این پکیج</span>
+                          </h5>
+                          <span className="text-[11px] text-[#6F4E37] font-bold">
+                            {isPeriodic 
+                              ? `${toPersianDigits(arch.overallReports?.length || 0)} رکورد تحلیلی`
+                              : `${toPersianDigits(arch.totalClientsContacted)} ردیف کارفرمایی در ${toPersianDigits(arch.reports?.length || 0)} فرم`
+                            }
+                          </span>
+                        </div>
+
+                        {/* If Calls Daily: Show All Client Rows Table */}
+                        {!isPeriodic && (
+                          <div className="overflow-x-auto bg-white rounded-2xl border border-[#DEC8B0] shadow-xs max-h-96">
+                            <table className="w-full text-right text-xs border-collapse">
+                              <thead className="bg-[#F5EDE2] text-[#5C4033] font-black sticky top-0 border-b border-[#DEC8B0]">
+                                <tr>
+                                  <th className="p-2.5 text-center">#</th>
+                                  <th className="p-2.5">مشاور</th>
+                                  <th className="p-2.5">صنف</th>
+                                  <th className="p-2.5">نام کارفرما</th>
+                                  <th className="p-2.5">حوزه فعالیت</th>
+                                  <th className="p-2.5 text-center">پرسنل</th>
+                                  <th className="p-2.5">تلفن</th>
+                                  <th className="p-2.5">دغدغه اصلی کارفرما</th>
+                                  <th className="p-2.5 text-center">پ۱</th>
+                                  <th className="p-2.5 text-center">پ۲</th>
+                                  <th className="p-2.5 text-center">پ۳</th>
+                                  <th className="p-2.5 text-center">پ۴</th>
+                                  <th className="p-2.5">نتیجه پیگیری</th>
+                                  <th className="p-2.5">موضوع جلسه</th>
+                                  <th className="p-2.5">یادداشت / آدرس</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-[#E6DAC8]">
+                                {(() => {
+                                  let counter = 0;
+                                  return (arch.reports || []).flatMap(rep => 
+                                    (rep.rows || []).map(row => {
+                                      counter++;
+                                      return (
+                                        <tr key={row.id} className="hover:bg-[#FAF7F2] transition-colors">
+                                          <td className="p-2.5 text-center font-bold text-[#8D5B4C]">{toPersianDigits(counter)}</td>
+                                          <td className="p-2.5 font-bold text-[#2B1810] whitespace-nowrap">{rep.consultantName} ({rep.consultantCode})</td>
+                                          <td className="p-2.5 text-[#6F4E37] whitespace-nowrap">{rep.guild || '-'}</td>
+                                          <td className="p-2.5 font-bold text-[#2B1810] whitespace-nowrap">{row.clientName}</td>
+                                          <td className="p-2.5 text-[#5C4033] whitespace-nowrap">{row.activityField || '-'}</td>
+                                          <td className="p-2.5 text-center font-bold text-[#2B1810]">{row.personnelCount ? toPersianDigits(row.personnelCount) : '-'}</td>
+                                          <td className="p-2.5 font-mono text-[#5C4033] whitespace-nowrap" dir="ltr">{row.phone || '-'}</td>
+                                          <td className="p-2.5 text-[#8D5B4C] font-bold max-w-xs truncate">{row.employerConcern || '-'}</td>
+                                          <td className="p-2.5 text-center">
+                                            <div className="flex flex-col items-center gap-0.5">
+                                              <FollowUpBadge code={row.followUp1} size="sm" />
+                                              {row.followUp1DateShamsi && <span className="text-[10px] text-[#8D5B4C] font-mono">{row.followUp1DateShamsi.slice(5)}</span>}
+                                            </div>
+                                          </td>
+                                          <td className="p-2.5 text-center">
+                                            <div className="flex flex-col items-center gap-0.5">
+                                              <FollowUpBadge code={row.followUp2} size="sm" />
+                                              {row.followUp2DateShamsi && <span className="text-[10px] text-[#8D5B4C] font-mono">{row.followUp2DateShamsi.slice(5)}</span>}
+                                            </div>
+                                          </td>
+                                          <td className="p-2.5 text-center">
+                                            <div className="flex flex-col items-center gap-0.5">
+                                              <FollowUpBadge code={row.followUp3} size="sm" />
+                                              {row.followUp3DateShamsi && <span className="text-[10px] text-[#8D5B4C] font-mono">{row.followUp3DateShamsi.slice(5)}</span>}
+                                            </div>
+                                          </td>
+                                          <td className="p-2.5 text-center">
+                                            <div className="flex flex-col items-center gap-0.5">
+                                              <FollowUpBadge code={row.followUp4} size="sm" />
+                                              {row.followUp4DateShamsi && <span className="text-[10px] text-[#8D5B4C] font-mono">{row.followUp4DateShamsi.slice(5)}</span>}
+                                            </div>
+                                          </td>
+                                          <td className="p-2.5 font-bold text-[#2B1810] whitespace-nowrap">{row.followUpResult || '-'}</td>
+                                          <td className="p-2.5 text-[#5C4033] max-w-xs truncate">{row.meetingTopic || '-'}</td>
+                                          <td className="p-2.5 text-[#6F4E37] max-w-xs truncate">{row.notes || row.address || '-'}</td>
+                                        </tr>
+                                      );
+                                    })
+                                  );
+                                })()}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+
+                        {/* If Periodic: Show Periodic Reports Table */}
+                        {isPeriodic && (
+                          <div className="overflow-x-auto bg-white rounded-2xl border border-[#DEC8B0] shadow-xs max-h-96">
+                            <table className="w-full text-right text-xs border-collapse">
+                              <thead className="bg-[#F5EDE2] text-[#5C4033] font-black sticky top-0 border-b border-[#DEC8B0]">
+                                <tr>
+                                  <th className="p-2.5 text-center">#</th>
+                                  <th className="p-2.5">مشاور</th>
+                                  <th className="p-2.5">دوره</th>
+                                  <th className="p-2.5">عنوان دوره</th>
+                                  <th className="p-2.5">خلاصه عملکرد</th>
+                                  <th className="p-2.5">دستاوردها</th>
+                                  <th className="p-2.5">چالش‌ها</th>
+                                  <th className="p-2.5">اولویت‌ها</th>
+                                  <th className="p-2.5 text-center">خودارزیابی</th>
+                                  <th className="p-2.5 text-center">وضعیت مدیر</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-[#E6DAC8]">
+                                {(arch.overallReports || []).map((rep, idx) => (
+                                  <tr key={rep.id} className="hover:bg-[#FAF7F2] transition-colors">
+                                    <td className="p-2.5 text-center font-bold text-[#8D5B4C]">{toPersianDigits(idx + 1)}</td>
+                                    <td className="p-2.5 font-bold text-[#2B1810] whitespace-nowrap">{rep.consultantName} ({rep.consultantCode})</td>
+                                    <td className="p-2.5 whitespace-nowrap">
+                                      <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                                        rep.periodType === 'daily' ? 'bg-[#E8F5E9] text-[#2E7D32]' :
+                                        rep.periodType === 'weekly' ? 'bg-[#E3F2FD] text-[#1565C0]' :
+                                        'bg-[#F3E5F5] text-[#7B1FA2]'
+                                      }`}>
+                                        {rep.periodType === 'daily' ? 'روزانه' : rep.periodType === 'weekly' ? 'هفتگی' : 'ماهانه'}
+                                      </span>
+                                    </td>
+                                    <td className="p-2.5 text-[#6F4E37] font-bold whitespace-nowrap">{rep.periodLabel || '-'}</td>
+                                    <td className="p-2.5 text-[#2B1810] max-w-sm truncate">{rep.summary}</td>
+                                    <td className="p-2.5 text-[#2E7D32] max-w-xs truncate">{rep.keyAchievements || '-'}</td>
+                                    <td className="p-2.5 text-[#C62828] max-w-xs truncate">{rep.challengesOrBarriers || '-'}</td>
+                                    <td className="p-2.5 text-[#1565C0] max-w-xs truncate">{rep.plansOrPriorities || '-'}</td>
+                                    <td className="p-2.5 text-center font-black text-[#8D5B4C]">{rep.selfRating ? `${toPersianDigits(rep.selfRating)} از ۵` : '-'}</td>
+                                    <td className="p-2.5 text-center whitespace-nowrap">
+                                      {rep.managerStatus === 'approved' ? (
+                                        <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#E8F5E9] text-[#2E7D32]">تایید شده</span>
+                                      ) : rep.managerStatus === 'rewarded' ? (
+                                        <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF9C4] text-[#F57F17]">پاداش ویژه</span>
+                                      ) : (
+                                        <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#ECEFF1] text-[#455A64]">در انتظار</span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))
-            )}
+                );
+              });
+            })()}
           </div>
 
         </div>

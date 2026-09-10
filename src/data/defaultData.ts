@@ -1,4 +1,4 @@
-import { User, DailyReport, FollowUpStatusCode, ManagerDirective } from '../types';
+import { User, DailyReport, FollowUpStatusCode, ManagerDirective, PeriodicOverallReport } from '../types';
 import { getCurrentShamsiDate } from '../utils/shamsi';
 
 export const DEFAULT_DIRECTIVES: ManagerDirective[] = [
@@ -611,4 +611,232 @@ export function getInitialReports(): DailyReport[] {
     }
   ];
 }
+
+export function getInitialPeriodicReports(): PeriodicOverallReport[] {
+  const cur = getCurrentShamsiDate();
+  const todayShamsi = cur.formatted;
+  
+  // Calculate reference dates
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayShamsi = getCurrentShamsiDate(yesterday).formatted;
+
+  const dayBeforeYesterday = new Date();
+  dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
+  const dayBeforeYesterdayShamsi = getCurrentShamsiDate(dayBeforeYesterday).formatted;
+
+  return [
+    // 1. مهدی رضایی (C-101) - مشاور پیشتاز
+    {
+      id: 'per-c101-daily-today',
+      consultantId: 'user-c101',
+      consultantName: 'علیرضا رضایی',
+      consultantCode: 'C-101',
+      periodType: 'daily',
+      dateShamsi: todayShamsi,
+      periodLabel: `گزارش روزانه ${cur.dayOfWeek} ${cur.day} ${cur.monthName}`,
+      summary: 'انجام ۷ تماس هدفمند با مدیران کارخانجات شهرک صنعتی طوس. استقبال صنایع دارویی و شیمیایی از خدمات حسابرسی بیمه بالا بود.',
+      keyAchievements: 'تنظیم پیش‌نویس توافق با شرکت پارت‌سازان و ست شدن جلسه حضوری شنبه ساعت ۱۰ با مدیر مالی.',
+      challengesOrBarriers: 'برخی کارفرمایان خواستار نمونه قراردادهای استاندارد محرمانگی بودند که نیاز به فرم‌های حقوقی تکمیلی دارد.',
+      plansOrPriorities: 'پیگیری مرحله سوم کارفرما رضایی و ارسال تاییدیه جلسه به کارفرما حسینی.',
+      selfRating: 5,
+      submittedAt: '۱۶:۴۵',
+      createdAt: new Date().toISOString(),
+      managerStatus: 'approved',
+      managerFeedback: 'عملکرد عالی و پیگیری‌های منضبط؛ جلسه حضوری شنبه پیگیری شود.',
+      managerRating: 5,
+      managerReviewedAt: new Date().toISOString()
+    },
+    {
+      id: 'per-c101-daily-yesterday',
+      consultantId: 'user-c101',
+      consultantName: 'علیرضا رضایی',
+      consultantCode: 'C-101',
+      periodType: 'daily',
+      dateShamsi: yesterdayShamsi,
+      periodLabel: `گزارش روزانه روز قبل (${yesterdayShamsi})`,
+      summary: 'تمرکز بر پرونده‌های معوق و حل چالش‌های کارفرمایان چاپ و بسته‌بندی در خصوص جرایم تأمین اجتماعی.',
+      keyAchievements: 'حل شبهات کارفرما عباسی درباره سفته حسن انجام کار و ارجاع پرونده به وکیل مجموعه.',
+      challengesOrBarriers: 'مشغله شدید مدیران عامل قبل از ظهر؛ زمان بهینه تماس‌ها به بعد از ساعت ۱۴ منتقل شد.',
+      plansOrPriorities: 'شروع مذاکرات با صنف قطعات خودرو.',
+      selfRating: 4,
+      submittedAt: '۱۷:۱۰',
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      managerStatus: 'approved',
+      managerRating: 5
+    },
+    {
+      id: 'per-c101-weekly-last',
+      consultantId: 'user-c101',
+      consultantName: 'علیرضا رضایی',
+      consultantCode: 'C-101',
+      periodType: 'weekly',
+      dateShamsi: '1405/06/12',
+      periodLabel: 'گزارش هفتگی هفته دوم شهریور ۱۴۰۵',
+      summary: 'مجموع ۳۴ تماس موثر، ۴ جلسه ست‌شده و یک قرارداد قطعی با ارزش ۵۵ میلیون تومان در حوزه دعاوی کارگری.',
+      keyAchievements: 'عقد قرارداد با شرکت تولیدی توس و جذب ۳ مشتری جدید در شهرک ماشین‌سازی.',
+      challengesOrBarriers: 'رقابت با شرکت‌های سنتی حسابداری که مشاوره‌های نادرست به کارفرمایان ارائه می‌دهند.',
+      weeklyFocusGuilds: 'تولید قطعات صنعتی، صنایع پلیمری، ریخته‌گری',
+      plansOrPriorities: 'نهایی‌سازی ۲ قرارداد جاری و تمرکز ویژه بر خدمات پیشگیرانه بازرسی اداره کار.',
+      selfRating: 5,
+      submittedAt: '۱۸:۰۰',
+      createdAt: new Date(Date.now() - 7 * 86400000).toISOString(),
+      managerStatus: 'rewarded',
+      managerFeedback: 'بهترین عملکرد هفته در تیم مشاوره. پاداش انضباط و تحقق اهداف منظور شد.',
+      managerRating: 5
+    },
+    {
+      id: 'per-c101-monthly-mordad',
+      consultantId: 'user-c101',
+      consultantName: 'علیرضا رضایی',
+      consultantCode: 'C-101',
+      periodType: 'monthly',
+      dateShamsi: '1405/05/31',
+      periodLabel: 'گزارش ماهانه مرداد ۱۴۰۵',
+      summary: 'تحقق ۱۰۸ درصدی تارگت ماهانه با ثبت ۱۲۸ تماس و عقد ۴ قرارداد جامع سالانه بازبینی قراردادهای کار.',
+      keyAchievements: 'رشد ۴۰ درصدی تعامل با صنف ریخته‌گری و ارتقای رضایت مراجعین به ۴.۹ از ۵.',
+      challengesOrBarriers: 'نیاز به کاتالوگ‌های اختصاصی‌تر برای صنایع با بیش از ۵۰ پرسنل.',
+      monthlyStrategicNotes: 'پیشنهاد می‌شود یک وبینار تخصصی برای مدیران منابع انسانی شرکت‌های پیمانکاری تدارک دیده شود.',
+      selfRating: 5,
+      submittedAt: '۱۹:۳۰',
+      createdAt: new Date(Date.now() - 20 * 86400000).toISOString(),
+      managerStatus: 'rewarded',
+      managerFeedback: 'الگوی انضباط گزارش‌دهی و تعهد تیمی. مشمول پاداش ویژه ماهانه.',
+      managerRating: 5
+    },
+
+    // 2. سارا علیزاده (C-102) - عملکرد مناسب با یک تاخیر
+    {
+      id: 'per-c102-daily-today',
+      consultantId: 'user-c102',
+      consultantName: 'سارا علیزاده',
+      consultantCode: 'C-102',
+      periodType: 'daily',
+      dateShamsi: todayShamsi,
+      periodLabel: `گزارش روزانه ${cur.dayOfWeek} ${cur.day} ${cur.monthName}`,
+      summary: 'مذاکره با ۵ مدیر ارشد هلدینگ‌های غذایی و دارویی در خصوص دعاوی ماده ۱۴۸ قانون کار و بازنشستگی پیش‌ازموعد.',
+      keyAchievements: 'جلب نظر مساعد مدیر منابع انسانی شرکت بهنام‌شهد و هماهنگی جلسه معارفه.',
+      challengesOrBarriers: 'عدم حضور مستقیم تصمیم‌گیرنده نهایی در برخی کارخانجات و لزوم پیگیری از طریق سرپرستان.',
+      plansOrPriorities: 'ارسال مدارک حقوقی کارینو و برقراری تماس دوم در چرخه ۴ روزه.',
+      selfRating: 4,
+      submittedAt: '۱۷:۰۵',
+      createdAt: new Date().toISOString(),
+      managerStatus: 'pending'
+    },
+    {
+      id: 'per-c102-weekly-last',
+      consultantId: 'user-c102',
+      consultantName: 'سارا علیزاده',
+      consultantCode: 'C-102',
+      periodType: 'weekly',
+      dateShamsi: '1405/06/12',
+      periodLabel: 'گزارش هفتگی هفته دوم شهریور ۱۴۰۵',
+      summary: 'انجام ۲۹ تماس اولیه، ۸ پیگیری مرحله دوم و ۴ پیگیری مرحله سوم در صنف چاپ و صنایع غذایی.',
+      keyAchievements: '۲ جلسه مشاوره حضوری برگزار شد و پیش‌نویس توافق‌نامه ایمنی کار ارسال گردید.',
+      challengesOrBarriers: 'عدم پاسخگویی کارفرمایان در روز چهارشنبه به دلیل سفر.',
+      weeklyFocusGuilds: 'صنایع غذایی، بسته‌بندی، دارویی',
+      plansOrPriorities: 'تمرکز بر بستن قرارداد پرونده شرکت آرد خوشه طوس.',
+      selfRating: 4,
+      submittedAt: '۱۶:۳۰',
+      createdAt: new Date(Date.now() - 7 * 86400000).toISOString(),
+      managerStatus: 'approved',
+      managerFeedback: 'گزارش دقیق و مستند؛ پیگیری پرونده آرد خوشه در اولویت قرار گیرد.',
+      managerRating: 4
+    },
+    {
+      id: 'per-c102-monthly-mordad',
+      consultantId: 'user-c102',
+      consultantName: 'سارا علیزاده',
+      consultantCode: 'C-102',
+      periodType: 'monthly',
+      dateShamsi: '1405/05/31',
+      periodLabel: 'گزارش ماهانه مرداد ۱۴۰۵',
+      summary: 'پوشش ۸۵ کارفرما در طول ماه با ثبت ۳ قرارداد نهایی و نرخ تبدیل ۱۲ درصدی.',
+      keyAchievements: 'ورود موفق به صنف کارخانجات آرد و غلات شرق کشور.',
+      monthlyStrategicNotes: 'افزایش بودجه تبلیغاتی در لینکدین می‌تواند منجر به لیدهای باکیفیت‌تری شود.',
+      selfRating: 4,
+      submittedAt: '۱۸:۱۵',
+      createdAt: new Date(Date.now() - 20 * 86400000).toISOString(),
+      managerStatus: 'approved',
+      managerRating: 4
+    },
+
+    // 3. علی اکبری (C-103) - ثبت با تاخیر / دارای روزهای فاقد گزارش (تست جریمه و تذکر)
+    {
+      id: 'per-c103-daily-yesterday',
+      consultantId: 'user-c103',
+      consultantName: 'علی اکبری',
+      consultantCode: 'C-103',
+      periodType: 'daily',
+      dateShamsi: yesterdayShamsi,
+      periodLabel: `گزارش روزانه (${yesterdayShamsi})`,
+      summary: 'برقراری تماس با شرکت‌های پخش و توزیع در مشهد و حومه.',
+      keyAchievements: 'ارسال معرفی‌نامه به ۲ شرکت پخش مواد شوینده.',
+      challengesOrBarriers: 'عدم هماهنگی به موقع با مسئول دفتر مدیران.',
+      plansOrPriorities: 'تماس با صنف قطعه‌سازان خودرو.',
+      selfRating: 3,
+      submittedAt: '۱۹:۴۵',
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      managerStatus: 'warned',
+      managerFeedback: 'ارسال گزارش با تاخیر غیرموجه؛ دقت شود گزارشات روزانه حداکثر تا ساعت ۱۸ ارسال گردد.',
+      managerRating: 2
+    },
+    {
+      id: 'per-c103-monthly-mordad',
+      consultantId: 'user-c103',
+      consultantName: 'علی اکبری',
+      consultantCode: 'C-103',
+      periodType: 'monthly',
+      dateShamsi: '1405/05/31',
+      periodLabel: 'گزارش ماهانه مرداد ۱۴۰۵',
+      summary: 'مجموع تماس‌ها زیر سقف انتظار بود ولی در هفته پایانی جبران شد.',
+      keyAchievements: 'عقد یک قرارداد مشاوره در صنف عمده‌فروشان ابزار.',
+      selfRating: 3,
+      submittedAt: '۲۱:۰۰',
+      createdAt: new Date(Date.now() - 20 * 86400000).toISOString(),
+      managerStatus: 'warned',
+      managerFeedback: 'نیاز به افزایش نظم در ثبت مراحل پیگیری و تعهد به ساعات کاری.',
+      managerRating: 3
+    },
+
+    // 4. مریم حسینی (C-104) - مشاور دقیق نرم‌افزار و دانش‌بنیان
+    {
+      id: 'per-c104-daily-today',
+      consultantId: 'user-c104',
+      consultantName: 'مریم حسینی',
+      consultantCode: 'C-104',
+      periodType: 'daily',
+      dateShamsi: todayShamsi,
+      periodLabel: `گزارش روزانه ${cur.dayOfWeek} ${cur.day} ${cur.monthName}`,
+      summary: 'تماس با ۶ شرکت نرم‌افزاری و شتاب‌دهنده پارک علم و فناوری خراسان. دغدغه اصلی قراردادهای عدم افشا (NDA) و تضامین پرسنلی است.',
+      keyAchievements: 'هماهنگی جلسه آنلاین برای دوشنبه با شتاب‌دهنده پرشین و بررسی پکیج قراردادهای استارتاپی.',
+      challengesOrBarriers: 'نبود مدل تعرفه ساعتی مشخص برای استارتاپ‌های کوچک.',
+      plansOrPriorities: 'آماده‌سازی پیش‌نویس پکیج ویژه دانش‌بنیان‌ها.',
+      selfRating: 5,
+      submittedAt: '۱۶:۰۰',
+      createdAt: new Date().toISOString(),
+      managerStatus: 'approved',
+      managerRating: 5
+    },
+    {
+      id: 'per-c104-weekly-last',
+      consultantId: 'user-c104',
+      consultantName: 'مریم حسینی',
+      consultantCode: 'C-104',
+      periodType: 'weekly',
+      dateShamsi: '1405/06/12',
+      periodLabel: 'گزارش هفتگی هفته دوم شهریور ۱۴۰۵',
+      summary: 'تمرکز صددرصدی بر شرکت‌های فناور و پارک علم و فناوری. جذب ۲ پرونده تنظیم آیین‌نامه انضباطی کارگاهی.',
+      keyAchievements: 'عقد قرارداد با شرکت راهکارهای ابری پایا به مبلغ ۶۰ میلیون تومان.',
+      weeklyFocusGuilds: 'فناوری اطلاعات، فین‌تک، دانش‌بنیان',
+      selfRating: 5,
+      submittedAt: '۱۷:۴۰',
+      createdAt: new Date(Date.now() - 7 * 86400000).toISOString(),
+      managerStatus: 'rewarded',
+      managerFeedback: 'ورود به بازار دانش‌بنیان بسیار هوشمندانه و با بازدهی عالی بود. تبریک.',
+      managerRating: 5
+    }
+  ];
+}
+
 

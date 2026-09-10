@@ -17,6 +17,7 @@ import { FollowUpSelector } from '../common/FollowUpSelector';
 import { FollowUpBadge } from '../common/FollowUpBadge';
 import { ScrollableTabs, TabItem } from '../common/ScrollableTabs';
 import { MorningDashboard } from './MorningDashboard';
+import { PeriodicReportsConsultant } from './PeriodicReportsConsultant';
 import confetti from 'canvas-confetti';
 
 import { 
@@ -51,7 +52,7 @@ interface ConsultantDashboardProps {
 }
 
 export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ currentUser }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'morning' | 'form' | 'upcoming' | 'history'>('morning');
+  const [activeSubTab, setActiveSubTab] = useState<'morning' | 'form' | 'periodic' | 'upcoming' | 'history'>('morning');
   const [concernsList, setConcernsList] = useState<string[]>(getStoredConcerns());
   const [allReports, setAllReports] = useState<DailyReport[]>(getStoredReports());
   const [directives, setDirectives] = useState<ManagerDirective[]>(getStoredDirectives());
@@ -352,7 +353,6 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   const checkCompleteness = () => {
     const errors: string[] = [];
     if (!guild.trim()) errors.push('نام صنف یا حوزه فعالیت کلی گزارش را وارد کنید.');
-    if (!personalOpinion.trim()) errors.push('تکمیل بخش «نظر و بازخورد کارشناسی مشاور» برای مدیریت الزامی است.');
 
     rows.forEach((r, idx) => {
       const num = idx + 1;
@@ -379,10 +379,9 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
 
   // Calculate percentage of mandatory fields completed
   // 7 mandatory fields per row: clientName, activityField, phone, address, concern, followUp1, followUpResult
-  const totalMandatoryFields = 2 + (rows.length * 7); 
+  const totalMandatoryFields = 1 + (rows.length * 7); 
   let filledMandatoryFields = 0;
   if (guild.trim()) filledMandatoryFields++;
-  if (personalOpinion.trim()) filledMandatoryFields++;
   rows.forEach(r => {
     if (r.clientName.trim()) filledMandatoryFields++;
     if (r.activityField.trim()) filledMandatoryFields++;
@@ -408,8 +407,9 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
 
     const reportIdToSave = editingReportId || `rep-${Date.now()}`;
     const existingRep = editingReportId ? allReports.find(r => r.id === editingReportId) : null;
+    const cleanDateShamsi = toEnglishDigits(dateShamsi);
     
-    // Ensure all row follow-up results are populated and normalized without overwriting user edits
+    // Ensure all row follow-up results and Shamsi dates are populated and normalized without overwriting user edits
     const sanitizedRows = rows.map(r => {
       const trimmedResult = (r.followUpResult || '').trim();
       const latestSymbol = r.followUp4 || r.followUp3 || r.followUp2 || r.followUp1;
@@ -417,6 +417,10 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
       
       return {
         ...r,
+        followUp1DateShamsi: r.followUp1DateShamsi || cleanDateShamsi,
+        followUp2DateShamsi: r.followUp2DateShamsi || (r.followUp2 ? cleanDateShamsi : undefined),
+        followUp3DateShamsi: r.followUp3DateShamsi || (r.followUp3 ? cleanDateShamsi : undefined),
+        followUp4DateShamsi: r.followUp4DateShamsi || (r.followUp4 ? cleanDateShamsi : undefined),
         followUpResult: trimmedResult || defaultLabel,
         meetingTopic: (r.meetingTopic || '').trim()
       };
@@ -428,12 +432,12 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
       consultantName: currentUser.fullName,
       consultantCode: currentUser.consultantCode,
       guild,
-      dateShamsi: toEnglishDigits(dateShamsi),
+      dateShamsi: cleanDateShamsi,
       dayOfWeekShamsi,
       createdAt: existingRep?.createdAt || new Date().toISOString(),
       submittedAt: existingRep?.submittedAt || getCurrentTimeFormatted(),
       status: existingRep?.status || 'submitted',
-      personalOpinion,
+      personalOpinion: personalOpinion || '',
       rows: sanitizedRows,
       managerFeedback: existingRep?.managerFeedback,
       managerRating: existingRep?.managerRating,
@@ -538,15 +542,19 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
       if (isTargetRow) {
         const updatedRow: ReportRow = { ...row };
         const nowIso = new Date().toISOString();
+        const nowShamsi = getCurrentShamsiDate().formatted;
         if (activeFollowUpTarget.nextStepNumber === 2) {
           updatedRow.followUp2 = newFollowUpSymbol;
           updatedRow.followUp2Date = nowIso;
+          updatedRow.followUp2DateShamsi = nowShamsi;
         } else if (activeFollowUpTarget.nextStepNumber === 3) {
           updatedRow.followUp3 = newFollowUpSymbol;
           updatedRow.followUp3Date = nowIso;
+          updatedRow.followUp3DateShamsi = nowShamsi;
         } else if (activeFollowUpTarget.nextStepNumber === 4) {
           updatedRow.followUp4 = newFollowUpSymbol;
           updatedRow.followUp4Date = nowIso;
+          updatedRow.followUp4DateShamsi = nowShamsi;
         }
         if (newFollowUpResultText.trim()) {
           updatedRow.followUpResult = newFollowUpResultText.trim();
@@ -648,8 +656,13 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             },
             {
               id: 'form',
-              label: editingReportId ? 'ویرایش و تکمیل گزارش' : 'فرم ثبت گزارش عملکرد روزانه',
+              label: editingReportId ? 'ویرایش و تکمیل گزارش تماس‌ها' : 'فرم ثبت گزارش تماس‌های روزانه',
               icon: FilePlus
+            },
+            {
+              id: 'periodic',
+              label: '📊 گزارشات دوره‌ای (روزانه / هفتگی / ماهانه)',
+              icon: FileSpreadsheet
             },
             {
               id: 'upcoming',
@@ -1136,28 +1149,24 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             </div>
           </div>
 
-          {/* Mandatory Personal Opinion Section */}
-          <div className="navy-card-glass rounded-2xl border border-amber-500/40 p-5 shadow-xl space-y-2.5">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-bold text-amber-300 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-amber-400" />
-                <span>نظر و تحلیل شخصی مشاور درباره فعالیت روزانه (ستون به شدت مهم برای مدیریت) *</span>
-              </label>
-              <span className="text-[11px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded border border-amber-400/30">
-                تکمیل الزامی
-              </span>
+          {/* Info Notice: Personal Opinion & Periodic Reporting Separation */}
+          <div className="bg-[#081525] rounded-2xl border border-amber-500/30 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-lg">
+            <div className="flex items-center gap-2.5 text-amber-300">
+              <MessageSquare className="w-5 h-5 text-amber-400 shrink-0" />
+              <div>
+                <span className="font-bold block">تحلیل و گزارش عملکرد کلی دوره‌ای:</span>
+                <span className="text-slate-400">
+                  طبق ساختار جدید مدیریتی، تحلیل کلی روزانه، هفتگی و ماهانه به تب اختصاصی <strong>«گزارشات دوره‌ای»</strong> منتقل شده است.
+                </span>
+              </div>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              تحلیل کارشناسی، چالش‌ها، میزان پذیرش کارفرمایان و پیشنهاد شما برای بهبود خدمات یا تسهیل عقد قرارداد را ثبت فرمایید:
-            </p>
-            <textarea
-              required
-              rows={3}
-              value={personalOpinion}
-              onChange={(e) => setPersonalOpinion(e.target.value)}
-              placeholder="دیدگاه کارشناسی شما درباره جلسات امروز، مقاومت‌ها یا فرصت‌های کشف‌شده در این صنف..."
-              className="w-full bg-[#081525] border border-amber-500/30 focus:border-amber-400 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-400/20 leading-relaxed"
-            />
+            <button
+              type="button"
+              onClick={() => setActiveSubTab('periodic')}
+              className="px-3.5 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 rounded-xl shrink-0 cursor-pointer transition-all"
+            >
+              رفتن به ثبت گزارش کلی دوره‌ای ←
+            </button>
           </div>
 
           {/* Action Buttons Bar */}
@@ -1183,6 +1192,17 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
           </div>
 
         </form>
+      )}
+
+      {/* TAB: PERIODIC OVERALL REPORTS (DAILY / WEEKLY / MONTHLY) */}
+      {activeSubTab === 'periodic' && (
+        <div className="animate-fadeIn">
+          <PeriodicReportsConsultant
+            currentUser={currentUser}
+            allReports={allReports}
+            onReportSubmitted={reloadData}
+          />
+        </div>
       )}
 
       {/* TAB 2: UPCOMING FOLLOW-UPS (4-DAY CYCLE) */}

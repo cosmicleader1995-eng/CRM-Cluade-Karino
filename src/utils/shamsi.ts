@@ -160,7 +160,33 @@ export function getCurrentTimeFormatted(dateInput: Date = new Date()): string {
   return `${toPersianDigits(hours)}:${toPersianDigits(minutes)}`;
 }
 
-export function getArchiveFileName(dateShamsi?: string, dayOfWeek?: string): string {
+export function isLastWorkingDayOfShamsiMonth(dateInput?: string | Date): boolean {
+  let p: { year: number; month: number; day: number } | null = null;
+  if (!dateInput) {
+    const cur = getCurrentShamsiDate();
+    p = { year: cur.year, month: cur.month, day: cur.day };
+  } else if (typeof dateInput === 'string') {
+    p = parseShamsiDate(dateInput);
+  } else {
+    const [jy, jm, jd] = gregorianToJalali(dateInput.getFullYear(), dateInput.getMonth() + 1, dateInput.getDate());
+    p = { year: jy, month: jm, day: jd };
+  }
+
+  if (!p) return false;
+  const maxDay = getShamsiMonthLastDay(p.year, p.month);
+  const lastDayDate = shamsiToDate(`${p.year}/${p.month}/${maxDay}`);
+  // If last day of the month is Friday (day 5), the last working day is Thursday (maxDay - 1)
+  const isFriday = lastDayDate ? lastDayDate.getDay() === 5 : false;
+  const lastWorkingDay = isFriday ? maxDay - 1 : maxDay;
+
+  return p.day === lastWorkingDay;
+}
+
+export function getArchiveFileName(
+  dateShamsi?: string, 
+  dayOfWeek?: string,
+  archiveType: 'calls_daily' | 'periodic_daily' | 'periodic_weekly' | 'periodic_monthly' = 'calls_daily'
+): string {
   let dayName = dayOfWeek;
   let rawDate = dateShamsi;
   if (!rawDate) {
@@ -176,7 +202,20 @@ export function getArchiveFileName(dateShamsi?: string, dayOfWeek?: string): str
     }
   }
   const sanitized = rawDate.replace(/\//g, '-');
-  return `گزارش_روزانه_${dayName}_${sanitized}.xlsx`;
+  const parsed = parseShamsiDate(rawDate);
+  const monthName = parsed ? (PERSIAN_MONTH_NAMES[parsed.month] || '') : '';
+
+  switch (archiveType) {
+    case 'periodic_daily':
+      return `بایگانی_گزارشات_تحلیلی_روزانه_${dayName}_${sanitized}.xlsx`;
+    case 'periodic_weekly':
+      return `بایگانی_گزارشات_هفتگی_مشاورین_پنجشنبه_${sanitized}.xlsx`;
+    case 'periodic_monthly':
+      return `بایگانی_گزارشات_استراتژیک_ماهانه_${monthName}_${parsed?.year || ''}_${sanitized}.xlsx`;
+    case 'calls_daily':
+    default:
+      return `بایگانی_تماسها_و_پیگیری_روزانه_${dayName}_${sanitized}.xlsx`;
+  }
 }
 
 /**
@@ -280,4 +319,76 @@ export function compareReportsLatestFirst(
   // 4. Stable tie-breaker
   return wb.id.localeCompare(wa.id);
 }
+
+/**
+ * Checks if a given Shamsi date or Gregorian Date is Thursday (پنج‌شنبه)
+ */
+export function isThursday(dateInput?: string | Date): boolean {
+  if (!dateInput) {
+    const cur = getCurrentShamsiDate();
+    return cur.dayOfWeek === 'پنج‌شنبه';
+  }
+  if (typeof dateInput === 'string') {
+    const d = shamsiToDate(dateInput);
+    if (!d) return false;
+    return d.getDay() === 4; // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  }
+  return dateInput.getDay() === 4;
+}
+
+/**
+ * Returns the maximum days of a given Shamsi month
+ */
+export function getShamsiMonthLastDay(year: number, month: number): number {
+  if (month >= 1 && month <= 6) return 31;
+  if (month >= 7 && month <= 11) return 30;
+  // Esfand: check leap year (approximate Jalali leap cycle)
+  const isLeap = (((((year - 474) % 2820) + 474) + 38) * 682) % 2816 < 682;
+  return isLeap ? 30 : 29;
+}
+
+/**
+ * Checks if a given Shamsi date is the last working day or end of that Shamsi month (e.g. 29, 30, 31)
+ */
+export function isEndOfShamsiMonth(dateInput?: string | Date): boolean {
+  let p: { year: number; month: number; day: number } | null = null;
+  if (!dateInput) {
+    const cur = getCurrentShamsiDate();
+    p = { year: cur.year, month: cur.month, day: cur.day };
+  } else if (typeof dateInput === 'string') {
+    p = parseShamsiDate(dateInput);
+  } else {
+    const [jy, jm, jd] = gregorianToJalali(dateInput.getFullYear(), dateInput.getMonth() + 1, dateInput.getDate());
+    p = { year: jy, month: jm, day: jd };
+  }
+
+  if (!p) return false;
+  const maxDay = getShamsiMonthLastDay(p.year, p.month);
+  // Last 2-3 days of the month or last Thursday of the month
+  return p.day >= maxDay - 1;
+}
+
+/**
+ * Calculates exact elapsed calendar days between two Shamsi dates (date2 - date1)
+ */
+export function daysBetweenShamsiDates(d1?: string | null, d2?: string | null): number | null {
+  if (!d1 || !d2) return null;
+  const dt1 = shamsiToDate(d1);
+  const dt2 = shamsiToDate(d2);
+  if (!dt1 || !dt2) return null;
+  const msDiff = dt2.getTime() - dt1.getTime();
+  return Math.round(msDiff / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Formats a Shamsi date string to full Persian readable date (e.g. ۱۹ شهریور ۱۴۰۵)
+ */
+export function formatShamsiDateLong(d?: string | null): string {
+  if (!d) return '';
+  const p = parseShamsiDate(d);
+  if (!p) return d;
+  const monthName = PERSIAN_MONTH_NAMES[p.month] || '';
+  return `${toPersianDigits(p.day)} ${monthName} ${toPersianDigits(p.year)}`;
+}
+
 

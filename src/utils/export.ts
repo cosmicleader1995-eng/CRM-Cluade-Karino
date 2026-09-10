@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { DailyReport, ReportRow, ArchiveRecord } from '../types';
+import { DailyReport, ReportRow, ArchiveRecord, PeriodicOverallReport, ArchiveType } from '../types';
 import { toPersianDigits } from './shamsi';
 
 export function exportSingleReportToExcel(report: DailyReport) {
@@ -11,12 +11,16 @@ export function exportSingleReportToExcel(report: DailyReport) {
     'شماره تماس': row.phone,
     'آدرس': row.address,
     'دغدغه اصلی کارفرما': row.employerConcern,
-    'پیگیری ۱': row.followUp1,
-    'پیگیری ۲': row.followUp2,
-    'پیگیری ۳': row.followUp3,
-    'پیگیری ۴': row.followUp4,
-    'نتیجه نهایی پیگیری': row.followUpResult,
-    'موضوع جلسه': row.meetingTopic
+    'پیگیری ۱': row.followUp1 || '-',
+    'تاریخ پیگیری ۱': row.followUp1DateShamsi || '-',
+    'پیگیری ۲': row.followUp2 || '-',
+    'تاریخ پیگیری ۲': row.followUp2DateShamsi || '-',
+    'پیگیری ۳': row.followUp3 || '-',
+    'تاریخ پیگیری ۳': row.followUp3DateShamsi || '-',
+    'پیگیری ۴': row.followUp4 || '-',
+    'تاریخ پیگیری ۴': row.followUp4DateShamsi || '-',
+    'نتیجه نهایی پیگیری': row.followUpResult || '-',
+    'موضوع جلسه': row.meetingTopic || '-'
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(data);
@@ -40,7 +44,7 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
             'نام مشاور': rep.consultantName || '-',
             'کد مشاور': rep.consultantCode || '-',
             'صنف گزارش': rep.guild || '-',
-            'تاریخ ثبت': rep.dateShamsi || '-',
+            'تاریخ ثبت گزارش': rep.dateShamsi || '-',
             'نام کارفرما / مجموعه': r.clientName || '-',
             'زمینه فعالیت': r.activityField || '-',
             'تعداد پرسنل': r.personnelCount || '-',
@@ -48,9 +52,13 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
             'آدرس': r.address || '-',
             'دغدغه اصلی کارفرما': r.employerConcern || '-',
             'پیگیری ۱': r.followUp1 || '-',
+            'تاریخ پیگیری ۱': r.followUp1DateShamsi || (r.followUp1 ? rep.dateShamsi : '-'),
             'پیگیری ۲': r.followUp2 || '-',
+            'تاریخ پیگیری ۲': r.followUp2DateShamsi || (r.followUp2 ? rep.dateShamsi : '-'),
             'پیگیری ۳': r.followUp3 || '-',
+            'تاریخ پیگیری ۳': r.followUp3DateShamsi || (r.followUp3 ? rep.dateShamsi : '-'),
             'پیگیری ۴': r.followUp4 || '-',
+            'تاریخ پیگیری ۴': r.followUp4DateShamsi || (r.followUp4 ? rep.dateShamsi : '-'),
             'نتیجه پیگیری': r.followUpResult || '-',
             'موضوع جلسه': r.meetingTopic || '-',
             'نظر شخصی مشاور': rep.personalOpinion || '-'
@@ -62,7 +70,7 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
           'نام مشاور': rep.consultantName || '-',
           'کد مشاور': rep.consultantCode || '-',
           'صنف گزارش': rep.guild || '-',
-          'تاریخ ثبت': rep.dateShamsi || '-',
+          'تاریخ ثبت گزارش': rep.dateShamsi || '-',
           'نام کارفرما / مجموعه': 'بدون ردیف کارفرما',
           'زمینه فعالیت': '-',
           'تعداد پرسنل': '-',
@@ -70,9 +78,13 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
           'آدرس': '-',
           'دغدغه اصلی کارفرما': '-',
           'پیگیری ۱': '-',
+          'تاریخ پیگیری ۱': '-',
           'پیگیری ۲': '-',
+          'تاریخ پیگیری ۲': '-',
           'پیگیری ۳': '-',
+          'تاریخ پیگیری ۳': '-',
           'پیگیری ۴': '-',
+          'تاریخ پیگیری ۴': '-',
           'نتیجه پیگیری': '-',
           'موضوع جلسه': '-',
           'نظر شخصی مشاور': rep.personalOpinion || '-'
@@ -90,7 +102,7 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
       'نام مشاور': 'در این تاریخ هیچ گزارشی توسط مشاوران ثبت نشده است',
       'کد مشاور': '-',
       'صنف گزارش': '-',
-      'تاریخ ثبت': inferredDate,
+      'تاریخ ثبت گزارش': inferredDate,
       'نام کارفرما / مجموعه': 'روز بدون ثبت گزارش (بایگانی مکانیزه ۲۳:۰۰)',
       'زمینه فعالیت': '-',
       'تعداد پرسنل': '-',
@@ -98,9 +110,13 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
       'آدرس': '-',
       'دغدغه اصلی کارفرما': '-',
       'پیگیری ۱': '-',
+      'تاریخ پیگیری ۱': '-',
       'پیگیری ۲': '-',
+      'تاریخ پیگیری ۲': '-',
       'پیگیری ۳': '-',
+      'تاریخ پیگیری ۳': '-',
       'پیگیری ۴': '-',
+      'تاریخ پیگیری ۴': '-',
       'نتیجه پیگیری': '-',
       'موضوع جلسه': '-',
       'نظر شخصی مشاور': 'سیستم بایگانی خودکار ۲۳:۰۰ کارینو'
@@ -115,17 +131,21 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
     { wch: 18 }, // نام مشاور
     { wch: 12 }, // کد مشاور
     { wch: 14 }, // صنف گزارش
-    { wch: 14 }, // تاریخ ثبت
+    { wch: 14 }, // تاریخ ثبت گزارش
     { wch: 22 }, // نام کارفرما / مجموعه
     { wch: 18 }, // زمینه فعالیت
     { wch: 12 }, // تعداد پرسنل
     { wch: 16 }, // شماره تماس
     { wch: 28 }, // آدرس
     { wch: 30 }, // دغدغه اصلی کارفرما
-    { wch: 12 }, // پیگیری ۱
-    { wch: 12 }, // پیگیری ۲
-    { wch: 12 }, // پیگیری ۳
-    { wch: 12 }, // پیگیری ۴
+    { wch: 10 }, // پیگیری ۱
+    { wch: 14 }, // تاریخ پیگیری ۱
+    { wch: 10 }, // پیگیری ۲
+    { wch: 14 }, // تاریخ پیگیری ۲
+    { wch: 10 }, // پیگیری ۳
+    { wch: 14 }, // تاریخ پیگیری ۳
+    { wch: 10 }, // پیگیری ۴
+    { wch: 14 }, // تاریخ پیگیری ۴
     { wch: 18 }, // نتیجه پیگیری
     { wch: 22 }, // موضوع جلسه
     { wch: 30 }  // نظر شخصی مشاور
@@ -134,9 +154,111 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'گزارش تجمیعی روزانه');
 
-  const defaultName = `گزارش_روزانه_کارینو_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const defaultName = `بایگانی_تماسها_و_پیگیری_روزانه_${new Date().toISOString().slice(0, 10)}.xlsx`;
   const finalFileName = fileNameTitle ? (fileNameTitle.endsWith('.xlsx') ? fileNameTitle : `${fileNameTitle}.xlsx`) : defaultName;
   XLSX.writeFile(workbook, finalFileName);
+}
+
+export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], fileNameTitle?: string) {
+  const rows: Array<Record<string, string | number>> = [];
+  let rowIdx = 1;
+
+  if (Array.isArray(reports) && reports.length > 0) {
+    reports.forEach((rep) => {
+      const typeLabel = rep.periodType === 'daily' 
+        ? 'روزانه' 
+        : rep.periodType === 'weekly' 
+        ? 'هفتگی (پنج‌شنبه)' 
+        : 'ماهانه استراتژیک';
+
+      const statusLabel = rep.managerStatus === 'approved' 
+        ? 'تایید شده' 
+        : rep.managerStatus === 'rewarded' 
+        ? 'پاداش و تشویق عملکرد' 
+        : rep.managerStatus === 'warned' 
+        ? 'تذکر انضباطی' 
+        : 'در انتظار بازبینی';
+
+      rows.push({
+        'ردیف': rowIdx++,
+        'نام مشاور': rep.consultantName || '-',
+        'کد مشاور': rep.consultantCode || '-',
+        'نوع دوره': typeLabel,
+        'تاریخ ثبت': rep.dateShamsi || '-',
+        'عنوان دوره / برچسب': rep.periodLabel || '-',
+        'خلاصه عملکرد اجرایی': rep.summary || '-',
+        'دستاوردها و نتایج کلیدی': rep.keyAchievements || '-',
+        'موانع و چالش‌ها': rep.challengesOrBarriers || '-',
+        'برنامه و اهداف دوره بعد': rep.plansOrPriorities || '-',
+        'صنوف و صنایع کانون توجه (هفتگی)': rep.weeklyFocusGuilds || '-',
+        'پیشنهاد استراتژیک به مدیر (ماهانه)': rep.monthlyStrategicNotes || '-',
+        'خودارزیابی مشاور (از ۵)': rep.selfRating ? `${rep.selfRating} ستاره` : '-',
+        'وضعیت ارزیابی مدیریت': statusLabel,
+        'نمره مدیر (از ۵)': rep.managerRating ? `${rep.managerRating} از ۵` : '-',
+        'بازخورد مدیر': rep.managerFeedback || '-',
+        'ساعت ثبت': rep.submittedAt || '-'
+      });
+    });
+  } else {
+    rows.push({
+      'ردیف': '-',
+      'نام مشاور': 'هیچ گزارش تحلیلی در این دوره ثبت نشده است',
+      'کد مشاور': '-',
+      'نوع دوره': '-',
+      'تاریخ ثبت': '-',
+      'عنوان دوره / برچسب': '-',
+      'خلاصه عملکرد اجرایی': '-',
+      'دستاوردها و نتایج کلیدی': '-',
+      'موانع و چالش‌ها': '-',
+      'برنامه و اهداف دوره بعد': '-',
+      'صنوف و صنایع کانون توجه (هفتگی)': '-',
+      'پیشنهاد استراتژیک به مدیر (ماهانه)': '-',
+      'خودارزیابی مشاور (از ۵)': '-',
+      'وضعیت ارزیابی مدیریت': '-',
+      'نمره مدیر (از ۵)': '-',
+      'بازخورد مدیر': '-',
+      'ساعت ثبت': '-'
+    });
+  }
+
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+
+  worksheet['!cols'] = [
+    { wch: 8 },  // ردیف
+    { wch: 18 }, // نام مشاور
+    { wch: 12 }, // کد مشاور
+    { wch: 16 }, // نوع دوره
+    { wch: 14 }, // تاریخ ثبت
+    { wch: 16 }, // روز هفته / ماه
+    { wch: 24 }, // عنوان گزارش
+    { wch: 35 }, // خلاصه عملکرد
+    { wch: 30 }, // دستاوردها
+    { wch: 28 }, // موانع
+    { wch: 30 }, // برنامه دوره بعد
+    { wch: 30 }, // پیشنهاد به مدیر
+    { wch: 18 }, // خودارزیابی
+    { wch: 18 }, // وضعیت مدیریت
+    { wch: 14 }, // نمره مدیر
+    { wch: 30 }, // بازخورد مدیر
+    { wch: 12 }  // ساعت ثبت
+  ];
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'گزارشات دوره‌ای مشاورین');
+
+  const defaultName = `بایگانی_گزارشات_دوره‌ای_کارینو_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const finalFileName = fileNameTitle ? (fileNameTitle.endsWith('.xlsx') ? fileNameTitle : `${fileNameTitle}.xlsx`) : defaultName;
+  XLSX.writeFile(workbook, finalFileName);
+}
+
+export function exportArchiveToExcel(archive: ArchiveRecord) {
+  if (archive.archiveType && archive.archiveType !== 'calls_daily') {
+    if (archive.overallReports && archive.overallReports.length > 0) {
+      exportPeriodicReportsToExcel(archive.overallReports, archive.fileName);
+      return;
+    }
+  }
+  exportAggregatedReportsToExcel(archive.reports || [], archive.fileName);
 }
 
 export function printOfficialReport(report: DailyReport) {
