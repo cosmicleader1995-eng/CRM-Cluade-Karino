@@ -115,12 +115,10 @@ export const ScrollableTabs: React.FC<ScrollableTabsProps> = ({
         type="button"
         aria-label="اسکرول به راست"
         onClick={() => handleScrollClick('right')}
-        className={`flex shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full items-center justify-center transition-all z-20 mr-1 cursor-pointer active:scale-90 shadow-md ${
-          canScrollRight 
-            ? theme === 'nude' 
-              ? 'bg-[#9C6644] text-white hover:bg-[#7F4F24] opacity-100 ring-2 ring-[#9C6644]/20' 
-              : 'bg-amber-500 text-slate-950 hover:bg-amber-400 opacity-100 ring-2 ring-amber-500/20'
-            : 'opacity-0 pointer-events-none'
+        className={`${canScrollRight ? 'flex' : 'hidden'} shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full items-center justify-center transition-all z-20 mr-1 cursor-pointer active:scale-90 shadow-md ${
+          theme === 'nude' 
+            ? 'bg-[#9C6644] text-white hover:bg-[#7F4F24] opacity-100 ring-2 ring-[#9C6644]/20' 
+            : 'bg-amber-500 text-slate-950 hover:bg-amber-400 opacity-100 ring-2 ring-amber-500/20'
         }`}
       >
         <ChevronRight className="w-4 h-4" />
@@ -219,12 +217,10 @@ export const ScrollableTabs: React.FC<ScrollableTabsProps> = ({
         type="button"
         aria-label="اسکرول به چپ"
         onClick={() => handleScrollClick('left')}
-        className={`flex shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full items-center justify-center transition-all z-20 ml-1 cursor-pointer active:scale-90 shadow-md ${
-          canScrollLeft 
-            ? theme === 'nude' 
-              ? 'bg-[#9C6644] text-white hover:bg-[#7F4F24] opacity-100 ring-2 ring-[#9C6644]/20' 
-              : 'bg-amber-500 text-slate-950 hover:bg-amber-400 opacity-100 ring-2 ring-amber-500/20'
-            : 'opacity-0 pointer-events-none'
+        className={`${canScrollLeft ? 'flex' : 'hidden'} shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full items-center justify-center transition-all z-20 ml-1 cursor-pointer active:scale-90 shadow-md ${
+          theme === 'nude' 
+            ? 'bg-[#9C6644] text-white hover:bg-[#7F4F24] opacity-100 ring-2 ring-[#9C6644]/20' 
+            : 'bg-amber-500 text-slate-950 hover:bg-amber-400 opacity-100 ring-2 ring-amber-500/20'
         }`}
       >
         <ChevronLeft className="w-4 h-4" />

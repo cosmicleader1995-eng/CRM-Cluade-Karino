@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { DailyReport, ReportRow, ArchiveRecord, PeriodicOverallReport, ArchiveType } from '../types';
-import { toPersianDigits } from './shamsi';
+import { toPersianDigits, formatStandardReportTitle, compareReportsLatestFirst } from './shamsi';
 
 export function exportSingleReportToExcel(report: DailyReport) {
   const data = report.rows.map((row) => ({
@@ -152,9 +152,9 @@ export function exportAggregatedReportsToExcel(reports: DailyReport[], fileNameT
   ];
 
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'گزارش تجمیعی روزانه');
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'تماس‌ها و پیگیری‌ها');
 
-  const defaultName = `بایگانی_تماسها_و_پیگیری_روزانه_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const defaultName = `تماس‌های_روزانه_${new Date().toISOString().slice(0, 10)}.xlsx`;
   const finalFileName = fileNameTitle ? (fileNameTitle.endsWith('.xlsx') ? fileNameTitle : `${fileNameTitle}.xlsx`) : defaultName;
   XLSX.writeFile(workbook, finalFileName);
 }
@@ -164,17 +164,18 @@ export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], f
   let rowIdx = 1;
 
   if (Array.isArray(reports) && reports.length > 0) {
-    reports.forEach((rep) => {
+    const sorted = [...reports].sort(compareReportsLatestFirst);
+    sorted.forEach((rep) => {
       const typeLabel = rep.periodType === 'daily' 
-        ? 'روزانه' 
+        ? 'تحلیلی روزانه' 
         : rep.periodType === 'weekly' 
-        ? 'هفتگی (پنج‌شنبه)' 
-        : 'ماهانه استراتژیک';
+        ? 'تحلیلی هفتگی' 
+        : 'تحلیلی ماهانه';
 
       const statusLabel = rep.managerStatus === 'approved' 
         ? 'تایید شده' 
         : rep.managerStatus === 'rewarded' 
-        ? 'پاداش و تشویق عملکرد' 
+        ? 'پاداش و تشویق' 
         : rep.managerStatus === 'warned' 
         ? 'تذکر انضباطی' 
         : 'در انتظار بازبینی';
@@ -183,18 +184,18 @@ export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], f
         'ردیف': rowIdx++,
         'نام مشاور': rep.consultantName || '-',
         'کد مشاور': rep.consultantCode || '-',
-        'نوع دوره': typeLabel,
+        'سطح گزارش': typeLabel,
         'تاریخ ثبت': rep.dateShamsi || '-',
-        'عنوان دوره / برچسب': rep.periodLabel || '-',
+        'عنوان دوره': formatStandardReportTitle(rep.periodType, rep.dateShamsi, rep.periodLabel),
         'خلاصه عملکرد اجرایی': rep.summary || '-',
         'دستاوردها و نتایج کلیدی': rep.keyAchievements || '-',
         'موانع و چالش‌ها': rep.challengesOrBarriers || '-',
         'برنامه و اهداف دوره بعد': rep.plansOrPriorities || '-',
-        'صنوف و صنایع کانون توجه (هفتگی)': rep.weeklyFocusGuilds || '-',
-        'پیشنهاد استراتژیک به مدیر (ماهانه)': rep.monthlyStrategicNotes || '-',
-        'خودارزیابی مشاور (از ۵)': rep.selfRating ? `${rep.selfRating} ستاره` : '-',
+        'صنوف کانون توجه': rep.weeklyFocusGuilds || '-',
+        'پیشنهاد استراتژیک به مدیر': rep.monthlyStrategicNotes || '-',
+        'خودارزیابی مشاور': rep.selfRating ? `${rep.selfRating} از ۵` : '-',
         'وضعیت ارزیابی مدیریت': statusLabel,
-        'نمره مدیر (از ۵)': rep.managerRating ? `${rep.managerRating} از ۵` : '-',
+        'نمره مدیر': rep.managerRating ? `${rep.managerRating} از ۵` : '-',
         'بازخورد مدیر': rep.managerFeedback || '-',
         'ساعت ثبت': rep.submittedAt || '-'
       });
@@ -204,18 +205,18 @@ export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], f
       'ردیف': '-',
       'نام مشاور': 'هیچ گزارش تحلیلی در این دوره ثبت نشده است',
       'کد مشاور': '-',
-      'نوع دوره': '-',
+      'سطح گزارش': '-',
       'تاریخ ثبت': '-',
-      'عنوان دوره / برچسب': '-',
+      'عنوان دوره': '-',
       'خلاصه عملکرد اجرایی': '-',
       'دستاوردها و نتایج کلیدی': '-',
       'موانع و چالش‌ها': '-',
       'برنامه و اهداف دوره بعد': '-',
-      'صنوف و صنایع کانون توجه (هفتگی)': '-',
-      'پیشنهاد استراتژیک به مدیر (ماهانه)': '-',
-      'خودارزیابی مشاور (از ۵)': '-',
+      'صنوف کانون توجه': '-',
+      'پیشنهاد استراتژیک به مدیر': '-',
+      'خودارزیابی مشاور': '-',
       'وضعیت ارزیابی مدیریت': '-',
-      'نمره مدیر (از ۵)': '-',
+      'نمره مدیر': '-',
       'بازخورد مدیر': '-',
       'ساعت ثبت': '-'
     });
@@ -227,16 +228,16 @@ export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], f
     { wch: 8 },  // ردیف
     { wch: 18 }, // نام مشاور
     { wch: 12 }, // کد مشاور
-    { wch: 16 }, // نوع دوره
+    { wch: 16 }, // سطح گزارش
     { wch: 14 }, // تاریخ ثبت
-    { wch: 16 }, // روز هفته / ماه
-    { wch: 24 }, // عنوان گزارش
+    { wch: 22 }, // عنوان دوره
     { wch: 35 }, // خلاصه عملکرد
     { wch: 30 }, // دستاوردها
     { wch: 28 }, // موانع
     { wch: 30 }, // برنامه دوره بعد
+    { wch: 25 }, // صنوف کانون توجه
     { wch: 30 }, // پیشنهاد به مدیر
-    { wch: 18 }, // خودارزیابی
+    { wch: 16 }, // خودارزیابی
     { wch: 18 }, // وضعیت مدیریت
     { wch: 14 }, // نمره مدیر
     { wch: 30 }, // بازخورد مدیر
@@ -244,19 +245,17 @@ export function exportPeriodicReportsToExcel(reports: PeriodicOverallReport[], f
   ];
 
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'گزارشات دوره‌ای مشاورین');
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'تحلیلی عملکرد مشاورین');
 
-  const defaultName = `بایگانی_گزارشات_دوره‌ای_کارینو_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const defaultName = `تحلیلی_عملکرد_${new Date().toISOString().slice(0, 10)}.xlsx`;
   const finalFileName = fileNameTitle ? (fileNameTitle.endsWith('.xlsx') ? fileNameTitle : `${fileNameTitle}.xlsx`) : defaultName;
   XLSX.writeFile(workbook, finalFileName);
 }
 
 export function exportArchiveToExcel(archive: ArchiveRecord) {
-  if (archive.archiveType && archive.archiveType !== 'calls_daily') {
-    if (archive.overallReports && archive.overallReports.length > 0) {
-      exportPeriodicReportsToExcel(archive.overallReports, archive.fileName);
-      return;
-    }
+  if (archive.archiveType && archive.archiveType.startsWith('periodic')) {
+    exportPeriodicReportsToExcel(archive.overallReports || [], archive.fileName);
+    return;
   }
   exportAggregatedReportsToExcel(archive.reports || [], archive.fileName);
 }

@@ -187,19 +187,10 @@ export function getArchiveFileName(
   dayOfWeek?: string,
   archiveType: 'calls_daily' | 'periodic_daily' | 'periodic_weekly' | 'periodic_monthly' = 'calls_daily'
 ): string {
-  let dayName = dayOfWeek;
   let rawDate = dateShamsi;
   if (!rawDate) {
     const cur = getCurrentShamsiDate();
     rawDate = cur.formatted;
-    dayName = dayName || cur.dayOfWeek;
-  } else if (!dayName) {
-    const d = shamsiToDate(rawDate);
-    if (d) {
-      dayName = PERSIAN_WEEK_DAYS[d.getDay()];
-    } else {
-      dayName = 'روزانه';
-    }
   }
   const sanitized = rawDate.replace(/\//g, '-');
   const parsed = parseShamsiDate(rawDate);
@@ -207,14 +198,14 @@ export function getArchiveFileName(
 
   switch (archiveType) {
     case 'periodic_daily':
-      return `بایگانی_گزارشات_تحلیلی_روزانه_${dayName}_${sanitized}.xlsx`;
+      return `تحلیلی_روزانه_${sanitized}.xlsx`;
     case 'periodic_weekly':
-      return `بایگانی_گزارشات_هفتگی_مشاورین_پنجشنبه_${sanitized}.xlsx`;
+      return `تحلیلی_هفتگی_${sanitized}.xlsx`;
     case 'periodic_monthly':
-      return `بایگانی_گزارشات_استراتژیک_ماهانه_${monthName}_${parsed?.year || ''}_${sanitized}.xlsx`;
+      return monthName ? `تحلیلی_ماهانه_${monthName}_${parsed?.year || ''}.xlsx` : `تحلیلی_ماهانه_${sanitized}.xlsx`;
     case 'calls_daily':
     default:
-      return `بایگانی_تماسها_و_پیگیری_روزانه_${dayName}_${sanitized}.xlsx`;
+      return `تماس‌های_روزانه_${sanitized}.xlsx`;
   }
 }
 
@@ -242,43 +233,40 @@ export function getReportSubmissionWeight(r: {
   let creationMs = 0;
 
   const createdTime = r?.createdAt ? new Date(r.createdAt).getTime() : 0;
-  const updatedTime = r?.updatedAt ? new Date(r.updatedAt).getTime() : 0;
-  const isUpdatedLater = updatedTime > createdTime + 60000;
+  if (createdTime > 0) creationMs = createdTime;
+  if (!creationMs && r?.id) {
+    const m = String(r.id).match(/\d{10,}/);
+    if (m) creationMs = parseInt(m[0], 10);
+  }
 
-  if (isUpdatedLater) {
-    const uDate = new Date(updatedTime);
-    const uShamsi = getCurrentShamsiDate(uDate);
-    shamsiScore = uShamsi.year * 10000 + uShamsi.month * 100 + uShamsi.day;
-    timeOfDaySeconds = uDate.getHours() * 3600 + uDate.getMinutes() * 60 + uDate.getSeconds();
-    creationMs = updatedTime;
-  } else {
-    if (r?.dateShamsi) {
-      const p = parseShamsiDate(r.dateShamsi);
-      if (p) {
-        shamsiScore = p.year * 10000 + p.month * 100 + p.day;
-      }
+  // 1. Primary anchor: Shamsi calendar date (e.g. 1405/06/19 -> 14050619)
+  if (r?.dateShamsi) {
+    const p = parseShamsiDate(r.dateShamsi);
+    if (p) {
+      shamsiScore = p.year * 10000 + p.month * 100 + p.day;
     }
-
-    if (r?.submittedAt) {
-      const en = toEnglishDigits(String(r.submittedAt)).trim();
-      const m = en.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
-      if (m) {
-        const h = parseInt(m[1], 10);
-        const min = parseInt(m[2], 10);
-        const s = m[3] ? parseInt(m[3], 10) : 0;
-        timeOfDaySeconds = h * 3600 + min * 60 + s;
-      }
-    } else if (r?.createdAt) {
-      const cDate = new Date(r.createdAt);
-      if (!isNaN(cDate.getTime())) {
-        timeOfDaySeconds = cDate.getHours() * 3600 + cDate.getMinutes() * 60 + cDate.getSeconds();
-      }
+  } else if (r?.createdAt) {
+    const cDate = new Date(r.createdAt);
+    if (!isNaN(cDate.getTime())) {
+      const cShamsi = getCurrentShamsiDate(cDate);
+      shamsiScore = cShamsi.year * 10000 + cShamsi.month * 100 + cShamsi.day;
     }
+  }
 
-    if (createdTime > 0) creationMs = createdTime;
-    if (!creationMs && r?.id) {
-      const m = String(r.id).match(/\d{10,}/);
-      if (m) creationMs = parseInt(m[0], 10);
+  // 2. Secondary anchor: Exact submission time of day (e.g. '18:59' -> 68340 seconds)
+  if (r?.submittedAt) {
+    const en = toEnglishDigits(String(r.submittedAt)).trim();
+    const m = en.match(/(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+    if (m) {
+      const h = parseInt(m[1], 10);
+      const min = parseInt(m[2], 10);
+      const s = m[3] ? parseInt(m[3], 10) : 0;
+      timeOfDaySeconds = h * 3600 + min * 60 + s;
+    }
+  } else if (r?.createdAt) {
+    const cDate = new Date(r.createdAt);
+    if (!isNaN(cDate.getTime())) {
+      timeOfDaySeconds = cDate.getHours() * 3600 + cDate.getMinutes() * 60 + cDate.getSeconds();
     }
   }
 
@@ -288,6 +276,56 @@ export function getReportSubmissionWeight(r: {
     creationMs,
     id: String(r?.id || '')
   };
+}
+
+/**
+ * Unified, standard title generator for periodic reports (Daily, Weekly, Monthly).
+ * Format rules:
+ * - Daily: "گزارش روزانه [روز هفته] [روز] [نام ماه]" (e.g. "گزارش روزانه پنج‌شنبه ۱۹ شهریور")
+ * - Weekly: "گزارش هفتگی هفته [چندم] [نام ماه] پنج‌شنبه [روز] [نام ماه]" (e.g. "گزارش هفتگی هفته سوم شهریور پنج‌شنبه ۱۹ شهریور")
+ * - Monthly: "گزارش ماهانه [نام ماه] [سال]" (e.g. "گزارش ماهانه شهریور ۱۴۰۵")
+ */
+export function formatStandardReportTitle(
+  periodType: 'daily' | 'weekly' | 'monthly',
+  dateShamsi?: string,
+  existingLabel?: string
+): string {
+  let targetDate = dateShamsi;
+  if (!targetDate) {
+    targetDate = getCurrentShamsiDate().formatted;
+  }
+
+  const p = parseShamsiDate(targetDate);
+  if (!p) {
+    return existingLabel || (periodType === 'daily' ? 'گزارش روزانه' : periodType === 'weekly' ? 'گزارش هفتگی' : 'گزارش ماهانه');
+  }
+
+  const monthName = PERSIAN_MONTH_NAMES[p.month] || '';
+  const gDate = shamsiToDate(targetDate);
+  const dayOfWeek = gDate ? PERSIAN_WEEK_DAYS[gDate.getDay()] : '';
+  const dayStr = toPersianDigits(p.day);
+
+  if (periodType === 'daily') {
+    return `گزارش روزانه ${dayOfWeek} ${dayStr} ${monthName}`;
+  }
+
+  if (periodType === 'weekly') {
+    let weekWord = 'اول';
+    if (p.day <= 7) weekWord = 'اول';
+    else if (p.day <= 14) weekWord = 'دوم';
+    else if (p.day <= 21) weekWord = 'سوم';
+    else if (p.day <= 28) weekWord = 'چهارم';
+    else weekWord = 'پنجم';
+
+    const dayName = dayOfWeek || 'پنج‌شنبه';
+    return `گزارش هفتگی هفته ${weekWord} ${monthName} ${dayName} ${dayStr} ${monthName}`;
+  }
+
+  if (periodType === 'monthly') {
+    return `گزارش ماهانه ${monthName} ${toPersianDigits(p.year)}`;
+  }
+
+  return existingLabel || 'گزارش عملکرد';
 }
 
 /**
@@ -334,6 +372,97 @@ export function isThursday(dateInput?: string | Date): boolean {
     return d.getDay() === 4; // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
   }
   return dateInput.getDay() === 4;
+}
+
+/**
+ * Checks if a given Shamsi date or Gregorian Date is Friday (جمعه)
+ */
+export function isFriday(dateInput?: string | Date): boolean {
+  if (!dateInput) {
+    const cur = getCurrentShamsiDate();
+    return cur.dayOfWeek === 'جمعه';
+  }
+  if (typeof dateInput === 'string') {
+    const d = shamsiToDate(dateInput);
+    if (!d) return false;
+    return d.getDay() === 5; // 5 = Friday
+  }
+  return dateInput.getDay() === 5;
+}
+
+/**
+ * Returns current Tehran time components
+ */
+export function getTehranTimeInfo(): { hours: number; minutes: number; totalMinutes: number; timeString: string } {
+  try {
+    const tehranString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Tehran' });
+    const tehranDate = new Date(tehranString);
+    const hours = tehranDate.getHours();
+    const minutes = tehranDate.getMinutes();
+    const hStr = String(hours).padStart(2, '0');
+    const mStr = String(minutes).padStart(2, '0');
+    return { 
+      hours, 
+      minutes, 
+      totalMinutes: hours * 60 + minutes, 
+      timeString: `${toPersianDigits(hStr)}:${toPersianDigits(mStr)}` 
+    };
+  } catch (e) {
+    const now = new Date();
+    // Default fallback: +3.5 hours from UTC
+    const utcHours = now.getUTCHours();
+    const utcMinutes = now.getUTCMinutes();
+    let totalMinutes = Math.floor((utcHours * 60 + utcMinutes + 210) % 1440);
+    if (totalMinutes < 0) totalMinutes += 1440;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const hStr = String(hours).padStart(2, '0');
+    const mStr = String(minutes).padStart(2, '0');
+    return { 
+      hours, 
+      minutes, 
+      totalMinutes, 
+      timeString: `${toPersianDigits(hStr)}:${toPersianDigits(mStr)}` 
+    };
+  }
+}
+
+export interface DailyReportWindowStatus {
+  isFriday: boolean;
+  isBeforeSubmissionWindow: boolean; // < 17:00 on non-Friday
+  isInsideSubmissionWindow: boolean; // 17:00 - 19:00 on non-Friday
+  isPastDeadline: boolean; // >= 19:00 on non-Friday
+  tehranTimeString: string;
+  tehranHours: number;
+}
+
+export function getDailyReportWindowStatus(dateShamsi?: string): DailyReportWindowStatus {
+  const friday = isFriday(dateShamsi);
+  if (friday) {
+    const tehran = getTehranTimeInfo();
+    return {
+      isFriday: true,
+      isBeforeSubmissionWindow: false,
+      isInsideSubmissionWindow: false,
+      isPastDeadline: false,
+      tehranTimeString: tehran.timeString,
+      tehranHours: tehran.hours
+    };
+  }
+
+  const tehran = getTehranTimeInfo();
+  const isBefore = tehran.hours < 17;
+  const isInside = tehran.hours >= 17 && tehran.hours < 19;
+  const isPast = tehran.hours >= 19;
+
+  return {
+    isFriday: false,
+    isBeforeSubmissionWindow: isBefore,
+    isInsideSubmissionWindow: isInside,
+    isPastDeadline: isPast,
+    tehranTimeString: tehran.timeString,
+    tehranHours: tehran.hours
+  };
 }
 
 /**

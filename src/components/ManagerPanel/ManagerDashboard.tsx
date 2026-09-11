@@ -21,7 +21,8 @@ import {
   parseShamsiDate, 
   shamsiToDate, 
   normalizeShamsiDate, 
-  compareReportsLatestFirst 
+  compareReportsLatestFirst,
+  formatStandardReportTitle
 } from '../../utils/shamsi';
 import { exportAggregatedReportsToExcel, exportSingleReportToExcel, exportArchiveToExcel, printOfficialReport } from '../../utils/export';
 import { FollowUpBadge } from '../common/FollowUpBadge';
@@ -131,6 +132,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
   // Settings: New Concern
   const [newConcernInput, setNewConcernInput] = useState('');
   const [archiveSuccessMsg, setArchiveSuccessMsg] = useState('');
+  const [archiveMainCategory, setArchiveMainCategory] = useState<'executive' | 'analytical'>('executive');
+  const [analyticalSubFilter, setAnalyticalSubFilter] = useState<'all' | 'periodic_daily' | 'periodic_weekly' | 'periodic_monthly'>('all');
   const [selectedArchiveTypeFilter, setSelectedArchiveTypeFilter] = useState<'all' | 'calls_daily' | 'periodic_daily' | 'periodic_weekly' | 'periodic_monthly'>('all');
   const [expandedArchiveId, setExpandedArchiveId] = useState<string | null>(null);
 
@@ -1961,154 +1964,269 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
       {activeTab === 'archive' && (
         <div className="space-y-6 animate-fadeIn">
           
-          {/* Executive Manual Archive & Test Suite Hub */}
-          <div className="bg-gradient-to-l from-[#F5EDE2] via-[#FAF7F2] to-white rounded-3xl border border-[#DEC8B0] p-6 sm:p-7 shadow-sm space-y-5">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div>
+          {/* 1. MASTER TWO-CATEGORY SELECTOR (EXECUTIVE VS ANALYTICAL) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Category 1: Executive Archives (Calls & Follow-ups) */}
+            <button
+              type="button"
+              onClick={() => setArchiveMainCategory('executive')}
+              className={`p-5 rounded-3xl border-2 transition-all flex items-center justify-between text-right cursor-pointer relative overflow-hidden ${
+                archiveMainCategory === 'executive'
+                  ? 'bg-gradient-to-l from-[#F5EDE2] to-white border-[#9C6644] shadow-md ring-2 ring-[#9C6644]/20'
+                  : 'bg-white border-[#E6DAC8] hover:border-[#DEC8B0] text-[#5C4033]'
+              }`}
+            >
+              <div className="space-y-1.5 z-10">
                 <div className="flex items-center gap-2.5">
-                  <span className="p-2 rounded-2xl bg-[#9C6644] text-white shadow-sm">
-                    <Zap className="w-5 h-5" />
+                  <span className={`p-2.5 rounded-2xl ${archiveMainCategory === 'executive' ? 'bg-[#9C6644] text-white' : 'bg-[#F5EDE2] text-[#9C6644]'}`}>
+                    <Phone className="w-5 h-5" />
                   </span>
-                  <h3 className="text-base sm:text-lg font-black text-[#2B1810]">
-                    میز کار بایگانی دستی و تست جامع مکانیزه سیستم (ساعت ۲۳:۰۰)
-                  </h3>
+                  <div>
+                    <h3 className="font-black text-base sm:text-lg text-[#2B1810]">
+                      ۱. بایگانی اجرایی (تماس‌ها و پیگیری‌ها)
+                    </h3>
+                    <span className="text-[11px] font-bold text-[#8D5B4C]">
+                      فایل‌های اکسل گزارش تماس‌های روزانه با کارفرمایان
+                    </span>
+                  </div>
                 </div>
-                <p className="text-xs sm:text-sm text-[#6F4E37] font-medium mt-1.5 leading-relaxed max-w-3xl">
-                  جهت تست و اعتبارسنجی ثبت در دیتابیس، می‌توانید به صورت دستی ردیف‌های تماس و گزارشات تحلیلی را در هر ۴ دسته‌بندی (تماس‌های روزانه، تحلیلی روزانه، هفتگی پنج‌شنبه و ماهانه استراتژیک) بایگانی کنید و بلافاصله پیش‌نمایش ردیف‌ها را بررسی یا فایل استاندارد اکسل را دریافت نمایید.
+                <p className="text-xs text-[#6F4E37] max-w-sm leading-relaxed pr-10">
+                  شامل دیتای تماس‌ها، وضعیت پیگیری‌های ۱ تا ۴، موضوع جلسات ست‌شده و دغدغه‌های کارفرمایان
                 </p>
               </div>
 
-              {/* Master Test Button */}
-              <button
-                onClick={handleManualArchiveAll}
-                className="px-6 py-3.5 bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-black rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95 shrink-0"
-              >
-                <Zap className="w-4 h-4 text-[#F3E5F5]" />
-                <span>🚀 اجرای دستی و بایگانی همگانی (تست جامع همه دسته‌ها)</span>
-              </button>
-            </div>
-
-            {/* Individual Category Manual Triggers */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-              <button
-                onClick={() => handleManualArchiveCategory('calls_daily')}
-                className="p-3.5 rounded-2xl bg-white hover:bg-[#FDF0ED] border border-[#DEC8B0] hover:border-[#9C6644] text-[#9C6644] font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
-              >
-                <Phone className="w-4 h-4" />
-                <span>بایگانی دستی روزانه تماس‌ها</span>
-              </button>
-
-              <button
-                onClick={() => handleManualArchiveCategory('periodic_daily')}
-                className="p-3.5 rounded-2xl bg-white hover:bg-[#E8F5E9] border border-[#DEC8B0] hover:border-[#2E7D32] text-[#2E7D32] font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
-              >
-                <FileCheck className="w-4 h-4" />
-                <span>بایگانی دستی تحلیلی روزانه</span>
-              </button>
-
-              <button
-                onClick={() => handleManualArchiveCategory('periodic_weekly')}
-                className="p-3.5 rounded-2xl bg-white hover:bg-[#E3F2FD] border border-[#DEC8B0] hover:border-[#1565C0] text-[#1565C0] font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
-              >
-                <CalendarDays className="w-4 h-4" />
-                <span>بایگانی دستی هفتگی پنج‌شنبه</span>
-              </button>
-
-              <button
-                onClick={() => handleManualArchiveCategory('periodic_monthly')}
-                className="p-3.5 rounded-2xl bg-white hover:bg-[#F3E5F5] border border-[#DEC8B0] hover:border-[#7B1FA2] text-[#7B1FA2] font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-95"
-              >
-                <Building className="w-4 h-4" />
-                <span>بایگانی دستی ماهانه استراتژیک</span>
-              </button>
-            </div>
-
-            {/* Success toast notification */}
-            {archiveSuccessMsg && (
-              <div className="p-3.5 rounded-2xl bg-[#E8F5E9] border border-[#A5D6A7] text-[#1B5E20] text-xs sm:text-sm font-bold flex items-center gap-2.5 animate-fadeIn">
-                <CheckCircle2 className="w-5 h-5 shrink-0 text-[#2E7D32]" />
-                <span>{archiveSuccessMsg}</span>
+              <div className="text-center shrink-0 z-10 mr-3">
+                <span className={`text-xs font-black px-3.5 py-1.5 rounded-2xl border block ${
+                  archiveMainCategory === 'executive'
+                    ? 'bg-[#9C6644] text-white border-[#9C6644]'
+                    : 'bg-[#F5EDE2] text-[#8D5B4C] border-[#DEC8B0]'
+                }`}>
+                  {toPersianDigits(archives.filter(a => a.archiveType === 'calls_daily' || !a.archiveType).length)} فایل اکسل
+                </span>
+                <span className="text-[10px] text-[#8D5B4C] mt-1 block font-bold">بایگانی ۲۳:۰۰</span>
               </div>
-            )}
+            </button>
 
-            {/* Archive Type Filters */}
-            <div className="flex items-center gap-2 flex-wrap pt-3 border-t border-[#DEC8B0]">
-              <span className="text-xs font-bold text-[#6F4E37] ml-1">فیلتر دسته‌بندی کتابخانه:</span>
-              
-              <button
-                onClick={() => setSelectedArchiveTypeFilter('all')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  selectedArchiveTypeFilter === 'all'
-                    ? 'bg-[#2B1810] text-white shadow-sm font-black'
-                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
-                }`}
-              >
-                همه بایگانی‌ها ({toPersianDigits(archives.length)})
-              </button>
+            {/* Category 2: Analytical Archives (Periodic Strategic Reports) */}
+            <button
+              type="button"
+              onClick={() => setArchiveMainCategory('analytical')}
+              className={`p-5 rounded-3xl border-2 transition-all flex items-center justify-between text-right cursor-pointer relative overflow-hidden ${
+                archiveMainCategory === 'analytical'
+                  ? 'bg-gradient-to-l from-[#E8F5E9] to-white border-[#2E7D32] shadow-md ring-2 ring-[#2E7D32]/20'
+                  : 'bg-white border-[#E6DAC8] hover:border-[#DEC8B0] text-[#5C4033]'
+              }`}
+            >
+              <div className="space-y-1.5 z-10">
+                <div className="flex items-center gap-2.5">
+                  <span className={`p-2.5 rounded-2xl ${archiveMainCategory === 'analytical' ? 'bg-[#2E7D32] text-white' : 'bg-[#E8F5E9] text-[#2E7D32]'}`}>
+                    <FileSpreadsheet className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <h3 className="font-black text-base sm:text-lg text-[#2B1810]">
+                      ۲. بایگانی تحلیلی (عملکرد مشاورین)
+                    </h3>
+                    <span className="text-[11px] font-bold text-[#2E7D32]">
+                      فایل‌های اکسل گزارشات روزانه، هفتگی و ماهانه
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-[#6F4E37] max-w-sm leading-relaxed pr-10">
+                  شامل خلاصه‌های اجرایی، دستاوردها، چالش‌ها، برنامه‌های آتی و ارزیابی‌های مشاورین
+                </p>
+              </div>
 
-              <button
-                onClick={() => setSelectedArchiveTypeFilter('calls_daily')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  selectedArchiveTypeFilter === 'calls_daily'
-                    ? 'bg-[#9C6644] text-white shadow-sm font-black'
-                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
-                }`}
-              >
-                <Phone className="w-3.5 h-3.5" />
-                <span>روزانه تماس‌ها ({toPersianDigits(archives.filter(a => a.archiveType === 'calls_daily' || !a.archiveType).length)})</span>
-              </button>
+              <div className="text-center shrink-0 z-10 mr-3">
+                <span className={`text-xs font-black px-3.5 py-1.5 rounded-2xl border block ${
+                  archiveMainCategory === 'analytical'
+                    ? 'bg-[#2E7D32] text-white border-[#2E7D32]'
+                    : 'bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]'
+                }`}>
+                  {toPersianDigits(archives.filter(a => a.archiveType && a.archiveType.startsWith('periodic')).length)} فایل اکسل
+                </span>
+                <span className="text-[10px] text-[#2E7D32] mt-1 block font-bold">تفکیک دوره‌ای</span>
+              </div>
+            </button>
 
-              <button
-                onClick={() => setSelectedArchiveTypeFilter('periodic_daily')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  selectedArchiveTypeFilter === 'periodic_daily'
-                    ? 'bg-[#2D6A4F] text-white shadow-sm font-black'
-                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
-                }`}
-              >
-                <FileCheck className="w-3.5 h-3.5" />
-                <span>تحلیلی روزانه ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_daily').length)})</span>
-              </button>
-
-              <button
-                onClick={() => setSelectedArchiveTypeFilter('periodic_weekly')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  selectedArchiveTypeFilter === 'periodic_weekly'
-                    ? 'bg-[#1E40AF] text-white shadow-sm font-black'
-                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
-                }`}
-              >
-                <CalendarDays className="w-3.5 h-3.5" />
-                <span>هفتگی پنج‌شنبه‌ها ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_weekly').length)})</span>
-              </button>
-
-              <button
-                onClick={() => setSelectedArchiveTypeFilter('periodic_monthly')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  selectedArchiveTypeFilter === 'periodic_monthly'
-                    ? 'bg-[#6B21A8] text-white shadow-sm font-black'
-                    : 'bg-white text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
-                }`}
-              >
-                <Building className="w-3.5 h-3.5" />
-                <span>ماهانه استراتژیک ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_monthly').length)})</span>
-              </button>
-            </div>
           </div>
+
+          {/* 2. SUB-BAR & ACTIONS FOR ACTIVE CATEGORY */}
+          {archiveMainCategory === 'executive' ? (
+            /* EXECUTIVE ACTIONS BAR */
+            <div className="bg-white rounded-3xl border border-[#DEC8B0] p-5 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#9C6644]" />
+                    <h4 className="font-black text-sm sm:text-base text-[#2B1810]">
+                      کتابخانه فایل‌های اکسل تماس‌ها و پیگیری‌ها
+                    </h4>
+                  </div>
+                  <p className="text-xs text-[#6F4E37]">
+                    تمام تماس‌های ثبت‌شده روزانه مشاورین هر شب رأس ساعت ۲۳:۰۰ به‌صورت خودکار در قالب اکسل تفکیک‌شده بایگانی می‌شوند. (جمعه‌ها روز تعطیل است)
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  {/* Quick Download Latest Calls Archive */}
+                  {(() => {
+                    const latestCallArch = archives.find(a => a.archiveType === 'calls_daily' || !a.archiveType);
+                    if (!latestCallArch) return null;
+                    return (
+                      <button
+                        type="button"
+                        onClick={() => exportArchiveToExcel(latestCallArch)}
+                        className="px-4 py-2.5 bg-[#2D6A4F] hover:bg-[#1B4332] text-white font-bold text-xs rounded-2xl flex items-center gap-2 shadow-sm cursor-pointer transition-all active:scale-95"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>دانلود اکسل آخرین روز ({latestCallArch.dateShamsi})</span>
+                      </button>
+                    );
+                  })()}
+
+                  {/* Manual Test Archive Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => handleManualArchiveCategory('calls_daily')}
+                    className="px-4 py-2.5 bg-[#F5EDE2] hover:bg-[#EAE0D0] text-[#7F4F24] border border-[#DEC8B0] font-bold text-xs rounded-2xl flex items-center gap-2 cursor-pointer transition-all active:scale-95"
+                  >
+                    <Zap className="w-4 h-4 text-[#9C6644]" />
+                    <span>تست بایگانی دستی تماس‌ها</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* ANALYTICAL ACTIONS & 3-WAY FILTER BAR */
+            <div className="bg-white rounded-3xl border border-[#DEC8B0] p-5 shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#2E7D32]" />
+                    <h4 className="font-black text-sm sm:text-base text-[#2B1810]">
+                      کتابخانه فایل‌های اکسل تحلیلی عملکرد مشاورین
+                    </h4>
+                  </div>
+                  <p className="text-xs text-[#6F4E37]">
+                    گزارشات متنی و تحلیلی عملکرد مشاوران در ۳ سطح روزانه، پنج‌شنبه‌های پایان هفته و پایان هر ماه شمسی.
+                  </p>
+                </div>
+
+                {/* Manual Test Triggers */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleManualArchiveCategory('periodic_daily')}
+                    className="px-3 py-2 bg-[#E8F5E9] hover:bg-[#C8E6C9] text-[#2E7D32] border border-[#A5D6A7] font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>تست تحلیلی روزانه</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleManualArchiveCategory('periodic_weekly')}
+                    className="px-3 py-2 bg-[#E3F2FD] hover:bg-[#BBDEFB] text-[#1565C0] border border-[#90CAF9] font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>تست تحلیلی هفتگی</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleManualArchiveCategory('periodic_monthly')}
+                    className="px-3 py-2 bg-[#F3E5F5] hover:bg-[#E1BEE7] text-[#7B1FA2] border border-[#CE93D8] font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                  >
+                    <Zap className="w-3.5 h-3.5" />
+                    <span>تست تحلیلی ماهانه</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Simple 4 Filter Pills for Analytical Reports */}
+              <div className="flex items-center gap-2 flex-wrap pt-3 border-t border-[#DEC8B0]">
+                <span className="text-xs font-bold text-[#6F4E37] ml-1">نمایش فایل‌های:</span>
+                
+                <button
+                  type="button"
+                  onClick={() => setAnalyticalSubFilter('all')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    analyticalSubFilter === 'all'
+                      ? 'bg-[#2E7D32] text-white shadow-sm font-black'
+                      : 'bg-[#FAF7F2] text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                  }`}
+                >
+                  همه فایل‌های تحلیلی ({toPersianDigits(archives.filter(a => a.archiveType && a.archiveType.startsWith('periodic')).length)})
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAnalyticalSubFilter('periodic_daily')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    analyticalSubFilter === 'periodic_daily'
+                      ? 'bg-[#2E7D32] text-white shadow-sm font-black'
+                      : 'bg-[#FAF7F2] text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                  }`}
+                >
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>تحلیلی روزانه ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_daily').length)})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAnalyticalSubFilter('periodic_weekly')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    analyticalSubFilter === 'periodic_weekly'
+                      ? 'bg-[#1565C0] text-white shadow-sm font-black'
+                      : 'bg-[#FAF7F2] text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                  }`}
+                >
+                  <CalendarDays className="w-3.5 h-3.5" />
+                  <span>تحلیلی هفتگی پنج‌شنبه‌ها ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_weekly').length)})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAnalyticalSubFilter('periodic_monthly')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    analyticalSubFilter === 'periodic_monthly'
+                      ? 'bg-[#7B1FA2] text-white shadow-sm font-black'
+                      : 'bg-[#FAF7F2] text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                  }`}
+                >
+                  <Building className="w-3.5 h-3.5" />
+                  <span>تحلیلی ماهانه پایان ماه ({toPersianDigits(archives.filter(a => a.archiveType === 'periodic_monthly').length)})</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Success toast notification */}
+          {archiveSuccessMsg && (
+            <div className="p-3.5 rounded-2xl bg-[#E8F5E9] border border-[#A5D6A7] text-[#1B5E20] text-xs sm:text-sm font-bold flex items-center gap-2.5 animate-fadeIn">
+              <CheckCircle2 className="w-5 h-5 shrink-0 text-[#2E7D32]" />
+              <span>{archiveSuccessMsg}</span>
+            </div>
+          )}
 
           {/* Archive Cards Grid */}
           <div className="space-y-4">
             {(() => {
               const filteredArchives = archives.filter(arch => {
-                if (selectedArchiveTypeFilter === 'all') return true;
                 const type = arch.archiveType || 'calls_daily';
-                return type === selectedArchiveTypeFilter;
+                if (archiveMainCategory === 'executive') {
+                  return type === 'calls_daily';
+                } else {
+                  if (!type.startsWith('periodic')) return false;
+                  if (analyticalSubFilter === 'all') return true;
+                  return type === analyticalSubFilter;
+                }
               });
 
               if (filteredArchives.length === 0) {
                 return (
-                  <div className="bg-white rounded-3xl border border-[#E6DAC8] p-12 text-center text-sm font-bold text-[#8D5B4C]">
-                    هیچ پکیج آرشیوی با فیلتر انتخابی یافت نشد.
+                  <div className="bg-white rounded-3xl border border-[#E6DAC8] p-12 text-center text-sm font-bold text-[#8D5B4C] space-y-1">
+                    <div>هیچ فایل اکسلی در این دسته‌بندی یافت نشد.</div>
+                    <div className="text-xs text-[#6F4E37] font-normal">می‌توانید با استفاده از کلیدهای بالا بایگانی دستی انجام دهید یا منتظر اجرای خودکار ساعت ۲۳:۰۰ بمانید.</div>
                   </div>
                 );
               }
@@ -2338,7 +2456,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                                         {rep.periodType === 'daily' ? 'روزانه' : rep.periodType === 'weekly' ? 'هفتگی' : 'ماهانه'}
                                       </span>
                                     </td>
-                                    <td className="p-2.5 text-[#6F4E37] font-bold whitespace-nowrap">{rep.periodLabel || '-'}</td>
+                                    <td className="p-2.5 text-[#6F4E37] font-bold whitespace-nowrap">{formatStandardReportTitle(rep.periodType, rep.dateShamsi, rep.periodLabel)}</td>
                                     <td className="p-2.5 text-[#2B1810] max-w-sm truncate">{rep.summary}</td>
                                     <td className="p-2.5 text-[#2E7D32] max-w-xs truncate">{rep.keyAchievements || '-'}</td>
                                     <td className="p-2.5 text-[#C62828] max-w-xs truncate">{rep.challengesOrBarriers || '-'}</td>

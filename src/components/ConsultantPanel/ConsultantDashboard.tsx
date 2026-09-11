@@ -11,7 +11,7 @@ import {
   getStoredDirectives
 } from '../../services/storage';
 import { MEETING_TOPICS_LIST, FOLLOW_UP_STATUS_CODES } from '../../data/defaultData';
-import { getCurrentShamsiDate, toPersianDigits, toEnglishDigits, getCurrentTimeFormatted, shamsiToDate } from '../../utils/shamsi';
+import { getCurrentShamsiDate, toPersianDigits, toEnglishDigits, getCurrentTimeFormatted, shamsiToDate, getDailyReportWindowStatus, isFriday } from '../../utils/shamsi';
 import { exportSingleReportToExcel, printOfficialReport } from '../../utils/export';
 import { FollowUpSelector } from '../common/FollowUpSelector';
 import { FollowUpBadge } from '../common/FollowUpBadge';
@@ -44,7 +44,9 @@ import {
   AlertTriangle,
   RotateCcw,
   Check,
-  Flame
+  Flame,
+  Lock,
+  AlertOctagon
 } from 'lucide-react';
 
 interface ConsultantDashboardProps {
@@ -56,6 +58,20 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   const [concernsList, setConcernsList] = useState<string[]>(getStoredConcerns());
   const [allReports, setAllReports] = useState<DailyReport[]>(getStoredReports());
   const [directives, setDirectives] = useState<ManagerDirective[]>(getStoredDirectives());
+  
+  // Daily reporting window status (Tehran time & Friday holiday rules)
+  const windowStatus = useMemo(() => {
+    return getDailyReportWindowStatus(getCurrentShamsiDate().formatted);
+  }, []);
+
+  const todayDailyCallReport = useMemo(() => {
+    const curDate = getCurrentShamsiDate().formatted;
+    return allReports.find(r => 
+      (r.consultantId === currentUser.id || 
+       (currentUser.consultantCode && r.consultantCode?.toUpperCase() === currentUser.consultantCode.toUpperCase())) &&
+      r.dateShamsi === curDate
+    );
+  }, [allReports, currentUser]);
   
   // Header form states
   const shamsi = getCurrentShamsiDate();
@@ -88,6 +104,14 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   const [personalOpinion, setPersonalOpinion] = useState('');
   const [autoSavedTime, setAutoSavedTime] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Check if daily submission is locked due to Friday holiday or past 19:00
+  // Policy rule: past 19:00 Tehran time is strictly locked for all submissions
+  const isDailyCallSubmissionLocked = useMemo(() => {
+    if (windowStatus.isFriday) return true;
+    if (windowStatus.isPastDeadline) return true;
+    return false;
+  }, [windowStatus]);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [customConcernInput, setCustomConcernInput] = useState<{ [rowId: string]: string }>({});
 
@@ -396,6 +420,16 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   // Submit new or edited report
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (windowStatus.isFriday) {
+      alert('امروز جمعه و روز تعطیل رسمی است. نیازی به ارسال گزارش روزانه وجود ندارد.');
+      return;
+    }
+    if (windowStatus.isPastDeadline) {
+      alert('مهلت قانونی ارسال گزارش عملکرد (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید. امکان ثبت گزارش وجود ندارد و برای شما وضعیت عدم ارسال گزارش در KPI ثبت شد.');
+      return;
+    }
+
     const errors = checkCompleteness();
     if (errors.length > 0) {
       setValidationErrors(errors);
@@ -594,7 +628,7 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
   };
 
   return (
-    <div className="space-y-6 font-['Vazirmatn',sans-serif] text-slate-100">
+    <div className="space-y-6 font-['Vazirmatn',sans-serif] text-slate-100 max-w-full overflow-x-hidden">
       
       {/* 1. CONSULTANT HERO BANNER */}
       <div className="navy-card-glass rounded-3xl border border-amber-500/30 p-6 sm:p-7 shadow-2xl relative overflow-hidden">
@@ -639,42 +673,43 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
         <div className="absolute -left-12 -bottom-12 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
-      {/* 2. SUB-NAVIGATION BUTTONS (3 TABS) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      {/* 2. SUB-NAVIGATION BUTTONS (5 TABS) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3 max-w-full overflow-hidden">
         <ScrollableTabs
           theme="dark"
           activeTab={activeSubTab}
           onChange={(id) => setActiveSubTab(id as any)}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto max-w-full"
           tabs={[
             {
               id: 'morning',
-              label: '📋 برنامه روزانه (داشبورد هوشمند)',
+              label: 'برنامه روزانه',
               icon: Flame,
               badge: (overdueFollowUps.length + todayFollowUps.length) > 0 ? toPersianDigits(overdueFollowUps.length + todayFollowUps.length) : undefined,
               badgeColor: overdueFollowUps.length > 0 ? 'bg-rose-500 text-white animate-pulse' : 'bg-emerald-500 text-white'
             },
             {
               id: 'form',
-              label: editingReportId ? 'ویرایش و تکمیل گزارش تماس‌ها' : 'فرم ثبت گزارش تماس‌های روزانه',
+              label: editingReportId ? 'ویرایش گزارش تماس' : 'ثبت تماس‌های روزانه',
               icon: FilePlus
             },
             {
               id: 'periodic',
-              label: '📊 گزارشات دوره‌ای (روزانه / هفتگی / ماهانه)',
+              label: 'گزارشات تحلیلی دوره‌ای',
               icon: FileSpreadsheet
             },
             {
               id: 'upcoming',
-              label: 'پیگیری‌های آینده (چرخه ۴ روزه)',
+              label: 'پیگیری‌های ۴ روزه',
               icon: CalendarClock,
               badge: upcomingFollowUps.length > 0 ? toPersianDigits(upcomingFollowUps.length) : undefined,
               badgeColor: overdueFollowUps.length > 0 ? 'bg-rose-500 text-white animate-pulse' : undefined
             },
             {
               id: 'history',
-              label: `سوابق گزارشات و فیدبک مدیریت (${toPersianDigits(myReports.length)})`,
-              icon: History
+              label: 'سوابق و بازخورد مدیریت',
+              icon: History,
+              badge: myReports.length > 0 ? toPersianDigits(myReports.length) : undefined
             }
           ]}
         />
@@ -842,6 +877,48 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
 
             </div>
           </div>
+
+          {/* Daily Report Window Status Banner */}
+          {windowStatus.isFriday ? (
+            <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs sm:text-sm flex items-center gap-3">
+              <Clock className="w-6 h-6 text-amber-400 shrink-0" />
+              <div>
+                <span className="font-bold block text-sm text-white">امروز جمعه است (تعطیل رسمی اداری)</span>
+                <span>طبق قوانین سازمانی کارینو، روزهای جمعه تعطیل رسمی بوده و نیازی به ثبت و ارسال فرم گزارش روزانه وجود ندارد.</span>
+              </div>
+            </div>
+          ) : windowStatus.isPastDeadline && !todayDailyCallReport && !editingReportId ? (
+            <div className="p-5 rounded-2xl bg-rose-950/70 border-2 border-rose-500 text-rose-200 text-xs sm:text-sm flex items-start gap-3 shadow-xl animate-fadeIn">
+              <AlertOctagon className="w-6 h-6 text-rose-400 shrink-0 mt-0.5 animate-pulse" />
+              <div className="space-y-1.5 leading-relaxed">
+                <span className="font-black block text-sm sm:text-base text-rose-300">
+                  ⛔ قفل اداری: پایان مهلت قانونی ثبت گزارش روزانه (ساعت ۱۹:۰۰ به وقت تهران)
+                </span>
+                <p>
+                  همکار گرامی، طبق آیین‌نامه انضباطی سازمان، حداکثر مهلت ثبت گزارش روزانه تا ساعت ۱۹:۰۰ عصر بوده است. هم‌اکنون ساعت <strong>{windowStatus.tehranTimeString}</strong> به وقت تهران می‌باشد و دسترسی ثبت گزارش برای امروز قفل گردید.
+                </p>
+                <p className="text-xs text-rose-300 font-bold bg-rose-900/60 p-2.5 rounded-xl border border-rose-700/60">
+                  عدم ارسال گزارش در سیستم پایش KPI مدیریت به عنوان کسر امتیاز و جریمه انضباطی ثبت گردید. در صورت داشتن هماهنگی قبلی یا عذر موجه، با مدیریت تماس بگیرید.
+                </p>
+              </div>
+            </div>
+          ) : windowStatus.isInsideSubmissionWindow && !todayDailyCallReport && !editingReportId ? (
+            <div className="p-4 rounded-2xl bg-amber-500/20 border-2 border-amber-500 text-amber-200 text-xs sm:text-sm flex items-center gap-3 animate-pulse">
+              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+              <div>
+                <span className="font-black block text-sm text-white">⚡ موعد رسمی ارسال گزارش روزانه فعال است (مهلت تا ۱۹:۰۰)</span>
+                <span>ساعت کاری رسمی خاتمه یافته است (ساعت تهران: {windowStatus.tehranTimeString}). لطفاً قبل از ساعت ۱۹:۰۰ گزارش خود را ارسال فرمایید؛ رأس ساعت ۱۹ سامانه قفل خواهد شد.</span>
+              </div>
+            </div>
+          ) : windowStatus.isBeforeSubmissionWindow && !todayDailyCallReport && !editingReportId ? (
+            <div className="p-3.5 rounded-2xl bg-blue-950/40 border border-blue-500/30 text-blue-200 text-xs flex items-center gap-2.5">
+              <Clock className="w-4 h-4 text-blue-400 shrink-0" />
+              <div>
+                <span className="font-bold text-white">ساعت کاری اداری در حال اجراست (ساعت تهران: {windowStatus.tehranTimeString})</span>
+                <span className="block text-[11px] text-blue-300 mt-0.5">موعد رسمی ارسال گزارش روزانه از ساعت ۱۷:۰۰ الی ۱۹:۰۰ می‌باشد.</span>
+              </div>
+            </div>
+          ) : null}
 
           {/* Standard 5 Symbols Guide */}
           <div className="bg-[#081525]/90 border border-slate-800 rounded-2xl p-4 space-y-2">
@@ -1178,15 +1255,24 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <button
                 type="submit"
-                disabled={completionPercentage < 100}
+                disabled={completionPercentage < 100 || isDailyCallSubmissionLocked}
                 className={`w-full sm:w-auto px-8 py-3 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl transition-all ${
-                  completionPercentage === 100
+                  completionPercentage === 100 && !isDailyCallSubmissionLocked
                     ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-amber-500/30 cursor-pointer hover:scale-105'
                     : 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60 border border-slate-700'
                 }`}
               >
-                <Send className="w-4 h-4" />
-                <span>{editingReportId ? 'ذخیره تغییرات و تکمیل گزارش' : 'ثبت نهایی و ارسال به مدیریت'}</span>
+                {isDailyCallSubmissionLocked ? (
+                  <>
+                    <Lock className="w-4 h-4" />
+                    <span>{windowStatus.isFriday ? 'جمعه تعطیل است (بدون نیاز به گزارش)' : 'قفل شد: مهلت ثبت (۱۹:۰۰) پایان یافت'}</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span>{editingReportId ? 'ذخیره تغییرات و تکمیل گزارش' : 'ثبت نهایی و ارسال به مدیریت'}</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

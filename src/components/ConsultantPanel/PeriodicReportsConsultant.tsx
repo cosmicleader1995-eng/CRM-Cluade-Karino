@@ -5,9 +5,13 @@ import {
   getCurrentShamsiDate, 
   toPersianDigits, 
   isThursday, 
+  isFriday,
   isEndOfShamsiMonth, 
   formatShamsiDateLong,
-  getCurrentTimeFormatted 
+  getCurrentTimeFormatted,
+  getDailyReportWindowStatus,
+  compareReportsLatestFirst,
+  formatStandardReportTitle
 } from '../../utils/shamsi';
 import confetti from 'canvas-confetti';
 import { 
@@ -26,7 +30,10 @@ import {
   Info,
   Check,
   TrendingUp,
-  FileSpreadsheet
+  FileSpreadsheet,
+  AlertTriangle,
+  AlertOctagon,
+  Lock
 } from 'lucide-react';
 
 interface PeriodicReportsConsultantProps {
@@ -44,6 +51,11 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
   const todayIsThursday = isThursday(curShamsi.formatted);
   const todayIsMonthEnd = isEndOfShamsiMonth(curShamsi.formatted);
 
+  // Daily reporting window status (Tehran time & Friday holiday rules)
+  const windowStatus = useMemo(() => {
+    return getDailyReportWindowStatus(curShamsi.formatted);
+  }, [curShamsi.formatted]);
+
   const [periodType, setPeriodType] = useState<PeriodicReportType>('daily');
   const [summary, setSummary] = useState('');
   const [keyAchievements, setKeyAchievements] = useState('');
@@ -58,10 +70,11 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
   const [storedReports, setStoredReports] = useState<PeriodicOverallReport[]>(getStoredPeriodicReports());
 
   const myPeriodicReports = useMemo(() => {
-    return storedReports.filter(r => 
+    const list = storedReports.filter(r => 
       r.consultantId === currentUser.id || 
       (currentUser.consultantCode && r.consultantCode?.toUpperCase() === currentUser.consultantCode.toUpperCase())
     );
+    return [...list].sort(compareReportsLatestFirst);
   }, [storedReports, currentUser]);
 
   // Check today's submission status
@@ -77,15 +90,19 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
     return myPeriodicReports.find(r => r.periodType === 'monthly' && r.dateShamsi?.startsWith(`${curShamsi.year}/${String(curShamsi.month).padStart(2, '0')}`));
   }, [myPeriodicReports, curShamsi]);
 
-  // Dynamic default label
+  // Strict submission locking:
+  // - Friday is holiday for daily reports
+  // - Past 19:00: ALL report types (daily, weekly, monthly) are strictly locked!
+  // Even 1 minute past 19:00 is forbidden by organization policy.
+  const isSubmissionLocked = useMemo(() => {
+    if (periodType === 'daily' && windowStatus.isFriday) return true; // Friday is holiday!
+    if (windowStatus.isPastDeadline) return true; // Past 19:00 is strictly locked for ALL reports!
+    return false;
+  }, [periodType, windowStatus]);
+
+  // Dynamic default label strictly standardized
   const currentPeriodLabel = useMemo(() => {
-    if (periodType === 'daily') {
-      return `گزارش کلی روزانه ${curShamsi.dayOfWeek} ${curShamsi.day} ${curShamsi.monthName} ${curShamsi.year}`;
-    }
-    if (periodType === 'weekly') {
-      return `گزارش جامع هفتگی منتهی به پنج‌شنبه ${curShamsi.day} ${curShamsi.monthName}`;
-    }
-    return `گزارش راهبردی ماهانه ${curShamsi.monthName} ${curShamsi.year}`;
+    return formatStandardReportTitle(periodType, curShamsi.formatted);
   }, [periodType, curShamsi]);
 
   // Load an existing report into the form if requested
@@ -103,6 +120,17 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Strict cutoff rules across all report types:
+    if (periodType === 'daily' && windowStatus.isFriday) {
+      alert('امروز جمعه و روز تعطیل رسمی است. نیازی به ارسال گزارش روزانه وجود ندارد.');
+      return;
+    }
+    if (windowStatus.isPastDeadline) {
+      alert('مهلت قانونی ارسال کلیه گزارشات (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید. امکان ثبت هیچ‌گونه گزارشی وجود ندارد و وضعیت شما به عنوان عدم ارسال گزارش در سیستم ارزیابی انضباطی و KPI ثبت شد.');
+      return;
+    }
+
     if (!summary.trim()) {
       alert('لطفاً خلاصه عملکرد دوره را وارد نمایید.');
       return;
@@ -175,44 +203,84 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
             <div className={`px-3.5 py-2 rounded-xl border text-xs flex items-center gap-2 ${
               todayDailyReport 
                 ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' 
-                : 'bg-rose-950/60 border-rose-500/40 text-rose-300 animate-pulse'
+                : windowStatus.isFriday
+                  ? 'bg-slate-900/60 border-slate-800 text-slate-300'
+                  : windowStatus.isBeforeSubmissionWindow
+                    ? 'bg-amber-950/40 border-amber-500/30 text-amber-300'
+                    : 'bg-rose-950/60 border-rose-500/40 text-rose-300 animate-pulse'
             }`}>
               <CalendarCheck className="w-4 h-4" />
-              <span>روزانه امروز: {todayDailyReport ? '✅ ثبت شده' : '❌ نیاز به ثبت'}</span>
+              <span>
+                روزانه امروز: {
+                  todayDailyReport 
+                    ? '✅ ثبت شده' 
+                    : windowStatus.isFriday 
+                      ? '🌴 جمعه (تعطیل رسمی)' 
+                      : windowStatus.isBeforeSubmissionWindow
+                        ? `⏳ موعد ۱۷ الی ۱۹ (${windowStatus.tehranTimeString})`
+                        : windowStatus.isInsideSubmissionWindow
+                          ? '⚡ مهلت تا ۱۹:۰۰'
+                          : '⛔ قفل شد (کسر امتیاز KPI)'
+                }
+              </span>
             </div>
 
             <div className={`px-3.5 py-2 rounded-xl border text-xs flex items-center gap-2 ${
               thisWeekReport 
                 ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' 
                 : todayIsThursday 
-                  ? 'bg-amber-950/60 border-amber-500/40 text-amber-300 animate-bounce' 
+                  ? windowStatus.isPastDeadline
+                    ? 'bg-rose-950/60 border-rose-500/40 text-rose-300 animate-pulse'
+                    : 'bg-amber-950/60 border-amber-500/40 text-amber-300 animate-bounce' 
                   : 'bg-slate-900/60 border-slate-800 text-slate-400'
             }`}>
               <CalendarDays className="w-4 h-4" />
-              <span>هفتگی (پنج‌شنبه): {thisWeekReport ? '✅ ثبت شده' : todayIsThursday ? '⚡ موعد پنج‌شنبه' : 'در انتظار'}</span>
+              <span>
+                هفتگی (پنج‌شنبه): {
+                  thisWeekReport 
+                    ? '✅ ثبت شده' 
+                    : todayIsThursday 
+                      ? windowStatus.isPastDeadline
+                        ? '⛔ قفل شد (کسر امتیاز KPI)'
+                        : '⚡ مهلت تا ۱۹:۰۰' 
+                      : 'در انتظار موعد'
+                }
+              </span>
             </div>
 
             <div className={`px-3.5 py-2 rounded-xl border text-xs flex items-center gap-2 ${
               thisMonthReport 
                 ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' 
                 : todayIsMonthEnd 
-                  ? 'bg-amber-950/60 border-amber-500/40 text-amber-300 animate-bounce' 
+                  ? windowStatus.isPastDeadline
+                    ? 'bg-rose-950/60 border-rose-500/40 text-rose-300 animate-pulse'
+                    : 'bg-amber-950/60 border-amber-500/40 text-amber-300 animate-bounce' 
                   : 'bg-slate-900/60 border-slate-800 text-slate-400'
             }`}>
               <CalendarRange className="w-4 h-4" />
-              <span>ماهانه: {thisMonthReport ? '✅ ثبت شده' : todayIsMonthEnd ? '⚡ موعد پایان ماه' : 'در انتظار'}</span>
+              <span>
+                ماهانه: {
+                  thisMonthReport 
+                    ? '✅ ثبت شده' 
+                    : todayIsMonthEnd 
+                      ? windowStatus.isPastDeadline
+                        ? '⛔ قفل شد (کسر امتیاز KPI)'
+                        : '⚡ مهلت تا ۱۹:۰۰' 
+                      : 'در انتظار موعد'
+                }
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       {/* SPECIAL DATE ALERTS */}
-      {todayIsThursday && !thisWeekReport && (
+      {todayIsThursday && !thisWeekReport && !windowStatus.isPastDeadline && (
         <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/60 flex items-center gap-3 text-amber-200 text-xs sm:text-sm">
           <Flame className="w-5 h-5 text-amber-400 shrink-0 animate-bounce" />
           <div className="flex-1">
             <span className="font-bold">یادآوری ویژه پنج‌شنبه: </span>
-            امروز پنج‌شنبه است و موعد تحویل «گزارش هفتگی». لطفاً پس از گزارش روزانه، تب گزارش هفتگی را انتخاب کرده و خلاصه عملکرد هفته را ارسال نمایید.
+            امروز پنج‌شنبه است و موعد تحویل «گزارش هفتگی». لطفاً حداکثر تا قبل از ساعت ۱۹:۰۰ گزارش هفتگی خود را ارسال فرمایید تا مشمول کسر امتیاز نشوید.
           </div>
         </div>
       )}
@@ -285,6 +353,50 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
           <div className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl font-mono">
             📅 {currentPeriodLabel}
           </div>
+        </div>
+
+        {/* TIME WINDOW & CUTOFF NOTIFICATION BANNERS */}
+        <div className="space-y-3">
+          {windowStatus.isPastDeadline ? (
+            <div className="p-5 rounded-2xl bg-rose-950/70 border-2 border-rose-500 text-rose-200 text-xs sm:text-sm flex items-start gap-3 shadow-xl animate-fadeIn">
+              <AlertOctagon className="w-6 h-6 text-rose-400 shrink-0 mt-0.5 animate-pulse" />
+              <div className="space-y-1.5 leading-relaxed">
+                <span className="font-black block text-sm sm:text-base text-rose-300">
+                  ⛔ قفل اداری سامانه: پایان مهلت قانونی ثبت گزارش (ساعت ۱۹:۰۰ به وقت تهران)
+                </span>
+                <p>
+                  همکار گرامی، طبق ضوابط انضباطی سازمان کارینو، حداکثر مهلت ثبت و ارسال هرگونه گزارش (روزانه، هفتگی، ماهانه) تا ساعت <strong>۱۹:۰۰ عصر</strong> بوده است. هم‌اکنون ساعت <strong>{windowStatus.tehranTimeString}</strong> به وقت تهران می‌باشد و دسترسی ثبت گزارش برای امروز مسدود گردید.
+                </p>
+                <p className="text-xs text-rose-300 font-bold bg-rose-900/60 p-3 rounded-xl border border-rose-700/60">
+                  وضعیت پرونده شما در پنل نظارتی مدیریت به عنوان «عدم ارسال گزارش / مشمول جریمه انضباطی و کسر امتیاز در سیستم KPI» ثبت گردید. در صورت داشتن عذر موجه اداری، بلافاصله موضوع را با مدیریت هماهنگ نمایید.
+                </p>
+              </div>
+            </div>
+          ) : periodType === 'daily' && windowStatus.isFriday ? (
+            <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs sm:text-sm flex items-center gap-3">
+              <CalendarCheck className="w-6 h-6 text-amber-400 shrink-0" />
+              <div>
+                <span className="font-bold block text-sm text-white">امروز جمعه است (تعطیل رسمی اداری)</span>
+                <span>طبق ضوابط کارینو، روزهای جمعه نیازی به ارسال گزارش عملکرد روزانه نبوده و وضعیت غیبت منظور نمی‌گردد.</span>
+              </div>
+            </div>
+          ) : periodType === 'daily' && windowStatus.isInsideSubmissionWindow && !todayDailyReport ? (
+            <div className="p-4 rounded-2xl bg-amber-500/20 border-2 border-amber-500 text-amber-200 text-xs sm:text-sm flex items-center gap-3 animate-pulse">
+              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+              <div>
+                <span className="font-black block text-sm text-white">⚡ پنجره موعد ارسال گزارش روزانه (فعال تا ساعت ۱۹:۰۰)</span>
+                <span>ساعت اداری خاتمه یافته است (ساعت تهران: {windowStatus.tehranTimeString}). لطفاً حداکثر تا پیش از ساعت ۱۹:۰۰ گزارش خود را ثبت فرمایید، زیرا رأس ساعت ۱۹:۰۰ سامانه قفل شده و عدم ارسال مشمول جریمه انضباطی خواهد شد.</span>
+              </div>
+            </div>
+          ) : periodType === 'daily' && windowStatus.isBeforeSubmissionWindow && !todayDailyReport ? (
+            <div className="p-3.5 rounded-2xl bg-blue-950/40 border border-blue-500/30 text-blue-200 text-xs flex items-center gap-2.5">
+              <Clock className="w-4 h-4 text-blue-400 shrink-0" />
+              <div>
+                <span className="font-bold text-white">ساعت کاری رسمی در جریان است (ساعت تهران: {windowStatus.tehranTimeString})</span>
+                <span className="block text-[11px] text-blue-300 mt-0.5">پنجره رسمی تحویل گزارش روزانه از ساعت ۱۷:۰۰ الی ۱۹:۰۰ می‌باشد. می‌توانید در این فاصله پیش‌نویس متن گزارش را تنظیم فرمایید.</span>
+              </div>
+            </div>
+          ) : null}
         </div>
 
         {/* Form Inputs */}
@@ -424,10 +536,28 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
 
             <button
               type="submit"
-              className="px-8 py-3.5 rounded-2xl font-black text-sm bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-xl shadow-amber-500/25 flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+              disabled={isSubmissionLocked}
+              className={`px-8 py-3.5 rounded-2xl font-black text-sm flex items-center gap-2 transition-all ${
+                isSubmissionLocked
+                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700 opacity-60'
+                  : 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-xl shadow-amber-500/25 cursor-pointer hover:scale-105'
+              }`}
             >
-              <Send className="w-4 h-4" />
-              <span>ثبت نهایی {periodType === 'daily' ? 'گزارش روزانه' : periodType === 'weekly' ? 'گزارش هفتگی' : 'گزارش ماهانه'}</span>
+              {isSubmissionLocked ? (
+                <>
+                  <Lock className="w-4 h-4" />
+                  <span>
+                    {windowStatus.isFriday && periodType === 'daily'
+                      ? 'جمعه تعطیل رسمی است (بدون الزام گزارش)' 
+                      : 'قفل شد: مهلت قانونی (۱۹:۰۰) پایان یافت'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  <span>ثبت نهایی {periodType === 'daily' ? 'گزارش روزانه' : periodType === 'weekly' ? 'گزارش هفتگی' : 'گزارش ماهانه'}</span>
+                </>
+              )}
             </button>
           </div>
 
@@ -478,7 +608,9 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
                       }`}>
                         {rep.periodType === 'daily' ? 'روزانه' : rep.periodType === 'weekly' ? 'هفتگی' : 'ماهانه'}
                       </span>
-                      <span className="text-xs font-bold text-white">{rep.periodLabel || rep.dateShamsi}</span>
+                      <span className="text-xs font-bold text-white">
+                        {formatStandardReportTitle(rep.periodType, rep.dateShamsi, rep.periodLabel)}
+                      </span>
                     </div>
 
                     <span className="text-[11px] text-slate-400 font-mono">

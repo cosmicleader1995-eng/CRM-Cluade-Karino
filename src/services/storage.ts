@@ -4,12 +4,14 @@ import {
   getCurrentShamsiDate, 
   getArchiveFileName, 
   compareReportsLatestFirst, 
+  formatStandardReportTitle,
   normalizeShamsiDate, 
   shamsiToDate, 
   PERSIAN_WEEK_DAYS, 
   toEnglishDigits,
   isThursday,
-  isLastWorkingDayOfShamsiMonth
+  isLastWorkingDayOfShamsiMonth,
+  getTehranTimeInfo
 } from '../utils/shamsi';
 
 const STORAGE_KEYS = {
@@ -209,9 +211,12 @@ function mergeStates(local: CloudDatabaseState, remote: CloudDatabaseState): Clo
   getInitialPeriodicReports().forEach(p => overallMap.set(p.id, p));
   (remote.overallReports || []).forEach(p => overallMap.set(p.id, p));
   (local.overallReports || []).forEach(p => overallMap.set(p.id, p));
-  const mergedOverallReports = Array.from(overallMap.values()).sort((a, b) => 
-    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-  );
+  const mergedOverallReports = Array.from(overallMap.values())
+    .map(p => ({
+      ...p,
+      periodLabel: formatStandardReportTitle(p.periodType, p.dateShamsi, p.periodLabel)
+    }))
+    .sort(compareReportsLatestFirst);
 
   return {
     version: '2.5',
@@ -1148,31 +1153,34 @@ export async function pushLocalToServer(): Promise<boolean> {
 }
 
 // -----------------------------------------------------------
-// 23:00 NIGHTLY ARCHIVE ENGINE (Archive Only — No Auto-Download)
+// 23:00 NIGHTLY ARCHIVE ENGINE (Strictly Asia/Tehran 23:00, Exclude Fridays)
 // -----------------------------------------------------------
 export function processNightlyArchive(): void {
   try {
-    const now = new Date();
-    const curHour = now.getHours();
-    const curShamsi = getCurrentShamsiDate(now);
+    // Strictly calculate Tehran time (Asia/Tehran)
+    const tehranDateStr = new Date().toLocaleString('en-US', { timeZone: 'Asia/Tehran' });
+    const tehranNow = new Date(tehranDateStr);
+    const curHour = tehranNow.getHours();
+    const curShamsi = getCurrentShamsiDate(tehranNow);
     const allReports = getStoredReports();
     const allPeriodic = getStoredPeriodicReports();
     const archives = getStoredArchives();
 
     const datesToProcess: { dateShamsi: string; dayOfWeek: string }[] = [];
 
-    // If current time is 23:00 or later, today's work day is closed and eligible
-    if (curHour >= 23) {
+    // Friday is strictly holiday: No daily reports are ever processed on Friday
+    if (curHour >= 23 && curShamsi.dayOfWeek !== 'جمعه') {
       datesToProcess.push({
         dateShamsi: curShamsi.formatted,
         dayOfWeek: curShamsi.dayOfWeek
       });
     }
 
-    // Include recent past days (past 7 calendar days)
+    // Include recent past working days (past 7 calendar days, strictly skip Fridays)
     for (let i = 1; i <= 7; i++) {
-      const pastDate = new Date(Date.now() - i * 86400000);
+      const pastDate = new Date(tehranNow.getTime() - i * 86400000);
       const pastShamsi = getCurrentShamsiDate(pastDate);
+      if (pastShamsi.dayOfWeek === 'جمعه') continue; // Friday is strictly holiday
       if (!datesToProcess.some(d => d.dateShamsi === pastShamsi.formatted)) {
         datesToProcess.push({
           dateShamsi: pastShamsi.formatted,
@@ -1181,20 +1189,24 @@ export function processNightlyArchive(): void {
       }
     }
 
-    // Also include any distinct date found in allReports
+    // Also check any distinct date found in allReports (strictly exclude Fridays)
     allReports.forEach(r => {
       const norm = normalizeShamsiDate(r.dateShamsi);
-      if (norm && !datesToProcess.some(d => d.dateShamsi === norm)) {
-        const d = shamsiToDate(norm);
+      if (!norm) return;
+      const d = shamsiToDate(norm);
+      const dayOfWeek = d ? PERSIAN_WEEK_DAYS[d.getDay()] : 'روزانه';
+      if (dayOfWeek === 'جمعه') return; // Exclude Fridays
+      if (!datesToProcess.some(d => d.dateShamsi === norm)) {
         datesToProcess.push({
           dateShamsi: norm,
-          dayOfWeek: d ? PERSIAN_WEEK_DAYS[d.getDay()] : 'روزانه'
+          dayOfWeek
         });
       }
     });
 
-    // 1. Process Daily Calls Archives
+    // 1. Process Daily Calls Archives (Strictly Working Days)
     datesToProcess.forEach(item => {
+      if (item.dayOfWeek === 'جمعه') return;
       const normDate = normalizeShamsiDate(item.dateShamsi);
       const dayReports = allReports.filter(r => normalizeShamsiDate(r.dateShamsi) === normDate);
       if (!dayReports || dayReports.length === 0) return;
@@ -1212,8 +1224,9 @@ export function processNightlyArchive(): void {
       }
     });
 
-    // 2. Process Daily Periodic Overall Reports Archives
+    // 2. Process Daily Periodic Overall Reports Archives (Strictly Working Days)
     datesToProcess.forEach(item => {
+      if (item.dayOfWeek === 'جمعه') return;
       const normDate = normalizeShamsiDate(item.dateShamsi);
       const dayPeriodic = allPeriodic.filter(p => 
         normalizeShamsiDate(p.dateShamsi) === normDate && p.periodType === 'daily'
@@ -1226,12 +1239,12 @@ export function processNightlyArchive(): void {
 
       const countMismatch = !arch || (arch.overallReports || []).length !== dayPeriodic.length;
       if (!arch || countMismatch) {
-        createPeriodicArchiveRecord(dayPeriodic, 'periodic_daily', true, normDate, item.dayOfWeek, 'بایگانی روزانه گزارشات تحلیلی مشاورین');
+        createPeriodicArchiveRecord(dayPeriodic, 'periodic_daily', true, normDate, item.dayOfWeek, 'تحلیلی روزانه عملکرد مشاورین');
       }
     });
 
-    // 3. Process Weekly Periodic Reports Archives (Every Thursday, 23:00)
-    if (isThursday(now) && curHour >= 23) {
+    // 3. Process Weekly Periodic Reports Archives (Strictly Every Thursday at 23:00 Tehran time)
+    if (isThursday(tehranNow) && curHour >= 23) {
       const weekPeriodic = allPeriodic.filter(p => p.periodType === 'weekly');
       if (weekPeriodic.length > 0) {
         const arch = archives.find(a => 
@@ -1239,13 +1252,13 @@ export function processNightlyArchive(): void {
         );
         const countMismatch = !arch || (arch.overallReports || []).length !== weekPeriodic.length;
         if (!arch || countMismatch) {
-          createPeriodicArchiveRecord(weekPeriodic, 'periodic_weekly', true, curShamsi.formatted, curShamsi.dayOfWeek, 'بایگانی هفتگی گزارشات مشاورین (پنج‌شنبه)');
+          createPeriodicArchiveRecord(weekPeriodic, 'periodic_weekly', true, curShamsi.formatted, curShamsi.dayOfWeek, 'تحلیلی هفتگی عملکرد مشاورین (پنج‌شنبه)');
         }
       }
     }
 
-    // 4. Process Monthly Periodic Reports Archives (Last Working Day of Shamsi Month, 23:00)
-    if (isLastWorkingDayOfShamsiMonth(now) && curHour >= 23) {
+    // 4. Process Monthly Periodic Reports Archives (Strictly Last Working Day of Shamsi Month at 23:00 Tehran time)
+    if (isLastWorkingDayOfShamsiMonth(tehranNow) && curHour >= 23) {
       const monthPeriodic = allPeriodic.filter(p => p.periodType === 'monthly');
       if (monthPeriodic.length > 0) {
         const arch = archives.find(a => 
@@ -1253,7 +1266,7 @@ export function processNightlyArchive(): void {
         );
         const countMismatch = !arch || (arch.overallReports || []).length !== monthPeriodic.length;
         if (!arch || countMismatch) {
-          createPeriodicArchiveRecord(monthPeriodic, 'periodic_monthly', true, curShamsi.formatted, curShamsi.dayOfWeek, 'بایگانی ماهانه گزارشات استراتژیک (پایان ماه)');
+          createPeriodicArchiveRecord(monthPeriodic, 'periodic_monthly', true, curShamsi.formatted, curShamsi.dayOfWeek, 'تحلیلی ماهانه استراتژیک (پایان ماه)');
         }
       }
     }
@@ -1345,13 +1358,32 @@ export function getDirectivesForConsultant(consultantId: string, consultantCode?
 }
 
 // -----------------------------------------------------------
+// Helper to strictly reject and filter out any report submitted at or after 19:00
+// Policy rule: No report (daily, weekly, monthly) can be accepted past 19:00 Tehran time.
+// -----------------------------------------------------------
+export function isReportSubmittedPastDeadline(submittedAt?: string): boolean {
+  if (!submittedAt) return false;
+  const eng = toEnglishDigits(submittedAt).trim();
+  const match = eng.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return false;
+  const h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  // Cutoff is 19:00 sharp. Any submission with hours >= 19 (e.g. 19:00, 19:01, 19:15, 19:45, 21:00...)
+  // or after 19 is strictly late and forbidden.
+  return h > 19 || (h === 19 && m > 0);
+}
+
+// -----------------------------------------------------------
 // PERIODIC OVERALL REPORTS (Daily, Weekly, Monthly)
 // -----------------------------------------------------------
 export function getStoredPeriodicReports(): PeriodicOverallReport[] {
   if (cachedOverallReports.length > 0) {
-    return [...cachedOverallReports].sort((a, b) => 
-      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-    );
+    const valid = cachedOverallReports.filter(r => !isReportSubmittedPastDeadline(r.submittedAt));
+    const normalized = valid.map(r => ({
+      ...r,
+      periodLabel: formatStandardReportTitle(r.periodType, r.dateShamsi, r.periodLabel)
+    }));
+    return [...normalized].sort(compareReportsLatestFirst);
   }
 
   try {
@@ -1359,15 +1391,30 @@ export function getStoredPeriodicReports(): PeriodicOverallReport[] {
     if (data) {
       const parsed = JSON.parse(data);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        cachedOverallReports = parsed;
-        return parsed.sort((a, b) => 
-          new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
-        );
+        // Purge any late mock/test reports (submitted after 19:00) to ensure KPI integrity
+        const validParsed = parsed.filter((r: PeriodicOverallReport) => !isReportSubmittedPastDeadline(r.submittedAt));
+        const normalized = validParsed.map((r: PeriodicOverallReport) => ({
+          ...r,
+          periodLabel: formatStandardReportTitle(r.periodType, r.dateShamsi, r.periodLabel)
+        })).sort(compareReportsLatestFirst);
+        cachedOverallReports = normalized;
+        // Persist sanitized data so localStorage is permanently cleaned
+        try {
+          localStorage.setItem(STORAGE_KEYS.OVERALL_REPORTS, JSON.stringify(normalized));
+        } catch (_) {}
+        return normalized;
       }
     }
   } catch (e) {}
 
-  const initial = getInitialPeriodicReports();
+  const initial = getInitialPeriodicReports()
+    .filter(r => !isReportSubmittedPastDeadline(r.submittedAt))
+    .map(r => ({
+      ...r,
+      periodLabel: formatStandardReportTitle(r.periodType, r.dateShamsi, r.periodLabel)
+    }))
+    .sort(compareReportsLatestFirst);
+
   cachedOverallReports = initial;
   if (initial.length > 0) {
     try {
@@ -1378,11 +1425,24 @@ export function getStoredPeriodicReports(): PeriodicOverallReport[] {
 }
 
 export function savePeriodicReport(report: PeriodicOverallReport): void {
+  // Strict 19:00 cutoff validation:
+  // No report of any kind (daily, weekly, monthly) can be registered even 1 minute past 19:00
+  const tehranTime = getTehranTimeInfo();
+  if (tehranTime.hours >= 19) {
+    throw new Error('مهلت قانونی ارسال گزارش (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید. وضعیت شما به عنوان عدم ارسال گزارش ثبت شد.');
+  }
+
+  if (isReportSubmittedPastDeadline(report.submittedAt)) {
+    throw new Error('گزارش‌های ثبت‌شده پس از ساعت ۱۹:۰۰ پذیرفته نمی‌شوند و مشمول عدم ارسال گزارش می‌گردند.');
+  }
+
   const current = getStoredPeriodicReports();
   const existingIdx = current.findIndex(r => r.id === report.id);
 
+  const standardizedLabel = formatStandardReportTitle(report.periodType, report.dateShamsi, report.periodLabel);
   const enriched: PeriodicOverallReport = {
     ...report,
+    periodLabel: standardizedLabel,
     updatedAt: new Date().toISOString()
   };
 
@@ -1392,6 +1452,7 @@ export function savePeriodicReport(report: PeriodicOverallReport): void {
     current.unshift(enriched);
   }
 
+  current.sort(compareReportsLatestFirst);
   cachedOverallReports = current;
   try {
     localStorage.setItem(STORAGE_KEYS.OVERALL_REPORTS, JSON.stringify(current));
