@@ -159,6 +159,8 @@ export interface PeriodicOverallReport {
   challengesOrBarriers?: string; // چالش‌ها و موانع برخورد شده
   plansOrPriorities?: string; // برنامه‌ها و اولویت‌های کاری فردا / دوره بعد
   selfRating?: number; // خودارزیابی مشاور (۱ تا ۵)
+  hasSetMeeting?: boolean; // جلسه ست شد (مربوط به نماد ✓)
+  autoFollowUpEnabled?: boolean; // پیگیری خودکار هوشمند (همواره فعال/disabled)
   
   // فیلدهای ویژه دوره‌های هفتگی و ماهانه
   weeklyFocusGuilds?: string; // ارزیابی صنوف و صنایع کانون توجه (ویژه هفتگی)

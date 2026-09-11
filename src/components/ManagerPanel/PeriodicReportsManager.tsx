@@ -17,7 +17,11 @@ import {
   getCurrentTimeFormatted,
   getDailyReportWindowStatus,
   compareReportsLatestFirst,
-  formatStandardReportTitle
+  formatStandardReportTitle,
+  isDateInCurrentShamsiWeek,
+  isDateInCurrentShamsiMonth,
+  parseShamsiDate,
+  shamsiToDate
 } from '../../utils/shamsi';
 import { FollowUpBadge } from '../common/FollowUpBadge';
 import confetti from 'canvas-confetti';
@@ -51,7 +55,14 @@ import {
   Lock,
   Unlock,
   AlertOctagon,
-  Check
+  Check,
+  Zap,
+  Calendar,
+  Layers,
+  ChevronRight,
+  ChevronLeft,
+  ArrowUpDown,
+  FileText
 } from 'lucide-react';
 
 interface PeriodicReportsManagerProps {
@@ -94,9 +105,12 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
   const [warningModalTarget, setWarningModalTarget] = useState<{ consultant: User; reason: string } | null>(null);
   const [warningMessage, setWarningMessage] = useState('');
 
-  // Follow-up dates table search
+  // Follow-up dates table search, filters and pagination
   const [followUpSearch, setFollowUpSearch] = useState('');
   const [followUpConsultantFilter, setFollowUpConsultantFilter] = useState('all');
+  const [followUpTimeFilter, setFollowUpTimeFilter] = useState<'all' | 'today' | 'this_week' | 'this_month'>('all');
+  const [followUpPage, setFollowUpPage] = useState<number>(1);
+  const [showAllFollowUpRows, setShowAllFollowUpRows] = useState<boolean>(false);
 
   // Daily reporting window status (Tehran time & Friday holiday rules)
   const windowStatus = useMemo(() => {
@@ -184,9 +198,9 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
     return [...list].sort(compareReportsLatestFirst);
   }, [periodicReports, selectedPeriodFilter, selectedConsultantFilter, selectedStatusFilter, searchQuery]);
 
-  // Extract all rows with follow-up dates for the Calendar Follow-up Dates Table
-  const allFollowUpRows = useMemo(() => {
-    const list: {
+  // Extract, normalize and sort all rows by their latest follow-up date/time
+  const { sortedFollowUpRows, timeCounts } = useMemo(() => {
+    type FollowUpItem = {
       reportId: string;
       consultantName: string;
       consultantCode?: string;
@@ -198,7 +212,7 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
       address: string;
       employerConcern: string;
       followUp1: string;
-      followUp1DateShamsi?: string;
+      followUp1DateShamsi: string;
       followUp2: string;
       followUp2DateShamsi?: string;
       followUp3: string;
@@ -207,10 +221,66 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
       followUp4DateShamsi?: string;
       followUpResult: string;
       meetingTopic?: string;
-    }[] = [];
+      latestStepNumber: 1 | 2 | 3 | 4;
+      latestStepCode: string;
+      latestDateShamsi: string;
+      latestTimestamp: number;
+      isToday: boolean;
+      isThisWeek: boolean;
+      isThisMonth: boolean;
+    };
+
+    const list: FollowUpItem[] = [];
 
     allDailyReports.forEach(rep => {
-      rep.rows.forEach(row => {
+      (rep.rows || []).forEach(row => {
+        // Skip completely blank rows
+        if (!row.clientName?.trim() && !row.phone?.trim() && !row.followUp1?.trim()) {
+          return;
+        }
+
+        const f1DateShamsi = row.followUp1DateShamsi || rep.dateShamsi;
+        const f2DateShamsi = row.followUp2DateShamsi || (row.followUp2 ? (row.followUp2Date ? getCurrentShamsiDate(new Date(row.followUp2Date)).formatted : rep.dateShamsi) : undefined);
+        const f3DateShamsi = row.followUp3DateShamsi || (row.followUp3 ? (row.followUp3Date ? getCurrentShamsiDate(new Date(row.followUp3Date)).formatted : rep.dateShamsi) : undefined);
+        const f4DateShamsi = row.followUp4DateShamsi || (row.followUp4 ? (row.followUp4Date ? getCurrentShamsiDate(new Date(row.followUp4Date)).formatted : rep.dateShamsi) : undefined);
+
+        // Determine the latest follow-up step executed
+        let latestStepNumber: 1 | 2 | 3 | 4 = 1;
+        let latestStepCode = row.followUp1 || '';
+        let latestDateShamsi = f1DateShamsi;
+        let latestIsoDate = row.followUp1Date || rep.createdAt;
+
+        if (row.followUp4 && row.followUp4.trim()) {
+          latestStepNumber = 4;
+          latestStepCode = row.followUp4;
+          latestDateShamsi = f4DateShamsi || rep.dateShamsi;
+          latestIsoDate = row.followUp4Date || rep.updatedAt || rep.createdAt;
+        } else if (row.followUp3 && row.followUp3.trim()) {
+          latestStepNumber = 3;
+          latestStepCode = row.followUp3;
+          latestDateShamsi = f3DateShamsi || rep.dateShamsi;
+          latestIsoDate = row.followUp3Date || rep.updatedAt || rep.createdAt;
+        } else if (row.followUp2 && row.followUp2.trim()) {
+          latestStepNumber = 2;
+          latestStepCode = row.followUp2;
+          latestDateShamsi = f2DateShamsi || rep.dateShamsi;
+          latestIsoDate = row.followUp2Date || rep.updatedAt || rep.createdAt;
+        }
+
+        let latestTimestamp = 0;
+        if (latestIsoDate) {
+          const t = new Date(latestIsoDate).getTime();
+          if (!isNaN(t)) latestTimestamp = t;
+        }
+        if (!latestTimestamp && latestDateShamsi) {
+          const d = shamsiToDate(latestDateShamsi);
+          if (d) latestTimestamp = d.getTime();
+        }
+
+        const isToday = latestDateShamsi === curShamsi.formatted;
+        const isThisWeek = isDateInCurrentShamsiWeek(latestDateShamsi);
+        const isThisMonth = isDateInCurrentShamsiMonth(latestDateShamsi);
+
         list.push({
           reportId: rep.id,
           consultantName: rep.consultantName,
@@ -223,23 +293,72 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
           address: row.address,
           employerConcern: row.employerConcern,
           followUp1: row.followUp1,
-          followUp1DateShamsi: row.followUp1DateShamsi || rep.dateShamsi,
-          followUp2: row.followUp2,
-          followUp2DateShamsi: row.followUp2DateShamsi || (row.followUp2 ? rep.dateShamsi : undefined),
-          followUp3: row.followUp3,
-          followUp3DateShamsi: row.followUp3DateShamsi || (row.followUp3 ? rep.dateShamsi : undefined),
-          followUp4: row.followUp4,
-          followUp4DateShamsi: row.followUp4DateShamsi || (row.followUp4 ? rep.dateShamsi : undefined),
+          followUp1DateShamsi: f1DateShamsi,
+          followUp2: row.followUp2 || '',
+          followUp2DateShamsi: f2DateShamsi,
+          followUp3: row.followUp3 || '',
+          followUp3DateShamsi: f3DateShamsi,
+          followUp4: row.followUp4 || '',
+          followUp4DateShamsi: f4DateShamsi,
           followUpResult: row.followUpResult,
-          meetingTopic: row.meetingTopic
+          meetingTopic: row.meetingTopic,
+          latestStepNumber,
+          latestStepCode,
+          latestDateShamsi,
+          latestTimestamp,
+          isToday,
+          isThisWeek,
+          isThisMonth
         });
       });
     });
 
-    return list.filter(item => {
-      if (followUpConsultantFilter !== 'all' && item.consultantName !== followUpConsultantFilter && item.consultantCode !== followUpConsultantFilter) {
+    // CRITICAL REQUIREMENT: Always sort latest follow-up activity to the absolute top row!
+    list.sort((a, b) => {
+      // 1. Compare Shamsi date of latest follow-up (descending, e.g. "1405/06/21" > "1405/06/20")
+      const dateCmp = (b.latestDateShamsi || '').localeCompare(a.latestDateShamsi || '');
+      if (dateCmp !== 0) return dateCmp;
+
+      // 2. Compare exact timestamp (descending)
+      if (b.latestTimestamp !== a.latestTimestamp) {
+        return b.latestTimestamp - a.latestTimestamp;
+      }
+
+      // 3. Higher follow-up step first (Step 4 > Step 3 > Step 2 > Step 1)
+      if (b.latestStepNumber !== a.latestStepNumber) {
+        return b.latestStepNumber - a.latestStepNumber;
+      }
+
+      return b.reportId.localeCompare(a.reportId);
+    });
+
+    // Global counts before filter
+    const counts = {
+      all: list.length,
+      today: list.filter(i => i.isToday).length,
+      this_week: list.filter(i => i.isThisWeek).length,
+      this_month: list.filter(i => i.isThisMonth).length
+    };
+
+    return { sortedFollowUpRows: list, timeCounts: counts };
+  }, [allDailyReports, curShamsi.formatted]);
+
+  // Filtered follow-up rows based on consultant, time filter, and search
+  const filteredFollowUpRows = useMemo(() => {
+    return sortedFollowUpRows.filter(item => {
+      // Consultant filter
+      if (followUpConsultantFilter !== 'all' && 
+          item.consultantName !== followUpConsultantFilter && 
+          item.consultantCode !== followUpConsultantFilter) {
         return false;
       }
+
+      // Time filter
+      if (followUpTimeFilter === 'today' && !item.isToday) return false;
+      if (followUpTimeFilter === 'this_week' && !item.isThisWeek) return false;
+      if (followUpTimeFilter === 'this_month' && !item.isThisMonth) return false;
+
+      // Search filter
       if (followUpSearch.trim()) {
         const q = followUpSearch.toLowerCase().trim();
         const matchesClient = item.clientName?.toLowerCase().includes(q);
@@ -251,7 +370,18 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
       }
       return true;
     });
-  }, [allDailyReports, followUpConsultantFilter, followUpSearch]);
+  }, [sortedFollowUpRows, followUpConsultantFilter, followUpTimeFilter, followUpSearch]);
+
+  // Backward-compatible alias
+  const allFollowUpRows = filteredFollowUpRows;
+
+  // Pagination for 25-row office forms
+  const FOLLOWUP_PAGE_SIZE = 25;
+  const followUpTotalPages = Math.ceil(filteredFollowUpRows.length / FOLLOWUP_PAGE_SIZE) || 1;
+  const currentFollowUpPage = Math.min(Math.max(1, followUpPage), followUpTotalPages);
+  const displayedFollowUpRows = showAllFollowUpRows 
+    ? filteredFollowUpRows 
+    : filteredFollowUpRows.slice((currentFollowUpPage - 1) * FOLLOWUP_PAGE_SIZE, currentFollowUpPage * FOLLOWUP_PAGE_SIZE);
 
   // Handle Review Modal submission
   const handleSaveReview = (status: 'approved' | 'rewarded' | 'warned') => {
@@ -308,34 +438,119 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
     setWarningModalTarget(null);
   };
 
-  // Export Follow-up dates table to Excel
-  const handleExportFollowUpExcel = () => {
-    const data = allFollowUpRows.map(r => ({
-      'مشاور مسئول': r.consultantName,
-      'کد مشاور': r.consultantCode || '—',
-      'تاریخ گزارش اولیه': r.reportDateShamsi,
-      'صنف / اتحادیه': r.guild || '—',
-      'نام کارفرما': r.clientName,
-      'زمینه فعالیت': r.activityField,
-      'تلفن تماس': r.phone,
-      'آدرس': r.address,
-      'دغدغه اصلی کارفرما': r.employerConcern,
-      'نماد پیگیری ۱': r.followUp1,
-      'تاریخ دقیق پیگیری ۱': r.followUp1DateShamsi || r.reportDateShamsi,
-      'نماد پیگیری ۲': r.followUp2 || '—',
-      'تاریخ دقیق پیگیری ۲': r.followUp2DateShamsi || '—',
-      'نماد پیگیری ۳': r.followUp3 || '—',
-      'تاریخ دقیق پیگیری ۳': r.followUp3DateShamsi || '—',
-      'نماد پیگیری ۴': r.followUp4 || '—',
-      'تاریخ دقیق پیگیری ۴': r.followUp4DateShamsi || '—',
-      'نتیجه پیگیری': r.followUpResult,
-      'موضوع جلسه ست شده': r.meetingTopic || '—'
-    }));
+  // Export Follow-up dates table to Excel (paginated into 25 reports per sheet matching 25-row office forms)
+  const handleExportFollowUpExcel = (periodType?: 'all' | 'today' | 'this_week' | 'this_month') => {
+    const targetPeriod = periodType || followUpTimeFilter;
+    let targetRows = sortedFollowUpRows;
 
-    const ws = XLSX.utils.json_to_sheet(data);
+    // Apply consultant filter
+    if (followUpConsultantFilter !== 'all') {
+      targetRows = targetRows.filter(r => r.consultantName === followUpConsultantFilter || r.consultantCode === followUpConsultantFilter);
+    }
+    // Apply search query
+    if (followUpSearch.trim()) {
+      const q = followUpSearch.toLowerCase().trim();
+      targetRows = targetRows.filter(item => {
+        const matchesClient = item.clientName?.toLowerCase().includes(q);
+        const matchesPhone = item.phone?.includes(q);
+        const matchesField = item.activityField?.toLowerCase().includes(q);
+        const matchesConcern = item.employerConcern?.toLowerCase().includes(q);
+        const matchesConsultant = item.consultantName?.toLowerCase().includes(q);
+        return matchesClient || matchesPhone || matchesField || matchesConcern || matchesConsultant;
+      });
+    }
+
+    // Apply period filter
+    let filterLabel = 'جامع_همه';
+    if (targetPeriod === 'today') {
+      targetRows = targetRows.filter(r => r.isToday);
+      filterLabel = 'پیگیری‌های_امروز';
+    } else if (targetPeriod === 'this_week') {
+      targetRows = targetRows.filter(r => r.isThisWeek);
+      filterLabel = 'پیگیری‌های_هفتگی';
+    } else if (targetPeriod === 'this_month') {
+      targetRows = targetRows.filter(r => r.isThisMonth);
+      filterLabel = 'پیگیری‌های_ماهانه';
+    }
+
+    if (targetRows.length === 0) {
+      alert('هیچ رکوردی برای خروجی اکسل در بازه انتخابی یافت نشد.');
+      return;
+    }
+
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'رهگیری تقویمی پیگیری‌ها');
-    XLSX.writeFile(wb, `رهگیری_تقویمی_پیگیری‌ها_${curShamsi.formatted.replace(/\//g, '')}.xlsx`);
+    const CHUNK_SIZE = 25; // Strict requirement: exactly 25 reports per sheet matching Karino's office 25-row forms!
+    const totalPages = Math.ceil(targetRows.length / CHUNK_SIZE);
+
+    for (let p = 0; p < totalPages; p++) {
+      const startIdx = p * CHUNK_SIZE;
+      const endIdx = Math.min((p + 1) * CHUNK_SIZE, targetRows.length);
+      const chunk = targetRows.slice(startIdx, endIdx);
+
+      const sheetData = chunk.map((r, rowIdxInChunk) => ({
+        'ردیف در فرم (۱ تا ۲۵)': toPersianDigits(rowIdxInChunk + 1),
+        'شماره ردیف کل': toPersianDigits(startIdx + rowIdxInChunk + 1),
+        'مشاور مسئول': r.consultantName,
+        'کد مشاور': r.consultantCode || '—',
+        'تاریخ ثبت اولیه': r.reportDateShamsi,
+        'صنف / اتحادیه': r.guild || '—',
+        'نام کارفرما': r.clientName,
+        'زمینه فعالیت': r.activityField,
+        'تلفن تماس': r.phone,
+        'آدرس': r.address,
+        'دغدغه اصلی کارفرما': r.employerConcern,
+        'آخرین مرحله انجام‌شده': `پیگیری ${toPersianDigits(r.latestStepNumber)}`,
+        'تاریخ آخرین پیگیری': r.latestDateShamsi,
+        'نماد پیگیری ۱': r.followUp1,
+        'تاریخ دقیق پیگیری ۱': r.followUp1DateShamsi || r.reportDateShamsi,
+        'نماد پیگیری ۲': r.followUp2 || '—',
+        'تاریخ دقیق پیگیری ۲': r.followUp2DateShamsi || '—',
+        'نماد پیگیری ۳': r.followUp3 || '—',
+        'تاریخ دقیق پیگیری ۳': r.followUp3DateShamsi || '—',
+        'نماد پیگیری ۴': r.followUp4 || '—',
+        'تاریخ دقیق پیگیری ۴': r.followUp4DateShamsi || '—',
+        'نتیجه پیگیری': r.followUpResult,
+        'موضوع جلسه ست شده': r.meetingTopic || '—'
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(sheetData);
+
+      // Set Right-to-Left sheet view
+      ws['!views'] = [{ rightToLeft: true }];
+
+      // Column widths
+      ws['!cols'] = [
+        { wch: 20 }, // ردیف در فرم
+        { wch: 14 }, // شماره کل
+        { wch: 20 }, // مشاور
+        { wch: 12 }, // کد مشاور
+        { wch: 18 }, // تاریخ اولیه
+        { wch: 16 }, // صنف
+        { wch: 24 }, // نام کارفرما
+        { wch: 20 }, // زمینه
+        { wch: 16 }, // تلفن
+        { wch: 30 }, // آدرس
+        { wch: 28 }, // دغدغه
+        { wch: 22 }, // آخرین مرحله
+        { wch: 18 }, // تاریخ آخرین پیگیری
+        { wch: 14 }, // نماد ۱
+        { wch: 16 }, // تاریخ ۱
+        { wch: 14 }, // نماد ۲
+        { wch: 16 }, // تاریخ ۲
+        { wch: 14 }, // نماد ۳
+        { wch: 16 }, // تاریخ ۳
+        { wch: 14 }, // نماد ۴
+        { wch: 16 }, // تاریخ ۴
+        { wch: 24 }, // نتیجه
+        { wch: 25 }  // جلسه
+      ];
+
+      const sheetName = `صفحه ${toPersianDigits(p + 1)} (ردیف ${toPersianDigits(startIdx + 1)} تا ${toPersianDigits(endIdx)})`;
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    }
+
+    const fileName = `رهگیری_${filterLabel}_${curShamsi.formatted.replace(/\//g, '')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
   };
 
   const submittedDailyCount = consultantComplianceList.filter(c => !!c.todayDailyReport).length;
@@ -871,6 +1086,19 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
                       </p>
                     </div>
 
+                    {/* Flags / Badges */}
+                    <div className="flex items-center gap-2 flex-wrap text-[10px]">
+                      <span className="px-2 py-0.5 rounded bg-white text-[#8D5B4C] border border-[#DEC8B0] font-mono">
+                        🔄 پیگیری خودکار فعال
+                      </span>
+                      {rep.hasSetMeeting && (
+                        <span className="px-2 py-0.5 rounded bg-[#E8F5E9] text-[#1B5E20] border border-[#A5D6A7] font-bold flex items-center gap-1">
+                          <Check className="w-3 h-3 text-[#2E7D32]" />
+                          <span>جلسه ست شد (نماد ✓)</span>
+                        </span>
+                      )}
+                    </div>
+
                     {/* Achievements */}
                     {rep.keyAchievements && (
                       <div className="space-y-1 bg-[#E8F5E9] p-3.5 rounded-2xl border border-[#C8E6C9]">
@@ -942,40 +1170,169 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
       {activeSection === 'followup_dates' && (
         <div className="space-y-5 animate-fadeIn">
           
-          {/* Header & Controls */}
+          {/* Header & Controls Card */}
           <div className="bg-white rounded-3xl border border-[#DEC8B0] p-5 sm:p-6 space-y-4 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div>
                 <h3 className="text-sm sm:text-base font-black text-[#2B1810] flex items-center gap-2">
                   <Clock className="w-5 h-5 text-[#9C6644]" />
                   <span>جدول جامع رهگیری تقویمی تاریخ پیگیری‌های ۱ تا ۴</span>
                 </h3>
                 <p className="text-xs text-[#6F4E37] mt-1">
-                  تاریخ دقیق هر تماس و پیگیری کارفرما به تفکیک مراحل، به صورت مجزا از تب یادآوری چرخه ۴ روزه
+                  مرتب‌سازی هوشمند: آخرین پیگیری‌های ثبت‌شده در صدر جدول • خروجی اکسل ۲۵ تایی منطبق با فرم‌های پیگیری دفتری
                 </p>
               </div>
 
-              <div className="flex items-center gap-2.5">
+              {/* Excel Export Actions */}
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   type="button"
-                  onClick={handleExportFollowUpExcel}
+                  onClick={() => handleExportFollowUpExcel()}
                   className="px-4 py-2.5 rounded-2xl bg-[#2D6A4F] hover:bg-[#1B4332] text-white text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+                  title="خروجی اکسل ۲۵ ردیف در هر صفحه مطابق فرم فیزیکی"
                 >
-                  <Download className="w-4 h-4" />
-                  <span>خروجی اکسل رهگیری</span>
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>خروجی اکسل (۲۵ ردیف در صفحه)</span>
+                  <Download className="w-3.5 h-3.5 opacity-80" />
                 </button>
+
+                {/* Quick Period Exports */}
+                <div className="hidden sm:flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-2xl border border-[#DEC8B0]">
+                  <button
+                    type="button"
+                    onClick={() => handleExportFollowUpExcel('today')}
+                    className="px-2.5 py-1 text-[11px] font-bold text-[#1565C0] hover:bg-white rounded-xl transition-colors cursor-pointer"
+                    title="دانلود پیگیری‌های ثبت‌شده امروز در اکسل ۲۵ تایی"
+                  >
+                    ⚡ اکسل امروز ({toPersianDigits(timeCounts.today)})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleExportFollowUpExcel('this_week')}
+                    className="px-2.5 py-1 text-[11px] font-bold text-[#B78103] hover:bg-white rounded-xl transition-colors cursor-pointer"
+                    title="دانلود پیگیری‌های این هفته در اکسل ۲۵ تایی"
+                  >
+                    📅 اکسل این هفته ({toPersianDigits(timeCounts.this_week)})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleExportFollowUpExcel('this_month')}
+                    className="px-2.5 py-1 text-[11px] font-bold text-[#7B1FA2] hover:bg-white rounded-xl transition-colors cursor-pointer"
+                    title="دانلود پیگیری‌های این ماه در اکسل ۲۵ تایی"
+                  >
+                    🗓️ اکسل این ماه ({toPersianDigits(timeCounts.this_month)})
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Filter controls */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 pt-3 border-t border-[#E6DAC8]">
+            {/* Time Filter Tabs (All / Today / This Week / This Month) */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1 border-t border-[#E6DAC8]">
+              <button
+                type="button"
+                onClick={() => {
+                  setFollowUpTimeFilter('all');
+                  setFollowUpPage(1);
+                }}
+                className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                  followUpTimeFilter === 'all'
+                    ? 'bg-[#9C6644] text-white shadow-sm'
+                    : 'bg-[#FAF7F2] hover:bg-[#F5EDE2] text-[#6F4E37] border border-[#DEC8B0]'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>همه پیگیری‌ها</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  followUpTimeFilter === 'all' ? 'bg-white/25 text-white' : 'bg-[#E6DAC8] text-[#5C4033]'
+                }`}>
+                  {toPersianDigits(timeCounts.all)}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFollowUpTimeFilter('today');
+                  setFollowUpPage(1);
+                }}
+                className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                  followUpTimeFilter === 'today'
+                    ? 'bg-[#1565C0] text-white shadow-sm ring-2 ring-[#90CAF9]'
+                    : 'bg-[#E3F2FD]/50 hover:bg-[#E3F2FD] text-[#0D47A1] border border-[#90CAF9]'
+                }`}
+              >
+                <Zap className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                <span>پیگیری‌های امروز</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  followUpTimeFilter === 'today' ? 'bg-white/25 text-white' : 'bg-[#BBDEFB] text-[#0D47A1]'
+                }`}>
+                  {toPersianDigits(timeCounts.today)}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFollowUpTimeFilter('this_week');
+                  setFollowUpPage(1);
+                }}
+                className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                  followUpTimeFilter === 'this_week'
+                    ? 'bg-[#B78103] text-white shadow-sm ring-2 ring-[#FFE082]'
+                    : 'bg-[#FFF8E1]/70 hover:bg-[#FFF8E1] text-[#7A4B00] border border-[#FFE082]'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>پیگیری‌های این هفته</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  followUpTimeFilter === 'this_week' ? 'bg-white/25 text-white' : 'bg-[#FFE082] text-[#5D3800]'
+                }`}>
+                  {toPersianDigits(timeCounts.this_week)}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFollowUpTimeFilter('this_month');
+                  setFollowUpPage(1);
+                }}
+                className={`px-4 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+                  followUpTimeFilter === 'this_month'
+                    ? 'bg-[#7B1FA2] text-white shadow-sm ring-2 ring-[#CE93D8]'
+                    : 'bg-[#F3E5F5]/70 hover:bg-[#F3E5F5] text-[#4A148C] border border-[#CE93D8]'
+                }`}
+              >
+                <CalendarDays className="w-3.5 h-3.5" />
+                <span>پیگیری‌های این ماه</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  followUpTimeFilter === 'this_month' ? 'bg-white/25 text-white' : 'bg-[#E1BEE7] text-[#4A148C]'
+                }`}>
+                  {toPersianDigits(timeCounts.this_month)}
+                </span>
+              </button>
+            </div>
+
+            {/* Smart Sorting Callout */}
+            <div className="flex items-center gap-2.5 bg-[#FFF9E6] border border-[#FFE082] p-3 rounded-2xl text-xs text-[#7A4B00]">
+              <Zap className="w-4 h-4 text-amber-600 shrink-0" />
+              <p className="leading-relaxed">
+                <strong className="font-black">مرتب‌سازی اولویت‌دار:</strong> ردیف‌ها همواره بر اساس آخرین تاریخ و ساعت پیگیری در صدر جدول قرار دارند. اگر مشاوری حتی برای یک مشتری قدیمی پیگیری جدیدی (۱ تا ۴) ثبت کند، آن مشتری فوراً به ردیف شماره ۱ منتقل می‌شود.
+              </p>
+            </div>
+
+            {/* Filter controls: Search & Consultant */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <div className="relative flex-1 w-full">
                 <Search className="w-4 h-4 text-[#8D5B4C] absolute right-3.5 top-2.5" />
                 <input
                   type="text"
                   value={followUpSearch}
-                  onChange={(e) => setFollowUpSearch(e.target.value)}
-                  placeholder="جستجوی نام کارفرما، شماره تماس، زمینه فعالیت یا دغدغه..."
+                  onChange={(e) => {
+                    setFollowUpSearch(e.target.value);
+                    setFollowUpPage(1);
+                  }}
+                  placeholder="جستجوی نام کارفرما، شماره تماس، زمینه فعالیت، دغدغه یا مشاور..."
                   className="w-full bg-[#FAF7F2] border border-[#DEC8B0] focus:border-[#9C6644] rounded-2xl pr-10 pl-3 py-2 text-xs text-[#2B1810] placeholder-[#8D5B4C] focus:outline-none font-medium"
                 />
               </div>
@@ -984,7 +1341,10 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
                 <span className="text-xs text-[#6F4E37] font-bold whitespace-nowrap">مشاور:</span>
                 <select
                   value={followUpConsultantFilter}
-                  onChange={(e) => setFollowUpConsultantFilter(e.target.value)}
+                  onChange={(e) => {
+                    setFollowUpConsultantFilter(e.target.value);
+                    setFollowUpPage(1);
+                  }}
                   className="bg-[#FAF7F2] border border-[#DEC8B0] focus:border-[#9C6644] rounded-2xl px-3 py-2 text-xs text-[#2B1810] font-medium focus:outline-none"
                 >
                   <option value="all">تمام مشاوران</option>
@@ -995,6 +1355,133 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
                   ))}
                 </select>
               </div>
+
+              {(followUpSearch.trim() || followUpConsultantFilter !== 'all' || followUpTimeFilter !== 'all') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFollowUpSearch('');
+                    setFollowUpConsultantFilter('all');
+                    setFollowUpTimeFilter('all');
+                    setFollowUpPage(1);
+                  }}
+                  className="px-3 py-2 rounded-2xl bg-[#E6DAC8] hover:bg-[#DEC8B0] text-[#5C4033] text-xs font-bold transition-all whitespace-nowrap cursor-pointer"
+                >
+                  حذف فیلترها
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Form 25-Row Pagination Bar */}
+          <div className="bg-white rounded-2xl border border-[#DEC8B0] p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-black text-[#5C4033] flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-[#9C6644]" />
+                <span>{showAllFollowUpRows ? 'نمایش پیوسته گزارش‌ها:' : 'ساختار فرم دفتری (۲۵ ردیف در هر فرم/صفحه):'}</span>
+              </span>
+              <span className="text-[#8D5B4C]">
+                {showAllFollowUpRows ? (
+                  <>
+                    نمایش یکجای تمام{' '}
+                    <strong className="text-[#2B1810] font-mono font-bold">
+                      {toPersianDigits(filteredFollowUpRows.length)}
+                    </strong>{' '}
+                    پیگیری (ردیف ۱ تا {toPersianDigits(filteredFollowUpRows.length)})
+                  </>
+                ) : (
+                  <>
+                    نمایش ردیف‌های{' '}
+                    <strong className="text-[#2B1810] font-mono font-bold">
+                      {toPersianDigits(displayedFollowUpRows.length === 0 ? 0 : (currentFollowUpPage - 1) * FOLLOWUP_PAGE_SIZE + 1)}
+                    </strong>{' '}
+                    تا{' '}
+                    <strong className="text-[#2B1810] font-mono font-bold">
+                      {toPersianDigits(Math.min(currentFollowUpPage * FOLLOWUP_PAGE_SIZE, filteredFollowUpRows.length))}
+                    </strong>{' '}
+                    از کل{' '}
+                    <strong className="text-[#9C6644] font-mono font-bold">
+                      {toPersianDigits(filteredFollowUpRows.length)}
+                    </strong>{' '}
+                    پیگیری (فرم {toPersianDigits(currentFollowUpPage)} از {toPersianDigits(followUpTotalPages)})
+                  </>
+                )}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAllFollowUpRows(!showAllFollowUpRows);
+                  setFollowUpPage(1);
+                }}
+                className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  showAllFollowUpRows
+                    ? 'border-[#9C6644] bg-[#9C6644] text-white shadow-xs'
+                    : 'border-[#DEC8B0] bg-[#FAF7F2] hover:bg-[#F5EDE2] text-[#5C4033]'
+                }`}
+              >
+                {showAllFollowUpRows ? (
+                  <>
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>فعال‌سازی صفحه‌بندی ۲۵ تایی</span>
+                  </>
+                ) : (
+                  <>
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>نمایش یکجای همه ردیف‌ها ({toPersianDigits(filteredFollowUpRows.length)})</span>
+                  </>
+                )}
+              </button>
+
+              {!showAllFollowUpRows && followUpTotalPages > 1 && (
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    disabled={currentFollowUpPage <= 1}
+                    onClick={() => setFollowUpPage(p => Math.max(1, p - 1))}
+                    className="p-1.5 rounded-xl border border-[#DEC8B0] disabled:opacity-30 hover:bg-[#FAF7F2] text-[#5C4033] transition-all cursor-pointer disabled:cursor-not-allowed"
+                    title="فرم قبلی"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: followUpTotalPages }, (_, i) => i + 1)
+                      .filter(p => p === 1 || p === followUpTotalPages || Math.abs(p - currentFollowUpPage) <= 2)
+                      .map((p, idx, arr) => {
+                        const showEllipsis = idx > 0 && p - arr[idx - 1] > 1;
+                        return (
+                          <React.Fragment key={p}>
+                            {showEllipsis && <span className="px-1 text-[#8D5B4C]">...</span>}
+                            <button
+                              type="button"
+                              onClick={() => setFollowUpPage(p)}
+                              className={`w-7 h-7 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                                currentFollowUpPage === p
+                                  ? 'bg-[#9C6644] text-white shadow-xs'
+                                  : 'bg-[#FAF7F2] text-[#5C4033] hover:bg-[#F5EDE2] border border-[#DEC8B0]'
+                              }`}
+                            >
+                              {toPersianDigits(p)}
+                            </button>
+                          </React.Fragment>
+                        );
+                      })}
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={currentFollowUpPage >= followUpTotalPages}
+                    onClick={() => setFollowUpPage(p => Math.min(followUpTotalPages, p + 1))}
+                    className="p-1.5 rounded-xl border border-[#DEC8B0] disabled:opacity-30 hover:bg-[#FAF7F2] text-[#5C4033] transition-all cursor-pointer disabled:cursor-not-allowed"
+                    title="فرم بعدی"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -1003,109 +1490,232 @@ export const PeriodicReportsManager: React.FC<PeriodicReportsManagerProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-right border-collapse text-xs">
                 <thead>
-                  <tr className="bg-[#FAF7F2] border-b border-[#DEC8B0] text-[#5C4033]">
-                    <th className="p-3.5 font-bold">#</th>
-                    <th className="p-3.5 font-bold">مشاور</th>
-                    <th className="p-3.5 font-bold">نام کارفرما</th>
-                    <th className="p-3.5 font-bold">حوزه فعالیت</th>
-                    <th className="p-3.5 font-bold">تلفن تماس</th>
-                    <th className="p-3.5 font-bold text-center bg-[#E3F2FD]/50 border-r border-l border-[#DEC8B0] text-[#1565C0]">
-                      پیگیری ۱ (تاریخ)
+                  <tr className="bg-[#FAF7F2] border-b border-[#DEC8B0] text-[#5C4033] text-[11px]">
+                    <th className="py-2.5 px-2 font-bold text-center w-12 sm:w-14 whitespace-nowrap">
+                      {showAllFollowUpRows ? 'ردیف' : 'ردیف فرم'}
                     </th>
-                    <th className="p-3.5 font-bold text-center bg-[#FFF8E1]/60 border-r border-[#DEC8B0] text-[#B78103]">
-                      پیگیری ۲ (تاریخ)
+                    <th className="py-2.5 px-2 font-bold w-24 sm:w-28 whitespace-nowrap">مشاور</th>
+                    <th className="py-2.5 px-2 font-bold w-28 sm:w-32 whitespace-nowrap">نام کارفرما</th>
+                    <th className="py-2.5 px-2 font-bold w-24 sm:w-28 whitespace-nowrap">حوزه فعالیت</th>
+                    <th className="py-2.5 px-1.5 font-bold text-center w-24 whitespace-nowrap">تلفن تماس</th>
+                    <th className="py-2.5 px-2 font-bold text-center bg-[#FFE082]/35 border-r border-l border-[#DEC8B0] text-[#7A4B00] w-28 whitespace-nowrap">
+                      آخرین پیگیری
                     </th>
-                    <th className="p-3.5 font-bold text-center bg-[#F3E5F5]/60 border-r border-[#DEC8B0] text-[#7B1FA2]">
-                      پیگیری ۳ (تاریخ)
+                    <th className="py-2.5 px-1.5 font-bold text-center bg-[#E3F2FD]/50 border-r border-[#DEC8B0] text-[#1565C0] w-20 whitespace-nowrap">
+                      پیگیری ۱
                     </th>
-                    <th className="p-3.5 font-bold text-center bg-[#E8F5E9]/60 border-r border-[#DEC8B0] text-[#2E7D32]">
-                      پیگیری ۴ (تاریخ)
+                    <th className="py-2.5 px-1.5 font-bold text-center bg-[#FFF8E1]/60 border-r border-[#DEC8B0] text-[#B78103] w-20 whitespace-nowrap">
+                      پیگیری ۲
                     </th>
-                    <th className="p-3.5 font-bold">نتیجه نهایی</th>
+                    <th className="py-2.5 px-1.5 font-bold text-center bg-[#F3E5F5]/60 border-r border-[#DEC8B0] text-[#7B1FA2] w-20 whitespace-nowrap">
+                      پیگیری ۳
+                    </th>
+                    <th className="py-2.5 px-1.5 font-bold text-center bg-[#E8F5E9]/60 border-r border-[#DEC8B0] text-[#2E7D32] w-20 whitespace-nowrap">
+                      پیگیری ۴
+                    </th>
+                    <th className="py-2.5 px-3 font-bold min-w-[140px]">نتیجه نهایی / موضوع جلسه</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E6DAC8]">
-                  {allFollowUpRows.length === 0 ? (
+                  {displayedFollowUpRows.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="p-10 text-center text-[#8D5B4C] text-xs font-bold">
-                        هیچ رکوردی برای نمایش یافت نشد.
+                      <td colSpan={11} className="p-10 text-center text-[#8D5B4C] text-xs font-bold">
+                        هیچ رکوردی منطبق با بازه زمانی و فیلترهای انتخابی یافت نشد.
                       </td>
                     </tr>
                   ) : (
-                    allFollowUpRows.map((item, idx) => (
-                      <tr key={idx} className="hover:bg-[#FAF7F2]/60 transition-colors">
-                        <td className="p-3 text-[#8D5B4C] font-mono">{toPersianDigits(idx + 1)}</td>
-                        <td className="p-3 font-bold text-[#5C4033] whitespace-nowrap">
-                          {item.consultantName}
-                        </td>
-                        <td className="p-3 font-black text-[#2B1810] whitespace-nowrap">
-                          {item.clientName}
-                        </td>
-                        <td className="p-3 text-[#5C4033]">{item.activityField}</td>
-                        <td className="p-3 text-[#2B1810] font-mono text-left dir-ltr">{item.phone}</td>
+                    displayedFollowUpRows.map((item, idx) => {
+                      // In 25-row office page mode: 1 to 25 per page
+                      // In continuous mode (showAllFollowUpRows): 1 to N without any reset
+                      const displayRowNumber = idx + 1;
+                      const globalRowNumber = showAllFollowUpRows ? (idx + 1) : ((currentFollowUpPage - 1) * FOLLOWUP_PAGE_SIZE + idx + 1);
 
-                        {/* Step 1 Date */}
-                        <td className="p-2.5 text-center bg-[#E3F2FD]/20 border-r border-l border-[#DEC8B0]">
-                          <div className="flex flex-col items-center gap-1">
-                            <FollowUpBadge code={item.followUp1} size="sm" />
-                            <span className="text-[10px] text-[#1565C0] font-mono font-bold">
-                              {item.followUp1DateShamsi || item.reportDateShamsi}
+                      return (
+                        <tr key={`${item.reportId}-${idx}`} className="hover:bg-[#FAF7F2]/60 transition-colors">
+                          {/* Row Number */}
+                          <td className="py-2 px-1 text-center">
+                            {showAllFollowUpRows ? (
+                              <span className="w-6 h-6 mx-auto rounded-full bg-[#9C6644]/15 text-[#7F4F24] font-mono font-black text-xs flex items-center justify-center">
+                                {toPersianDigits(displayRowNumber)}
+                              </span>
+                            ) : (
+                              <div className="flex flex-col items-center">
+                                <span className="w-6 h-6 rounded-full bg-[#9C6644]/15 text-[#7F4F24] font-mono font-black text-xs flex items-center justify-center">
+                                  {toPersianDigits(displayRowNumber)}
+                                </span>
+                                <span className="text-[9px] text-[#8D5B4C] font-mono mt-0.5" title="شماره ردیف کل">
+                                  کل #{toPersianDigits(globalRowNumber)}
+                                </span>
+                              </div>
+                            )}
+                          </td>
+
+                          {/* Consultant */}
+                          <td className="py-2 px-2 text-[#5C4033]">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-xs truncate max-w-[105px]">{item.consultantName}</span>
+                              {item.consultantCode && (
+                                <span className="text-[9px] text-[#8D5B4C] font-mono">{item.consultantCode}</span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Client Name */}
+                          <td className="py-2 px-2">
+                            <div className="flex flex-col">
+                              <span className="font-black text-xs text-[#2B1810] truncate max-w-[125px]">{item.clientName}</span>
+                              {item.guild && (
+                                <span className="text-[9px] text-[#8D5B4C] truncate max-w-[125px]">{item.guild}</span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Activity Field */}
+                          <td className="py-2 px-2 text-[#5C4033]">
+                            <span className="text-[11px] truncate block max-w-[110px]" title={item.activityField}>
+                              {item.activityField || '—'}
                             </span>
-                          </div>
-                        </td>
+                          </td>
 
-                        {/* Step 2 Date */}
-                        <td className="p-2.5 text-center bg-[#FFF8E1]/20 border-r border-[#DEC8B0]">
-                          {item.followUp2 ? (
-                            <div className="flex flex-col items-center gap-1">
-                              <FollowUpBadge code={item.followUp2} size="sm" />
-                              <span className="text-[10px] text-[#B78103] font-mono font-bold">
-                                {item.followUp2DateShamsi || item.reportDateShamsi}
+                          {/* Phone */}
+                          <td className="py-2 px-1.5 text-center">
+                            <span className="text-[#2B1810] font-mono text-[11px] dir-ltr inline-block">
+                              {item.phone}
+                            </span>
+                          </td>
+
+                          {/* LATEST FOLLOW-UP COLUMN */}
+                          <td className="py-2 px-1.5 text-center bg-[#FFE082]/20 border-r border-l border-[#DEC8B0]">
+                            <div className="flex flex-col items-center justify-center gap-0.5">
+                              <div className="flex items-center gap-1">
+                                <span className="px-1.5 py-0.2 rounded bg-[#7F4F24] text-white text-[9px] font-bold">
+                                  گام {toPersianDigits(item.latestStepNumber)}
+                                </span>
+                                <FollowUpBadge code={item.latestStepCode} size="sm" />
+                              </div>
+                              <span className="text-[10px] font-mono font-bold text-[#2B1810]">
+                                {item.latestDateShamsi}
+                              </span>
+                              {item.isToday && (
+                                <span className="px-1 py-0.2 rounded bg-amber-500 text-white font-bold text-[8px] animate-pulse">
+                                  ⚡ امروز
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Step 1 Date */}
+                          <td className={`py-2 px-1 text-center border-r border-[#DEC8B0] ${
+                            item.latestStepNumber === 1 ? 'bg-[#E3F2FD]/50 ring-1 ring-inset ring-[#90CAF9]' : 'bg-[#E3F2FD]/20'
+                          }`}>
+                            <div className="flex flex-col items-center gap-0.5">
+                              <FollowUpBadge code={item.followUp1} size="sm" />
+                              <span className="text-[9px] text-[#1565C0] font-mono font-bold">
+                                {item.followUp1DateShamsi || item.reportDateShamsi}
                               </span>
                             </div>
-                          ) : (
-                            <span className="text-[11px] text-[#8D5B4C]">—</span>
-                          )}
-                        </td>
+                          </td>
 
-                        {/* Step 3 Date */}
-                        <td className="p-2.5 text-center bg-[#F3E5F5]/20 border-r border-[#DEC8B0]">
-                          {item.followUp3 ? (
-                            <div className="flex flex-col items-center gap-1">
-                              <FollowUpBadge code={item.followUp3} size="sm" />
-                              <span className="text-[10px] text-[#7B1FA2] font-mono font-bold">
-                                {item.followUp3DateShamsi || item.reportDateShamsi}
-                              </span>
+                          {/* Step 2 Date */}
+                          <td className={`py-2 px-1 text-center border-r border-[#DEC8B0] ${
+                            item.latestStepNumber === 2 ? 'bg-[#FFF8E1]/60 ring-1 ring-inset ring-[#FFE082]' : 'bg-[#FFF8E1]/20'
+                          }`}>
+                            {item.followUp2 ? (
+                              <div className="flex flex-col items-center gap-0.5">
+                                <FollowUpBadge code={item.followUp2} size="sm" />
+                                <span className="text-[9px] text-[#B78103] font-mono font-bold">
+                                  {item.followUp2DateShamsi || item.reportDateShamsi}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-[#8D5B4C]">—</span>
+                            )}
+                          </td>
+
+                          {/* Step 3 Date */}
+                          <td className={`py-2 px-1 text-center border-r border-[#DEC8B0] ${
+                            item.latestStepNumber === 3 ? 'bg-[#F3E5F5]/60 ring-1 ring-inset ring-[#CE93D8]' : 'bg-[#F3E5F5]/20'
+                          }`}>
+                            {item.followUp3 ? (
+                              <div className="flex flex-col items-center gap-0.5">
+                                <FollowUpBadge code={item.followUp3} size="sm" />
+                                <span className="text-[9px] text-[#7B1FA2] font-mono font-bold">
+                                  {item.followUp3DateShamsi || item.reportDateShamsi}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-[#8D5B4C]">—</span>
+                            )}
+                          </td>
+
+                          {/* Step 4 Date */}
+                          <td className={`py-2 px-1 text-center border-r border-[#DEC8B0] ${
+                            item.latestStepNumber === 4 ? 'bg-[#E8F5E9]/60 ring-1 ring-inset ring-[#A5D6A7]' : 'bg-[#E8F5E9]/20'
+                          }`}>
+                            {item.followUp4 ? (
+                              <div className="flex flex-col items-center gap-0.5">
+                                <FollowUpBadge code={item.followUp4} size="sm" />
+                                <span className="text-[9px] text-[#2E7D32] font-mono font-bold">
+                                  {item.followUp4DateShamsi || item.reportDateShamsi}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-[#8D5B4C]">—</span>
+                            )}
+                          </td>
+
+                          {/* Final Result / Meeting */}
+                          <td className="py-2 px-3 text-[#2B1810]">
+                            <div className="space-y-1">
+                              <div className="text-[11px] font-bold leading-snug line-clamp-2" title={item.followUpResult}>
+                                {item.followUpResult}
+                              </div>
+                              {item.meetingTopic && (
+                                <div className="text-[9px] text-[#2E7D32] bg-[#E8F5E9] px-1.5 py-0.5 rounded border border-[#A5D6A7] font-medium inline-block truncate max-w-full">
+                                  ✓ جلسه: {item.meetingTopic}
+                                </div>
+                              )}
                             </div>
-                          ) : (
-                            <span className="text-[11px] text-[#8D5B4C]">—</span>
-                          )}
-                        </td>
-
-                        {/* Step 4 Date */}
-                        <td className="p-2.5 text-center bg-[#E8F5E9]/20 border-r border-[#DEC8B0]">
-                          {item.followUp4 ? (
-                            <div className="flex flex-col items-center gap-1">
-                              <FollowUpBadge code={item.followUp4} size="sm" />
-                              <span className="text-[10px] text-[#2E7D32] font-mono font-bold">
-                                {item.followUp4DateShamsi || item.reportDateShamsi}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-[11px] text-[#8D5B4C]">—</span>
-                          )}
-                        </td>
-
-                        <td className="p-3 text-[#2B1810] font-bold whitespace-nowrap">
-                          {item.followUpResult}
-                        </td>
-                      </tr>
-                    ))
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
             </div>
           </div>
+
+          {/* Bottom Pagination for convenience */}
+          {!showAllFollowUpRows && followUpTotalPages > 1 && (
+            <div className="flex items-center justify-between bg-white rounded-2xl border border-[#DEC8B0] p-3 shadow-xs">
+              <span className="text-xs text-[#6F4E37] font-medium">
+                صفحه {toPersianDigits(currentFollowUpPage)} از {toPersianDigits(followUpTotalPages)}
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={currentFollowUpPage <= 1}
+                  onClick={() => setFollowUpPage(p => Math.max(1, p - 1))}
+                  className="px-3 py-1.5 rounded-xl border border-[#DEC8B0] disabled:opacity-30 hover:bg-[#FAF7F2] text-[#5C4033] text-xs font-bold transition-all cursor-pointer disabled:cursor-not-allowed flex items-center gap-1"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                  <span>فرم قبلی</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={currentFollowUpPage >= followUpTotalPages}
+                  onClick={() => setFollowUpPage(p => Math.min(followUpTotalPages, p + 1))}
+                  className="px-3 py-1.5 rounded-xl border border-[#DEC8B0] disabled:opacity-30 hover:bg-[#FAF7F2] text-[#5C4033] text-xs font-bold transition-all cursor-pointer disabled:cursor-not-allowed flex items-center gap-1"
+                >
+                  <span>فرم بعدی</span>
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
 
         </div>
       )}

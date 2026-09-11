@@ -520,4 +520,58 @@ export function formatShamsiDateLong(d?: string | null): string {
   return `${toPersianDigits(p.day)} ${monthName} ${toPersianDigits(p.year)}`;
 }
 
+/**
+ * Iranian Phone Number Validator:
+ * Validates Iranian mobile (09XXXXXXXXX) and landline with city area code (0XXXXXXXXXX, 11 digits starting with 0).
+ */
+export function isValidIranianPhone(phoneStr: string | undefined | null): boolean {
+  if (!phoneStr) return false;
+  const digits = toEnglishDigits(phoneStr).replace(/[\s\-\(\)\.]/g, '');
+  // Mobile: 09 followed by 9 digits (11 digits total), or 9 followed by 9 digits (10 digits)
+  const mobileRegex = /^(?:0)?9\d{9}$/;
+  // Landline: 0 followed by 2 or 3 digit area code + 7 or 8 digits (11 digits total starting with 0)
+  const landlineRegex = /^0\d{10}$/;
+  return mobileRegex.test(digits) || landlineRegex.test(digits);
+}
+
+export function formatIranianPhone(phoneStr: string | undefined | null): string {
+  if (!phoneStr) return '';
+  let digits = toEnglishDigits(phoneStr).replace(/[\s\-\(\)\.]/g, '');
+  if (digits.length === 10 && digits.startsWith('9')) {
+    digits = '0' + digits;
+  }
+  return digits;
+}
+
+/**
+ * Checks if a given Shamsi date falls within the current Persian calendar week (Saturday to Friday)
+ */
+export function isDateInCurrentShamsiWeek(shamsiDateStr?: string | null, referenceDate: Date = new Date()): boolean {
+  if (!shamsiDateStr) return false;
+  const d = shamsiToDate(shamsiDateStr);
+  if (!d) return false;
+
+  // In Persian calendar, week starts on Saturday (شنبه).
+  // JS getDay(): 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat.
+  const dayOfWeek = referenceDate.getDay();
+  const daysSinceSaturday = (dayOfWeek + 1) % 7;
+
+  const saturday = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate() - daysSinceSaturday, 0, 0, 0, 0);
+  const nextFriday = new Date(saturday.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
+
+  const t = d.getTime();
+  return t >= saturday.getTime() && t <= nextFriday.getTime();
+}
+
+/**
+ * Checks if a given Shamsi date falls within the current Persian month
+ */
+export function isDateInCurrentShamsiMonth(shamsiDateStr?: string | null, referenceDate: Date = new Date()): boolean {
+  if (!shamsiDateStr) return false;
+  const cur = getCurrentShamsiDate(referenceDate);
+  const parsed = parseShamsiDate(shamsiDateStr);
+  if (!parsed) return false;
+  return parsed.year === cur.year && parsed.month === cur.month;
+}
+
 

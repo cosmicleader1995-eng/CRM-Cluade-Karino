@@ -50,6 +50,10 @@ export const MorningDashboard: React.FC<MorningDashboardProps> = ({
     return upcomingFollowUps.filter(f => f.statusCategory === 'today');
   }, [upcomingFollowUps]);
 
+  const futureFollowUps = useMemo(() => {
+    return upcomingFollowUps.filter(f => f.statusCategory === 'future');
+  }, [upcomingFollowUps]);
+
   // Calculate consultant's weekly performance
   const weeklyStats = useMemo(() => {
     // Filter reports of current consultant
@@ -176,11 +180,11 @@ export const MorningDashboard: React.FC<MorningDashboardProps> = ({
       </div>
 
       {/* 2. PERFORMANCE & DIRECTIVES METRICS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Metric 1: Overdue Count */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+        {/* Metric 1: Overdue Count (RED) */}
         <div 
           id="stat-overdue-card" 
-          className={`rounded-xl p-5 border transition-all ${
+          className={`rounded-xl p-4 border transition-all ${
             overdueFollowUps.length > 0 
               ? 'bg-rose-950/30 border-rose-500/50 text-rose-200 shadow-lg shadow-rose-950/20' 
               : 'bg-slate-900/50 border-slate-800 text-slate-300'
@@ -189,80 +193,102 @@ export const MorningDashboard: React.FC<MorningDashboardProps> = ({
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-rose-400 flex items-center gap-1.5">
               <ShieldAlert className="w-4 h-4 text-rose-500" />
-              معوق (اقدام فوری)
+              معوق‌ها (قرمز)
             </span>
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 font-bold text-lg">
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 font-bold text-base">
               {overdueFollowUps.length}
             </span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">
-            {overdueFollowUps.length} <span className="text-sm font-normal text-slate-400">تماس معوق</span>
+          <p className="mt-2 text-xl font-bold text-white">
+            {overdueFollowUps.length} <span className="text-xs font-normal text-slate-400">تماس معوق</span>
           </p>
-          <p className="text-xs text-rose-300/80 mt-1">
-            {overdueFollowUps.length > 0 ? 'سررسید گذشته — نیازمند تماس فوری' : 'عالی! هیچ تماس معوقی ندارید.'}
+          <p className="text-[11px] text-rose-300/80 mt-1">
+            {overdueFollowUps.length > 0 ? 'سررسید گذشته — اقدام فوری' : 'عالی! هیچ تماس معوقی ندارید.'}
           </p>
         </div>
 
-        {/* Metric 2: Today's Due */}
+        {/* Metric 2: Today's Due (GREEN) */}
         <div 
           id="stat-today-card" 
-          className="rounded-xl p-5 bg-emerald-950/30 border border-emerald-500/40 text-emerald-200 shadow-lg shadow-emerald-950/20"
+          className="rounded-xl p-4 bg-emerald-950/30 border border-emerald-500/40 text-emerald-200 shadow-lg shadow-emerald-950/20"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-emerald-400 flex items-center gap-1.5">
               <Clock className="w-4 h-4 text-emerald-500" />
-              برنامه امروز
+              تماس‌های امروز (سبز)
             </span>
-            <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-lg">
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-base">
               {todayFollowUps.length}
             </span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">
-            {todayFollowUps.length} <span className="text-sm font-normal text-slate-400">تماس موعد امروز</span>
+          <p className="mt-2 text-xl font-bold text-white">
+            {todayFollowUps.length} <span className="text-xs font-normal text-slate-400">تماس موعد امروز</span>
           </p>
-          <p className="text-xs text-emerald-300/80 mt-1">
-            طبق چرخه ۴ روزه پیگیری دقیق
+          <p className="text-[11px] text-emerald-300/80 mt-1">
+            طبق چرخه ۴ روزه دقیق
           </p>
         </div>
 
-        {/* Metric 3: Weekly Activity */}
+        {/* Metric 3: Future Follow-ups (YELLOW) */}
+        <div 
+          id="stat-future-card" 
+          className="rounded-xl p-4 bg-amber-950/20 border border-amber-500/30 text-amber-200 shadow-lg shadow-amber-950/10"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-amber-400 flex items-center gap-1.5">
+              <Calendar className="w-4 h-4 text-amber-400" />
+              آینده (زرد)
+            </span>
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-bold text-base">
+              {futureFollowUps.length}
+            </span>
+          </div>
+          <p className="mt-2 text-xl font-bold text-white">
+            {futureFollowUps.length} <span className="text-xs font-normal text-slate-400">تماس روزهای آتی</span>
+          </p>
+          <p className="text-[11px] text-amber-300/80 mt-1">
+            موعد پیگیری‌های بعدی
+          </p>
+        </div>
+
+        {/* Metric 4: Weekly Activity */}
         <div 
           id="stat-activity-card" 
-          className="rounded-xl p-5 bg-slate-900/60 border border-slate-800 text-slate-200"
+          className="rounded-xl p-4 bg-slate-900/60 border border-slate-800 text-slate-200"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-indigo-400 flex items-center gap-1.5">
               <TrendingUp className="w-4 h-4 text-indigo-400" />
               عملکرد هفته
             </span>
-            <span className="text-xs text-slate-400 font-mono">هفته جاری</span>
+            <span className="text-[11px] text-slate-400 font-mono">هفته جاری</span>
           </div>
-          <p className="mt-2 text-xl font-bold text-white">
+          <p className="mt-2 text-lg font-bold text-white">
             {weeklyStats.totalCalls} <span className="text-xs font-normal text-slate-400">تماس</span> | {weeklyStats.totalMeetings} <span className="text-xs font-normal text-slate-400">جلسه</span>
           </p>
-          <p className="text-xs text-slate-400 mt-1">
-            {weeklyStats.totalPositive} تماس با اوکی اولیه مثبت (+)
+          <p className="text-[11px] text-slate-400 mt-1">
+            {weeklyStats.totalPositive} تماس مثبت (+)
           </p>
         </div>
 
-        {/* Metric 4: Manager Rating */}
+        {/* Metric 5: Manager Rating */}
         <div 
           id="stat-rating-card" 
-          className="rounded-xl p-5 bg-amber-950/20 border border-amber-500/30 text-amber-200"
+          className="rounded-xl p-4 bg-slate-900/60 border border-slate-800 text-slate-200"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-amber-400 flex items-center gap-1.5">
               <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-              امتیاز مدیریت
+              امتیاز مدیر
             </span>
-            <span className="text-xs font-bold text-amber-300">از ۵.۰</span>
+            <span className="text-[11px] font-bold text-amber-300">از ۵.۰</span>
           </div>
-          <p className="mt-2 text-2xl font-bold text-white flex items-center gap-1.5">
+          <p className="mt-2 text-xl font-bold text-white flex items-center gap-1.5">
             {weeklyStats.avgRating}
-            <span className="text-sm font-normal text-amber-400">/ ۵.۰</span>
+            <span className="text-xs font-normal text-amber-400">/ ۵.۰</span>
           </p>
-          <p className="text-xs text-amber-300/80 mt-1 truncate">
-            وضعیت کلی: عالی و پیشرو
+          <p className="text-[11px] text-amber-300/80 mt-1 truncate">
+            بازخورد: عالی و فعال
           </p>
         </div>
       </div>
@@ -543,6 +569,96 @@ export const MorningDashboard: React.FC<MorningDashboardProps> = ({
                     >
                       <PhoneForwarded className="w-4 h-4" />
                       <span>ثبت پیگیری {item.nextStepNumber}</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 6. FUTURE DAYS SECTION (YELLOW / AMBER - SCHEDULED FOR UPCOMING DAYS) */}
+      <div 
+        id="morning-section-future" 
+        className="rounded-2xl bg-slate-900/90 border-2 border-amber-500/30 overflow-hidden shadow-xl"
+      >
+        <div className="bg-gradient-to-r from-amber-950/60 via-amber-900/30 to-slate-900 px-6 py-4 border-b border-amber-500/30 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40">
+              <Calendar className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                🟡 پیگیری‌های آینده (زرد): {futureFollowUps.length} تماس آتی
+              </h2>
+              <p className="text-xs text-amber-200/80">
+                این پرونده‌ها در چرخه ۴ روزه بعدی قرار دارند و روزهای مانده تا موعد سررسید بعدی را نمایش می‌دهند.
+              </p>
+            </div>
+          </div>
+
+          <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold font-mono">
+            {futureFollowUps.length} پرونده آتی
+          </span>
+        </div>
+
+        <div className="p-5">
+          {futureFollowUps.length === 0 ? (
+            <div className="py-6 text-center text-slate-400 flex flex-col items-center justify-center gap-1.5">
+              <Calendar className="w-8 h-8 text-slate-500" />
+              <p className="text-sm font-medium text-slate-300">هیچ پیگیری آتی برنامه‌ریزی‌شده‌ای ثبت نشده است.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {futureFollowUps.map((item) => (
+                <div
+                  key={`future-${item.reportId}-${item.rowId}`}
+                  className="rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-amber-500/30 hover:border-amber-400/60 p-4 transition-all duration-200 shadow-md flex flex-col justify-between gap-3.5"
+                >
+                  <div className="space-y-1.5 flex-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-700/60 pb-2">
+                      <h4 className="text-base font-bold text-white">
+                        {item.clientName}
+                      </h4>
+                      <span className="px-2.5 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold font-mono">
+                        {item.daysRemaining} روز تا پیگیری {item.nextStepNumber}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
+                      <div className="flex items-center gap-1 text-slate-300">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                        <span>صنف: {item.guild || 'عمومی'}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-slate-300">
+                        <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                        <span>زمینه: {item.activityField || '—'}</span>
+                      </div>
+                      {item.employerConcern && (
+                        <div className="flex items-center gap-1 text-amber-300 font-medium">
+                          <span>دغدغه: {item.employerConcern}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-slate-400">
+                      شماره تماس: <span className="font-mono text-slate-200" dir="ltr">{item.phone}</span>
+                    </p>
+                  </div>
+
+                  {/* Quick Action Buttons */}
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-700/40">
+                    <span className="text-[11px] text-slate-400">
+                      تاریخ تماس اولیه: <span className="font-mono text-slate-300">{item.reportDateShamsi}</span>
+                    </span>
+
+                    <button
+                      onClick={() => onOpenFollowUp(item)}
+                      className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition-all active:scale-95"
+                    >
+                      <PhoneForwarded className="w-3.5 h-3.5" />
+                      <span>ثبت پیگیری زودهنگام {item.nextStepNumber}</span>
                     </button>
                   </div>
                 </div>

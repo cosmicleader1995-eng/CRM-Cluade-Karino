@@ -72,6 +72,28 @@ interface ManagerDashboardProps {
   currentUser: User;
 }
 
+export function getLatestFollowUpOutcome(row: {
+  followUp1?: string;
+  followUp2?: string;
+  followUp3?: string;
+  followUp4?: string;
+  followUpResult?: string;
+}): { symbol: string; label: string; stepNumber: number } {
+  if (row.followUp4 && row.followUp4.trim()) {
+    return { symbol: row.followUp4.trim(), label: `پیگیری ۴`, stepNumber: 4 };
+  }
+  if (row.followUp3 && row.followUp3.trim()) {
+    return { symbol: row.followUp3.trim(), label: `پیگیری ۳`, stepNumber: 3 };
+  }
+  if (row.followUp2 && row.followUp2.trim()) {
+    return { symbol: row.followUp2.trim(), label: `پیگیری ۲`, stepNumber: 2 };
+  }
+  if (row.followUp1 && row.followUp1.trim()) {
+    return { symbol: row.followUp1.trim(), label: `پیگیری ۱`, stepNumber: 1 };
+  }
+  return { symbol: row.followUpResult || '.', label: row.followUpResult || 'بدون نتیجه', stepNumber: 0 };
+}
+
 type TimePeriod = 'today' | 'week' | 'month' | 'all';
 
 interface AggregatedConsultantData {
@@ -1617,14 +1639,20 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                       </div>
 
                       <div className="space-y-1 text-left">
-                        <span className="text-xs text-[#6F4E37] block text-right font-semibold">نتیجه نهایی:</span>
-                        {FOLLOW_UP_STATUS_CODES.some(c => c.code === row.followUpResult) ? (
-                          <FollowUpBadge code={row.followUpResult} showLabel size="sm" />
-                        ) : (
-                          <span className="text-xs text-[#2B1810] font-bold bg-[#FAF7F2] px-2.5 py-1 rounded-xl border border-[#DEC8B0] block max-w-[140px] truncate text-right">
-                            {row.followUpResult || '—'}
-                          </span>
-                        )}
+                        <span className="text-xs text-[#6F4E37] block text-right font-semibold">آخرین نتیجه:</span>
+                        {(() => {
+                          const latest = getLatestFollowUpOutcome(row);
+                          return (
+                            <div className="flex items-center gap-1">
+                              <FollowUpBadge code={latest.symbol} showLabel size="sm" />
+                              {latest.stepNumber > 1 && (
+                                <span className="text-[10px] bg-[#FAF7F2] text-[#8D5B4C] font-bold px-1.5 py-0.5 rounded border border-[#DEC8B0]">
+                                  پ{toPersianDigits(latest.stepNumber)}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
 
@@ -1714,13 +1742,19 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                             </div>
                           </td>
                           <td className="py-3 px-3.5">
-                            {FOLLOW_UP_STATUS_CODES.some(c => c.code === row.followUpResult) ? (
-                              <FollowUpBadge code={row.followUpResult} showLabel size="md" />
-                            ) : (
-                              <span className="text-xs text-[#2B1810] font-bold bg-[#FAF7F2] px-2.5 py-1 rounded-xl border border-[#DEC8B0] block max-w-xs truncate" title={row.followUpResult}>
-                                {row.followUpResult || '—'}
-                              </span>
-                            )}
+                            {(() => {
+                              const latest = getLatestFollowUpOutcome(row);
+                              return (
+                                <div className="flex items-center gap-1.5">
+                                  <FollowUpBadge code={latest.symbol} showLabel size="md" />
+                                  {latest.stepNumber > 1 && (
+                                    <span className="text-[10px] bg-[#FAF7F2] text-[#8D5B4C] font-bold px-1.5 py-0.5 rounded border border-[#DEC8B0]">
+                                      پ{toPersianDigits(latest.stepNumber)}
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </td>
                           <td className="py-3 px-3.5 text-center">
                             {isFeedbacked ? (
@@ -2411,7 +2445,19 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                                               {row.followUp4DateShamsi && <span className="text-[10px] text-[#8D5B4C] font-mono">{row.followUp4DateShamsi.slice(5)}</span>}
                                             </div>
                                           </td>
-                                          <td className="p-2.5 font-bold text-[#2B1810] whitespace-nowrap">{row.followUpResult || '-'}</td>
+                                          <td className="p-2.5 font-bold text-[#2B1810] whitespace-nowrap">
+                                            {(() => {
+                                              const latest = getLatestFollowUpOutcome(row);
+                                              return (
+                                                <div className="flex items-center gap-1.5">
+                                                  <FollowUpBadge code={latest.symbol} size="sm" />
+                                                  <span className="text-xs">
+                                                    {latest.stepNumber > 1 ? `پ${toPersianDigits(latest.stepNumber)} (${latest.symbol})` : (row.followUpResult || latest.symbol)}
+                                                  </span>
+                                                </div>
+                                              );
+                                            })()}
+                                          </td>
                                           <td className="p-2.5 text-[#5C4033] max-w-xs truncate">{row.meetingTopic || '-'}</td>
                                           <td className="p-2.5 text-[#6F4E37] max-w-xs truncate">{row.notes || row.address || '-'}</td>
                                         </tr>
@@ -2766,14 +2812,20 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({ currentUser 
                         <div><strong className="text-[#9C6644]">دغدغه اصلی:</strong> {row.employerConcern}</div>
                         <div><strong>موضوع جلسه:</strong> {row.meetingTopic}</div>
                         <div className="flex items-center gap-2">
-                          <strong className="text-[#2D6A4F]">نتیجه پیگیری:</strong>
-                          {FOLLOW_UP_STATUS_CODES.some(c => c.code === row.followUpResult) ? (
-                            <FollowUpBadge code={row.followUpResult} showLabel size="md" />
-                          ) : (
-                            <span className="text-xs text-[#2B1810] font-bold bg-white px-2.5 py-1 rounded-xl border border-[#DEC8B0]">
-                              {row.followUpResult || 'ثبت نشده'}
-                            </span>
-                          )}
+                          <strong className="text-[#2D6A4F]">آخرین نتیجه پیگیری:</strong>
+                          {(() => {
+                            const latest = getLatestFollowUpOutcome(row);
+                            return (
+                              <div className="flex items-center gap-1.5">
+                                <FollowUpBadge code={latest.symbol} showLabel size="md" />
+                                {latest.stepNumber > 0 && (
+                                  <span className="text-[11px] bg-[#FAF7F2] text-[#8D5B4C] font-bold px-2 py-0.5 rounded border border-[#DEC8B0]">
+                                    ثبت‌شده در پیگیری {toPersianDigits(latest.stepNumber)}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
 

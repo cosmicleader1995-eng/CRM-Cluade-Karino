@@ -63,6 +63,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
   const [plansOrPriorities, setPlansOrPriorities] = useState('');
   const [weeklyFocusGuilds, setWeeklyFocusGuilds] = useState('');
   const [monthlyStrategicNotes, setMonthlyStrategicNotes] = useState('');
+  const [hasSetMeeting, setHasSetMeeting] = useState(false);
   const [selfRating, setSelfRating] = useState<number>(5);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -114,6 +115,7 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
     setPlansOrPriorities(rep.plansOrPriorities || '');
     setWeeklyFocusGuilds(rep.weeklyFocusGuilds || '');
     setMonthlyStrategicNotes(rep.monthlyStrategicNotes || '');
+    setHasSetMeeting(!!rep.hasSetMeeting);
     setSelfRating(rep.selfRating || 5);
     window.scrollTo({ top: 300, behavior: 'smooth' });
   };
@@ -151,6 +153,8 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
       plansOrPriorities: plansOrPriorities.trim(),
       weeklyFocusGuilds: periodType === 'weekly' ? weeklyFocusGuilds.trim() : undefined,
       monthlyStrategicNotes: periodType === 'monthly' ? monthlyStrategicNotes.trim() : undefined,
+      hasSetMeeting,
+      autoFollowUpEnabled: true,
       selfRating,
       submittedAt: getCurrentTimeFormatted(),
       createdAt: new Date().toISOString(),
@@ -500,6 +504,49 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
             </div>
           )}
 
+          {/* Options / Flags: Auto Follow-up (Disabled) & Meeting Set (Symbol ✓) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 p-4 rounded-2xl bg-[#081525] border border-slate-800">
+            {/* Checkbox 1: Auto Follow-up (Disabled) */}
+            <div className="flex items-start gap-3 p-3 rounded-xl bg-[#06101c] border border-slate-800 opacity-90 select-none">
+              <input
+                type="checkbox"
+                id="periodic-auto-followup"
+                checked={true}
+                disabled={true}
+                className="w-4 h-4 mt-0.5 rounded text-amber-500 bg-slate-800 border-slate-600 focus:ring-0 cursor-not-allowed"
+              />
+              <label htmlFor="periodic-auto-followup" className="space-y-0.5 cursor-not-allowed">
+                <span className="text-xs font-bold text-slate-200 block flex items-center gap-1.5">
+                  <span>پیگیری خودکار</span>
+                  <span className="text-[10px] text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20 font-mono">سیستمی</span>
+                </span>
+                <span className="text-[10px] text-slate-400 block leading-relaxed">
+                  پرونده‌ها به‌صورت خودکار در چرخه ۴ روزه ثبت و در پنل روزانه یادآوری می‌شوند.
+                </span>
+              </label>
+            </div>
+
+            {/* Checkbox 2: Set Meeting (Corresponds to ✓ symbol) */}
+            <label className="flex items-start gap-3 p-3 rounded-xl bg-[#06101c] border border-emerald-500/30 hover:border-emerald-500/60 cursor-pointer select-none transition-all">
+              <input
+                type="checkbox"
+                id="periodic-meeting-set"
+                checked={hasSetMeeting}
+                onChange={(e) => setHasSetMeeting(e.target.checked)}
+                className="w-4 h-4 mt-0.5 rounded text-emerald-500 bg-slate-800 border-slate-600 focus:ring-emerald-400 cursor-pointer"
+              />
+              <div className="space-y-0.5">
+                <span className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                  <span>جلسه ست شد</span>
+                  <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">نماد ✓</span>
+                </span>
+                <span className="text-[10px] text-slate-400 block leading-relaxed">
+                  در این دوره حداقل یک جلسه قطعی حضوری یا توافق اولیه با کارفرما محقق شد.
+                </span>
+              </div>
+            </label>
+          </div>
+
           {/* Self-Rating Star Selector */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#081525] border border-slate-800">
             <div className="space-y-0.5">
@@ -620,6 +667,19 @@ export const PeriodicReportsConsultant: React.FC<PeriodicReportsConsultantProps>
 
                   <div className="text-xs text-slate-300 line-clamp-3 leading-relaxed bg-[#06101c] p-3 rounded-xl border border-slate-800/80">
                     {rep.summary}
+                  </div>
+
+                  {/* Badges: Meeting Set and Auto-followup */}
+                  <div className="flex items-center gap-2 flex-wrap text-[10px]">
+                    <span className="px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700/60 font-mono">
+                      🔄 پیگیری خودکار فعال
+                    </span>
+                    {rep.hasSetMeeting && (
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span>جلسه ست شد (✓)</span>
+                      </span>
+                    )}
                   </div>
 
                   {rep.keyAchievements && (

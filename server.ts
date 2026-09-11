@@ -2,6 +2,8 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
 import { 
@@ -13,6 +15,41 @@ import {
 } from './src/utils/shamsi';
 
 dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'karino_secure_jwt_token_secret_2026_crm_management';
+
+// Security and Password Helpers
+function hashPassword(password: string): string {
+  if (!password) return '';
+  if (password.startsWith('$2a$') || password.startsWith('$2b$')) return password;
+  return bcrypt.hashSync(password, 10);
+}
+
+function verifyPassword(plain: string, hashOrPlain: string): boolean {
+  if (!plain || !hashOrPlain) return false;
+  if (hashOrPlain.startsWith('$2a$') || hashOrPlain.startsWith('$2b$')) {
+    try {
+      return bcrypt.compareSync(plain, hashOrPlain);
+    } catch {
+      return false;
+    }
+  }
+  return plain === hashOrPlain;
+}
+
+function generateToken(user: any): string {
+  return jwt.sign(
+    {
+      id: user.id,
+      username: user.username,
+      fullName: user.fullName,
+      role: user.role,
+      consultantCode: user.consultantCode
+    },
+    JWT_SECRET,
+    { expiresIn: '30d' }
+  );
+}
 
 // Local digit conversion function to avoid import issues
 function toEnglishDigits(str: string): string {
@@ -498,7 +535,7 @@ app.post('/api/auth/login', async (req, res) => {
      u.consultantCode?.toLowerCase() === cleanInputEn ||
      u.id?.toLowerCase() === cleanInput ||
      u.id?.toLowerCase() === cleanInputEn) &&
-    (u.password === cleanPass || u.password === cleanPassEn)
+    (verifyPassword(cleanPass, u.password) || verifyPassword(cleanPassEn, u.password))
   );
 
   if (!user) {
@@ -514,6 +551,14 @@ app.post('/api/auth/login', async (req, res) => {
     }
   }
 
+  // If password was stored in plaintext, upgrade to bcrypt hash
+  if (!user.password.startsWith('$2a$') && !user.password.startsWith('$2b$')) {
+    user.password = hashPassword(cleanPass);
+  }
+
+  // Generate secure JWT token
+  const token = generateToken(user);
+
   // Record audit log
   addAuditLog(db, {
     timeShamsi: 'ورود موفق به سامانه',
@@ -524,11 +569,17 @@ app.post('/api/auth/login', async (req, res) => {
 
   await persistDB(db);
 
+  const { password: _pwd, ...sanitizedUser } = user;
+
   return res.json({
     success: true,
-    user,
+    token,
+    user: sanitizedUser,
     db: {
-      users: db.users,
+      users: db.users.map((u: any) => {
+        const { password: _p, ...su } = u;
+        return su;
+      }),
       reports: db.reports,
       archives: db.archives,
       concerns: db.concerns
@@ -555,13 +606,16 @@ app.post('/api/auth/register', async (req, res) => {
     return res.status(400).json({ success: false, message: 'این کد پرسنلی قبلاً در سامانه ثبت گردیده است.' });
   }
 
+  const cleanPass = String(password).trim();
+  const hashedPassword = hashPassword(cleanPass);
+
   const newUser = {
     id: `user-${Date.now()}`,
     username: cleanUsername,
     fullName: String(fullName).trim(),
     consultantCode: cleanCode,
     role: role || 'consultant',
-    password: String(password).trim(),
+    password: hashedPassword,
     phone: phone ? String(phone).trim() : '',
     branch: branch ? String(branch).trim() : 'تیم اجرایی'
   };
@@ -575,11 +629,41 @@ app.post('/api/auth/register', async (req, res) => {
   });
 
   await persistDB(db);
+
+  const token = generateToken(newUser);
+  const { password: _pwd, ...sanitizedUser } = newUser;
+
   return res.json({
     success: true,
-    user: newUser,
-    users: db.users,
+    token,
+    user: sanitizedUser,
+    users: db.users.map((u: any) => {
+      const { password: _p, ...su } = u;
+      return su;
+    }),
     message: 'مشاور جدید با موفقیت در دیتابیس ابری ثبت و در تمامی دستگاه‌ها همگام گردید.'
+  });
+});
+
+// Verify Current Token and Get Authenticated User Profile
+app.get('/api/auth/me', async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'توکن امنیتی ارسال نشده است.' });
+  }
+
+  jwt.verify(token, JWT_SECRET, async (err: any, decoded: any) => {
+    if (err) {
+      return res.status(403).json({ success: false, message: 'توکن نامعتبر یا منقضی شده است.' });
+    }
+    const db = await getDB();
+    const user = db.users.find((u: any) => u.id === decoded.id || u.username === decoded.username);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'کاربر یافت نشد.' });
+    }
+    const { password: _pwd, ...sanitizedUser } = user;
+    return res.json({ success: true, user: sanitizedUser });
   });
 });
 
@@ -615,6 +699,24 @@ app.post('/api/db/sync', async (req, res) => {
 });
 
 // 2. USER Endpoints
+app.get('/api/db/users', async (req, res) => {
+  const db = await getDB();
+  const sanitized = (db.users || []).map((u: any) => {
+    const { password: _p, ...su } = u;
+    return su;
+  });
+  res.json({ success: true, users: sanitized });
+});
+
+app.get('/api/db/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const db = await getDB();
+  const user = db.users.find((u: any) => u.id === id || u.username.toLowerCase() === id.toLowerCase() || u.consultantCode?.toUpperCase() === id.toUpperCase());
+  if (!user) return res.status(404).json({ error: 'کاربر مورد نظر یافت نشد.' });
+  const { password: _p, ...safeUser } = user;
+  res.json({ success: true, user: safeUser });
+});
+
 app.post('/api/db/users', async (req, res) => {
   const user = req.body;
   if (!user || !user.username || !user.role) {
@@ -625,10 +727,15 @@ app.post('/api/db/users', async (req, res) => {
     u.id === user.id || u.username.toLowerCase() === user.username.toLowerCase()
   );
 
+  const processedUser = { ...user };
+  if (processedUser.password) {
+    processedUser.password = hashPassword(processedUser.password);
+  }
+
   if (existingIdx >= 0) {
-    db.users[existingIdx] = { ...db.users[existingIdx], ...user };
+    db.users[existingIdx] = { ...db.users[existingIdx], ...processedUser };
   } else {
-    db.users.push(user);
+    db.users.push(processedUser);
   }
 
   // Add audit log
@@ -640,7 +747,11 @@ app.post('/api/db/users', async (req, res) => {
   });
 
   await persistDB(db);
-  res.json({ success: true, users: db.users });
+  const sanitized = db.users.map((u: any) => {
+    const { password: _p, ...su } = u;
+    return su;
+  });
+  res.json({ success: true, users: sanitized });
 });
 
 app.put('/api/db/users/:id', async (req, res) => {
@@ -650,7 +761,11 @@ app.put('/api/db/users/:id', async (req, res) => {
   const idx = db.users.findIndex((u: any) => u.id === id || u.username.toLowerCase() === id.toLowerCase());
   
   if (idx >= 0) {
-    db.users[idx] = { ...db.users[idx], ...updates };
+    const processedUpdates = { ...updates };
+    if (processedUpdates.password) {
+      processedUpdates.password = hashPassword(processedUpdates.password);
+    }
+    db.users[idx] = { ...db.users[idx], ...processedUpdates };
     addAuditLog(db, {
       timeShamsi: 'ویرایش کاربر',
       category: 'AUTH',
@@ -658,7 +773,12 @@ app.put('/api/db/users/:id', async (req, res) => {
       message: `مشخصات/کلمه عبور کاربر «${db.users[idx].fullName}» به‌روزرسانی شد.`
     });
     await persistDB(db);
-    return res.json({ success: true, user: db.users[idx], users: db.users });
+    const { password: _p, ...safeUser } = db.users[idx];
+    const sanitized = db.users.map((u: any) => {
+      const { password: _pwd, ...su } = u;
+      return su;
+    });
+    return res.json({ success: true, user: safeUser, users: sanitized });
   }
 
   res.status(404).json({ error: 'کاربر مورد نظر یافت نشد.' });
@@ -760,6 +880,11 @@ app.delete('/api/db/reports/:id', async (req, res) => {
 });
 
 // 4. CONCERNS Endpoints
+app.get('/api/db/concerns', async (req, res) => {
+  const db = await getDB();
+  res.json({ success: true, concerns: db.concerns || [] });
+});
+
 app.post('/api/db/concerns', async (req, res) => {
   const { concerns } = req.body;
   if (!Array.isArray(concerns)) {
@@ -851,6 +976,11 @@ app.delete('/api/db/periodic-reports/:id', async (req, res) => {
 
 
 // 5. ARCHIVES Endpoints
+app.get('/api/db/archives', async (req, res) => {
+  const db = await getDB();
+  res.json({ success: true, archives: db.archives || [] });
+});
+
 app.post('/api/db/archive', async (req, res) => {
   const archive = req.body;
   if (!archive || !archive.dateShamsi) {

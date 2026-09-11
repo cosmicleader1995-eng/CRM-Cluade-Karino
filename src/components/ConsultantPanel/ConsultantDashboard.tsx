@@ -11,7 +11,7 @@ import {
   getStoredDirectives
 } from '../../services/storage';
 import { MEETING_TOPICS_LIST, FOLLOW_UP_STATUS_CODES } from '../../data/defaultData';
-import { getCurrentShamsiDate, toPersianDigits, toEnglishDigits, getCurrentTimeFormatted, shamsiToDate, getDailyReportWindowStatus, isFriday } from '../../utils/shamsi';
+import { getCurrentShamsiDate, toPersianDigits, toEnglishDigits, getCurrentTimeFormatted, shamsiToDate, getDailyReportWindowStatus, isFriday, isValidIranianPhone } from '../../utils/shamsi';
 import { exportSingleReportToExcel, printOfficialReport } from '../../utils/export';
 import { FollowUpSelector } from '../common/FollowUpSelector';
 import { FollowUpBadge } from '../common/FollowUpBadge';
@@ -382,7 +382,11 @@ export const ConsultantDashboard: React.FC<ConsultantDashboardProps> = ({ curren
       const num = idx + 1;
       if (!r.clientName.trim()) errors.push(`ردیف ${toPersianDigits(num)}: نام و نام خانوادگی کارفرما الزامی است.`);
       if (!r.activityField.trim()) errors.push(`ردیف ${toPersianDigits(num)}: زمینه فعالیت الزامی است.`);
-      if (!r.phone.trim()) errors.push(`ردیف ${toPersianDigits(num)}: شماره تماس الزامی است.`);
+      if (!r.phone.trim()) {
+        errors.push(`ردیف ${toPersianDigits(num)}: شماره تماس الزامی است.`);
+      } else if (!isValidIranianPhone(r.phone)) {
+        errors.push(`ردیف ${toPersianDigits(num)}: شماره تماس نامعتبر است (همراه ۱۱ رقمی با ۰۹... یا تلفن ثابت با پیش‌شماره معتبر شهر مثل ۰۵۱...).`);
+      }
       if (!r.address.trim()) errors.push(`ردیف ${toPersianDigits(num)}: آدرس الزامی است.`);
       if (!r.employerConcern.trim()) errors.push(`ردیف ${toPersianDigits(num)}: دغدغه کارفرما انتخاب نشده است.`);
       if (!r.followUp1.trim()) {

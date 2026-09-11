@@ -705,6 +705,18 @@ export function saveReport(report: DailyReport): void {
   const reports = getStoredReports();
   const existingIdx = reports.findIndex(r => r.id === report.id);
 
+  // Strict 19:00 cutoff validation for new daily reports:
+  // No report of any kind can be submitted past 19:00
+  if (existingIdx < 0) {
+    const tehranTime = getTehranTimeInfo();
+    if (tehranTime.hours >= 19) {
+      throw new Error('مهلت قانونی ارسال گزارش روزانه (ساعت ۱۹:۰۰ به وقت تهران) به پایان رسیده است و سیستم مسدود گردید. وضعیت شما به عنوان عدم ارسال گزارش ثبت شد.');
+    }
+    if (isReportSubmittedPastDeadline(report.submittedAt)) {
+      throw new Error('گزارش‌های ثبت‌شده پس از ساعت ۱۹:۰۰ پذیرفته نمی‌شوند و مشمول عدم ارسال گزارش می‌گردند.');
+    }
+  }
+
   // Normalize row follow-up dates into Shamsi
   const normalizedRows: ReportRow[] = (report.rows || []).map(row => {
     const r = { ...row };
